@@ -354,7 +354,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-blue-600 to-teal-600 relative overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-        <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
+        <div className="absolute inset-0 opacity-10" />
         <div className="container-custom relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             {t('home.final.title')}

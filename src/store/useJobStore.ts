@@ -1,0 +1,843 @@
+'use client';
+
+// ============================================
+// DentalHire - Jobs Store with Supabase
+// ============================================
+
+import { create } from 'zustand';
+import { getSupabaseClient } from '@/lib/supabase';
+import { Job, JobApplication, EmploymentType } from '@/types';
+
+interface JobState {
+    jobs: Job[];
+    selectedJob: Job | null;
+    isLoading: boolean;
+    userApplications: JobApplication[];
+    clinicApplications: JobApplication[];
+    favorites: string[];
+
+    // Actions
+    loadJobs: () => Promise<void>;
+    loadClinicJobs: (clinicId: string) => Promise<void>;
+    loadUserApplications: (userId: string) => Promise<void>;
+    loadClinicApplications: (clinicId: string) => Promise<void>;
+    updateApplicationStatus: (applicationId: string, status: string) => Promise<boolean>;
+    loadFavorites: (clinicId: string) => Promise<void>;
+    toggleFavorite: (clinicId: string, cvId: string) => Promise<boolean>;
+    addJob: (job: Omit<Job, 'id' | 'createdAt' | 'updatedAt' | 'applications'>) => Promise<boolean>;
+    updateJob: (id: string, updates: Partial<Job>) => Promise<boolean>;
+    deleteJob: (id: string) => Promise<boolean>;
+    setSelectedJob: (job: Job | null) => void;
+    applyToJob: (jobId: string, userId: string, cvId: string) => Promise<'success' | 'duplicate' | 'error'>;
+    searchJobs: (query: string, filters?: JobFilters) => Promise<void>;
+    savedJobs: string[];
+    toggleSavedJob: (jobId: string) => void;
+    subscribeToJobs: () => () => void;
+}
+
+interface JobFilters {
+    location?: string;
+    employmentType?: EmploymentType;
+    salaryMin?: number;
+    salaryMax?: number;
+}
+
+export const useJobStore = create<JobState>()((set, get) => ({
+    jobs: [],
+    selectedJob: null,
+    isLoading: false,
+
+    loadJobs: async () => {
+        set({ isLoading: true });
+        try {
+            const supabase = getSupabaseClient();
+            const { data, error } = await (supabase
+                .from('jobs') as any)
+                .select(`
+          *,
+          clinics!inner(name)
+        `)
+                .eq('status', 'active')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading jobs:', error);
+                return;
+            }
+
+            if (data) {
+                const jobs: Job[] = data.map((job: any) => ({
+                    id: job.id,
+                    clinicId: job.clinic_id,
+                    clinicName: job.clinics?.name || 'Unknown Clinic',
+                    title: job.title,
+                    description: job.description,
+                    requirements: job.requirements || [],
+                    salary: {
+                        min: job.salary_min,
+                        max: job.salary_max,
+                        currency: job.salary_currency,
+                    },
+                    location: job.location,
+                    employmentType: job.employment_type as EmploymentType,
+                    skills: job.skills || [],
+                    status: job.status as 'active' | 'closed' | 'draft',
+                    applications: job.applications || 0,
+                    createdAt: new Date(job.created_at),
+                    updatedAt: new Date(job.updated_at),
+                    gender: job.gender,
+                    workingHours: job.working_hours,
+                }));
+
+                set({ jobs });
+            }
+        } catch (error) {
+            console.error('Error loading jobs:', error);
+        } finally {
+            set({ isLoading: false });
+        }
+    },
+
+    loadClinicJobs: async (clinicId: string) => {
+        console.log('[loadClinicJobs] Starting with clinicId:', clinicId);
+        set({ isLoading: true });
+        try {
+            const supabase = getSupabaseClient();
+
+            // First, let's try a simple query without the join to see if it works
+            const { data: simpleData, error: simpleError } = await (supabase
+                .from('jobs') as any)
+                .select('*')
+                .eq('clinic_id', clinicId);
+
+            console.log('[loadClinicJobs] Simple query result:', { simpleData, simpleError });
+
+            // Now try the full query with join
+            const { data, error } = await (supabase
+                .from('jobs') as any)
+                .select(`
+          *,
+          clinics!inner(name)
+        `)
+                .eq('clinic_id', clinicId)
+                .order('created_at', { ascending: false });
+
+            console.log('[loadClinicJobs] Full query result:', { data, error });
+
+            if (error) {
+                console.error('[loadClinicJobs] Error:', error);
+                // Try using simple data if join fails
+                if (simpleData && simpleData.length > 0) {
+                    console.log('[loadClinicJobs] Using simple data as fallback');
+                    const jobs: Job[] = simpleData.map((job: any) => ({
+                        id: job.id,
+                        clinicId: job.clinic_id,
+                        clinicName: 'My Clinic',
+                        title: job.title,
+                        description: job.description,
+                        requirements: job.requirements || [],
+                        salary: {
+                            min: job.salary_min,
+                            max: job.salary_max,
+                            currency: job.salary_currency,
+                        },
+                        location: job.location,
+                        employmentType: job.employment_type as EmploymentType,
+                        skills: job.skills || [],
+                        status: job.status as 'active' | 'closed' | 'draft',
+                        applications: job.applications || 0,
+                        createdAt: new Date(job.created_at),
+                        updatedAt: new Date(job.updated_at),
+                        gender: job.gender,
+                        workingHours: job.working_hours,
+                    }));
+                    set({ jobs });
+                }
+                return;
+            }
+
+            if (data) {
+                const jobs: Job[] = data.map((job: any) => ({
+                    id: job.id,
+                    clinicId: job.clinic_id,
+                    clinicName: job.clinics?.name || 'Unknown Clinic',
+                    title: job.title,
+                    description: job.description,
+                    requirements: job.requirements || [],
+                    salary: {
+                        min: job.salary_min,
+                        max: job.salary_max,
+                        currency: job.salary_currency,
+                    },
+                    location: job.location,
+                    employmentType: job.employment_type as EmploymentType,
+                    skills: job.skills || [],
+                    status: job.status as 'active' | 'closed' | 'draft',
+                    applications: job.applications || 0,
+                    createdAt: new Date(job.created_at),
+                    updatedAt: new Date(job.updated_at),
+                    gender: job.gender,
+                    workingHours: job.working_hours,
+                }));
+
+                console.log('[loadClinicJobs] Mapped jobs:', jobs.length);
+                set({ jobs });
+            }
+        } catch (error) {
+            console.error('[loadClinicJobs] Catch error:', error);
+        } finally {
+            set({ isLoading: false });
+        }
+    },
+
+    searchJobs: async (query: string, filters?: JobFilters) => {
+        set({ isLoading: true });
+        try {
+            const supabase = getSupabaseClient();
+            let queryBuilder = (supabase
+                .from('jobs') as any)
+                .select(`
+          *,
+          clinics!inner(name)
+        `)
+                .eq('status', 'active');
+
+            if (query) {
+                queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
+            }
+
+            if (filters?.location) {
+                queryBuilder = queryBuilder.ilike('location', `%${filters.location}%`);
+            }
+
+            if (filters?.employmentType) {
+                queryBuilder = queryBuilder.eq('employment_type', filters.employmentType);
+            }
+
+            if (filters?.salaryMin) {
+                queryBuilder = queryBuilder.gte('salary_max', filters.salaryMin);
+            }
+
+            if (filters?.salaryMax) {
+                queryBuilder = queryBuilder.lte('salary_min', filters.salaryMax);
+            }
+
+            const { data, error } = await queryBuilder.order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error searching jobs:', error);
+                return;
+            }
+
+            if (data) {
+                const jobs: Job[] = data.map((job: any) => ({
+                    id: job.id,
+                    clinicId: job.clinic_id,
+                    clinicName: job.clinics?.name || 'Unknown Clinic',
+                    title: job.title,
+                    description: job.description,
+                    requirements: job.requirements || [],
+                    salary: {
+                        min: job.salary_min,
+                        max: job.salary_max,
+                        currency: job.salary_currency,
+                    },
+                    location: job.location,
+                    employmentType: job.employment_type as EmploymentType,
+                    skills: job.skills || [],
+                    status: job.status as 'active' | 'closed' | 'draft',
+                    applications: job.applications || 0,
+                    createdAt: new Date(job.created_at),
+                    updatedAt: new Date(job.updated_at),
+                    gender: job.gender,
+                    workingHours: job.working_hours,
+                }));
+
+                set({ jobs });
+            }
+        } catch (error) {
+            console.error('Error searching jobs:', error);
+        } finally {
+            set({ isLoading: false });
+        }
+    },
+
+    userApplications: [],
+    clinicApplications: [],
+
+    loadUserApplications: async (userId: string) => {
+        set({ isLoading: true });
+        try {
+            const supabase = getSupabaseClient();
+            const { data, error } = await (supabase
+                .from('job_applications') as any)
+                .select(`
+                    *,
+                    jobs:jobs!inner(
+                        *,
+                        clinics:clinics!inner(name)
+                    )
+                `)
+                .eq('user_id', userId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading user applications:', error);
+                return;
+            }
+
+            if (data) {
+                const applications: JobApplication[] = data.map((app: any) => ({
+                    id: app.id,
+                    jobId: app.job_id,
+                    userId: app.user_id,
+                    cvId: app.cv_id,
+                    status: app.status,
+                    appliedAt: new Date(app.created_at),
+                    updatedAt: new Date(app.updated_at || app.created_at),
+                    job: {
+                        id: app.jobs.id,
+                        clinicId: app.jobs.clinic_id,
+                        clinicName: app.jobs.clinics?.name || 'Unknown Clinic',
+                        title: app.jobs.title,
+                        description: app.jobs.description,
+                        requirements: app.jobs.requirements || [],
+                        salary: {
+                            min: app.jobs.salary_min,
+                            max: app.jobs.salary_max,
+                            currency: app.jobs.salary_currency,
+                        },
+                        location: app.jobs.location,
+                        employmentType: app.jobs.employment_type as EmploymentType,
+                        skills: app.jobs.skills || [],
+                        status: app.jobs.status as 'active' | 'closed' | 'draft',
+                        applications: app.jobs.applications || 0,
+                        createdAt: new Date(app.jobs.created_at),
+                        updatedAt: new Date(app.jobs.updated_at),
+
+                        gender: app.jobs.gender,
+                        workingHours: app.jobs.working_hours,
+                    }
+                }));
+
+                set({ userApplications: applications });
+            }
+        } catch (error) {
+            console.error('Error loading user applications:', error);
+        } finally {
+            set({ isLoading: false });
+        }
+    },
+
+
+    loadClinicApplications: async (clinicId: string) => {
+        set({ isLoading: true });
+        try {
+            const supabase = getSupabaseClient();
+
+            // First, get the clinic record to find the actual clinic ID
+            const { data: clinicData, error: clinicError } = await (supabase
+                .from('clinics') as any)
+                .select('id')
+                .eq('user_id', clinicId)
+                .single();
+
+            if (clinicError) {
+                console.error('Error loading clinic:', clinicError);
+                set({ isLoading: false });
+                return;
+            }
+
+            if (!clinicData) {
+                console.log('No clinic found for user:', clinicId);
+                set({ clinicApplications: [], isLoading: false });
+                return;
+            }
+
+            const actualClinicId = clinicData.id;
+            console.log('[loadClinicApplications] Found clinic ID:', actualClinicId);
+
+            // Get all applications for jobs posted by this clinic
+            const { data, error } = await (supabase
+                .from('job_applications') as any)
+                .select(`
+                    *,
+                    jobs:jobs!inner(
+                        *,
+                        clinics:clinics!inner(name)
+                    ),
+                    cvs:cvs!inner(
+                        id,
+                        full_name,
+                        email,
+                        phone,
+                        photo,
+                        city,
+                        skills,
+                        experience
+                    )
+                `)
+                .eq('jobs.clinic_id', actualClinicId)
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading clinic applications:', error);
+                return;
+            }
+
+            console.log('[loadClinicApplications] Found applications:', data?.length || 0);
+
+            if (data) {
+                const applications: JobApplication[] = data.map((app: any) => ({
+                    id: app.id,
+                    jobId: app.job_id,
+                    userId: app.user_id,
+                    cvId: app.cv_id,
+                    status: app.status,
+                    appliedAt: new Date(app.created_at),
+                    updatedAt: new Date(app.updated_at || app.created_at),
+                    job: {
+                        id: app.jobs.id,
+                        clinicId: app.jobs.clinic_id,
+                        clinicName: app.jobs.clinics?.name || 'Unknown Clinic',
+                        title: app.jobs.title,
+                        description: app.jobs.description,
+                        requirements: app.jobs.requirements || [],
+                        salary: {
+                            min: app.jobs.salary_min,
+                            max: app.jobs.salary_max,
+                            currency: app.jobs.salary_currency,
+                        },
+                        location: app.jobs.location,
+                        employmentType: app.jobs.employment_type as EmploymentType,
+                        skills: app.jobs.skills || [],
+                        status: app.jobs.status as 'active' | 'closed' | 'draft',
+                        applications: app.jobs.applications || 0,
+                        createdAt: new Date(app.jobs.created_at),
+                        updatedAt: new Date(app.jobs.updated_at),
+
+                        gender: app.jobs.gender,
+                        workingHours: app.jobs.working_hours,
+                    },
+                    cv: app.cvs ? {
+                        id: app.cvs.id,
+                        fullName: app.cvs.full_name,
+                        email: app.cvs.email,
+                        phone: app.cvs.phone,
+                        photo: app.cvs.photo,
+                        city: app.cvs.city,
+                        skills: app.cvs.skills || [],
+                        experience: app.cvs.experience || [],
+                    } : undefined
+                }));
+
+                set({ clinicApplications: applications });
+            }
+        } catch (error) {
+            console.error('Error loading clinic applications:', error);
+        } finally {
+            set({ isLoading: false });
+        }
+    },
+
+    updateApplicationStatus: async (applicationId: string, status: string) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            const { error } = await (supabase
+                .from('job_applications') as any)
+                .update({
+                    status,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', applicationId);
+
+            if (error) {
+                console.error('Error updating application status:', error);
+                return false;
+            }
+
+            // Update local state
+            set((state) => ({
+                clinicApplications: state.clinicApplications.map((app) =>
+                    app.id === applicationId
+                        ? { ...app, status: status as any, updatedAt: new Date() }
+                        : app
+                ),
+            }));
+
+            return true;
+        } catch (error) {
+            console.error('Error updating application status:', error);
+            return false;
+        }
+    },
+
+    favorites: [],
+
+    loadFavorites: async (clinicId: string) => {
+        console.log('[Favorites] Loading favorites for user_id:', clinicId);
+        const supabase = getSupabaseClient();
+        const { data, error } = await (supabase
+            .from('clinics') as any)
+            .select('favorites')
+            .eq('user_id', clinicId)
+            .single();
+
+        console.log('[Favorites] loadFavorites result:', { data, error: error?.message });
+
+        if (data && data.favorites) {
+            set({ favorites: data.favorites });
+        }
+    },
+
+    toggleFavorite: async (clinicId: string, cvId: string) => {
+        const jobs = get();
+        const { favorites } = jobs;
+
+        // Optimistic Update: Calculate new state
+        const isFavorite = favorites.includes(cvId);
+        const newFavorites = isFavorite
+            ? favorites.filter(id => id !== cvId)
+            : [...favorites, cvId];
+
+        // Apply immediately
+        set({ favorites: newFavorites });
+
+        const supabase = getSupabaseClient();
+        const { error } = await (supabase
+            .from('clinics') as any)
+            .update({ favorites: newFavorites })
+            .eq('user_id', clinicId);
+
+        if (error) {
+            console.error('Error toggling favorite:', error);
+            // Revert changes on error
+            set({ favorites });
+            alert('Failed to update favorite. Please check your internet connection.');
+            return false;
+        }
+        return true;
+    },
+
+    addJob: async (jobData) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            // Debug verify configuration
+            // Debug verify configuration
+            console.log('[addJob] Checking Supabase config...');
+
+            if (!navigator.onLine) {
+                alert('Network Error: You appear to be offline. Please check your internet connection.');
+                return false;
+            }
+
+            console.log('[addJob] Attempting to insert job with clinicId:', jobData.clinicId);
+
+            const { data, error } = await (supabase
+                .from('jobs') as any)
+                .insert({
+                    clinic_id: jobData.clinicId,
+                    title: jobData.title,
+                    description: jobData.description,
+                    requirements: jobData.requirements,
+                    salary_min: jobData.salary.min,
+                    salary_max: jobData.salary.max,
+                    salary_currency: jobData.salary.currency,
+                    location: jobData.location,
+                    employment_type: jobData.employmentType,
+                    skills: jobData.skills,
+                    status: jobData.status,
+                    applications: 0,
+                })
+                .select(`
+          *,
+          clinics!inner(name)
+        `)
+                .single();
+
+            if (error) {
+                console.error('[addJob] Supabase error:', error);
+                // Show the error to the user via alert
+                alert(`Error: ${error.message}\nCode: ${error.code}\nDetails: ${error.details || 'N/A'}`);
+                return false;
+            }
+
+            console.log('[addJob] Job created successfully:', data);
+
+            if (data) {
+                const newJob: Job = {
+                    id: data.id,
+                    clinicId: data.clinic_id,
+                    clinicName: data.clinics?.name || 'Unknown Clinic',
+                    title: data.title,
+                    description: data.description,
+                    requirements: data.requirements || [],
+                    salary: {
+                        min: data.salary_min,
+                        max: data.salary_max,
+                        currency: data.salary_currency,
+                    },
+                    location: data.location,
+                    employmentType: data.employment_type as EmploymentType,
+                    skills: data.skills || [],
+                    status: data.status as 'active' | 'closed' | 'draft',
+                    applications: 0,
+                    createdAt: new Date(data.created_at),
+                    updatedAt: new Date(data.updated_at),
+                    gender: data.gender,
+                    workingHours: data.working_hours,
+                };
+
+                set((state) => ({ jobs: [newJob, ...state.jobs] }));
+                return true;
+            }
+
+            return false;
+        } catch (error: any) {
+            console.error('[addJob] Catch error:', error);
+            alert(`Unexpected error: ${error?.message || 'Unknown error'}`);
+            return false;
+        }
+    },
+
+    updateJob: async (id, updates) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            const updateData: Record<string, unknown> = {};
+            if (updates.title) updateData.title = updates.title;
+            if (updates.description) updateData.description = updates.description;
+            if (updates.requirements) updateData.requirements = updates.requirements;
+            if (updates.salary) {
+                updateData.salary_min = updates.salary.min;
+                updateData.salary_max = updates.salary.max;
+                updateData.salary_currency = updates.salary.currency;
+            }
+            if (updates.location) updateData.location = updates.location;
+            if (updates.employmentType) updateData.employment_type = updates.employmentType;
+            if (updates.skills) updateData.skills = updates.skills;
+            if (updates.status) updateData.status = updates.status;
+            if (updates.gender) updateData.gender = updates.gender;
+            if (updates.workingHours) updateData.working_hours = updates.workingHours;
+
+            const { error } = await (supabase
+                .from('jobs') as any)
+                .update(updateData)
+                .eq('id', id);
+
+            if (error) {
+                console.error('Error updating job:', error);
+                return false;
+            }
+
+            set((state) => ({
+                jobs: state.jobs.map((job) =>
+                    job.id === id ? { ...job, ...updates, updatedAt: new Date() } : job
+                ),
+            }));
+
+            return true;
+        } catch (error) {
+            console.error('Error updating job:', error);
+            return false;
+        }
+    },
+
+    deleteJob: async (id) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            // Use the secure RPC function to delete (handles FK constraints & ownership)
+            const { data, error } = await (supabase as any).rpc('delete_job_safely', { target_job_id: id });
+
+            if (error) {
+                console.error('Error deleting job (RPC):', error);
+                // Fallback to standard delete if RPC doesn't exist yet (backward compatibility)
+                const { error: deleteError } = await (supabase.from('jobs') as any).delete().eq('id', id);
+                if (deleteError) {
+                    console.error('Error deleting job (Standard):', deleteError);
+                    return false;
+                }
+            } else if (!data) {
+                // RPC returned false (not owner or not found)
+                console.warn('RPC returned false. Checking if job exists...');
+
+                // Verify if job actually exists
+                const { data: jobExists } = await (supabase.from('jobs') as any)
+                    .select('id')
+                    .eq('id', id)
+                    .single();
+
+                if (!jobExists) {
+                    console.log('Job no longer exists in DB (Ghost job). Removing from UI.');
+                    // It was already deleted (maybe by deduplication script), so we just clean up UI
+                    set((state) => ({
+                        jobs: state.jobs.filter((job) => job.id !== id),
+                        selectedJob: state.selectedJob?.id === id ? null : state.selectedJob,
+                    }));
+                    return true;
+                }
+
+                console.error('Failed to delete job: Access denied (Job exists but not owned by this clinic)');
+                return false;
+            }
+
+            // Remove from local state
+            set((state) => ({
+                jobs: state.jobs.filter((job) => job.id !== id),
+                selectedJob: state.selectedJob?.id === id ? null : state.selectedJob,
+            }));
+
+            return true;
+        } catch (error) {
+            console.error('Error deleting job:', error);
+            return false;
+        }
+    },
+
+    setSelectedJob: (job) => {
+        set({ selectedJob: job });
+    },
+
+    applyToJob: async (jobId, userId, cvId) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            // Check if already applied
+            const { data: existing } = await (supabase
+                .from('job_applications') as any)
+                .select('id')
+                .eq('job_id', jobId)
+                .eq('user_id', userId)
+                .single();
+
+            if (existing) {
+                console.log('Already applied to this job');
+                return 'duplicate';
+            }
+
+            // Create application
+            const { error } = await (supabase.from('job_applications') as any).insert({
+                job_id: jobId,
+                cv_id: cvId,
+                user_id: userId,
+                status: 'pending',
+            });
+
+            if (error) {
+                console.error('Error applying to job:', error);
+                return 'error';
+            }
+
+            // Increment applications count
+            await (supabase as any).rpc('increment_job_applications', { job_id: jobId });
+
+            // Reload user applications
+            await get().loadUserApplications(userId);
+
+            return 'success';
+        } catch (error) {
+            console.error('Error applying to job:', error);
+            return 'error';
+        }
+    },
+
+    subscribeToJobs: () => {
+        const supabase = getSupabaseClient();
+        console.log('Subscribing to realtime jobs...');
+
+        const channel = supabase
+            .channel('public:jobs')
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'jobs'
+                },
+                (payload) => {
+                    console.log('Realtime job change received:', payload);
+                    const state = get();
+
+                    // Handle DELETE
+                    if (payload.eventType === 'DELETE') {
+                        if (payload.old && payload.old.id) {
+                            console.log('Removing deleted job:', payload.old.id);
+                            set((state) => ({
+                                jobs: state.jobs.filter((job) => job.id !== payload.old.id),
+                                selectedJob: state.selectedJob?.id === payload.old.id ? null : state.selectedJob
+                            }));
+                        } else {
+                            // Fallback if ID is missing (e.g. Replica Identity issue)
+                            console.log('DELETE payload missing ID, reloading all jobs...');
+                            state.loadJobs();
+                        }
+                    }
+                    // Handle UPDATE (Status Change)
+                    else if (payload.eventType === 'UPDATE') {
+                        const newStatus = payload.new.status;
+
+                        // If job became inactive (closed/draft), remove it instantly
+                        if (newStatus !== 'active') {
+                            console.log('Job became inactive, removing:', payload.new.id);
+                            set((state) => ({
+                                jobs: state.jobs.filter((job) => job.id !== payload.new.id),
+                                selectedJob: state.selectedJob?.id === payload.new.id ? null : state.selectedJob
+                            }));
+                        } else {
+                            // Otherwise reload to get updates (e.g. edited title)
+                            state.loadJobs();
+                        }
+                    }
+                    // Handle INSERT
+                    else {
+                        state.loadJobs();
+                    }
+                }
+            )
+            .subscribe((status) => {
+                console.log('Realtime subscription status:', status);
+            });
+
+        // Return unsubscribe function
+        return () => {
+            console.log('Unsubscribing from jobs...');
+            supabase.removeChannel(channel);
+        };
+    },
+
+    savedJobs: [],
+
+    toggleSavedJob: (jobId: string) => {
+        const { savedJobs } = get();
+        const isSaved = savedJobs.includes(jobId);
+        const newSavedJobs = isSaved
+            ? savedJobs.filter((id) => id !== jobId)
+            : [...savedJobs, jobId];
+
+        set({ savedJobs: newSavedJobs });
+
+        // Persist to localStorage
+        if (typeof window !== 'undefined') {
+            try {
+                localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
+            } catch (e) {
+                console.error('Failed to save jobs to localStorage', e);
+            }
+        }
+    },
+}));
+
+// Initialize saved jobs from local storage on client side
+if (typeof window !== 'undefined') {
+    try {
+        const saved = localStorage.getItem('savedJobs');
+        if (saved) {
+            useJobStore.getState().savedJobs = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error('Failed to load saved jobs from localStorage', e);
+    }
+}

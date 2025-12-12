@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Cairo } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers";
+import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AIAssistant } from "@/components/ai";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
@@ -54,7 +55,14 @@ export default function RootLayout({
       <body className={`${inter.variable} ${cairo.variable} font-sans antialiased`}>
         <LanguageProvider>
           <AuthProvider>
-            {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem={false}
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
             <AIAssistant />
           </AuthProvider>
         </LanguageProvider>

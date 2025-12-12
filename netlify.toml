@@ -4,3 +4,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  # Set these in the Netlify UI, this is just a reminder or for local dev if using netlify cli
+  NODE_VERSION = "20"
+

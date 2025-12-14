@@ -1,5 +1,5 @@
 {
-  "name": "temp-app",
+  "name": "dental-hire",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,7 +20,7 @@
     "framer-motion": "^12.23.25",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.556.0",
-    "next": "^15.0.7",
+    "next": "^16.0.10",
     "next-themes": "^0.4.6",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106",
@@ -37,6 +37,8 @@
     "@types/react-dom": "^19",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.19",
+    "eslint": "^9.39.2",
+    "eslint-config-next": "^16.0.10",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "tailwindcss-animate": "^1.0.7",

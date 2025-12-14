@@ -4,7 +4,7 @@
 // DentalHire - Jobs Listing Page
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useJobStore } from '@/store/useJobStore';
@@ -59,6 +59,7 @@ function JobsContent() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'duplicate'>('success');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const hasAutoSelected = useRef(false);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -102,11 +103,12 @@ function JobsContent() {
 
             // Default select first job if no specific job selected yet
             // ONLY if window width is desktop-sized (heuristic)
-            if (!selectedJobId) {
-                // Check for mobile view (768px is standard md breakpoint)
-                const isMobile = window.innerWidth < 768;
+            if (!selectedJobId && !hasAutoSelected.current) {
+                // Check for mobile view (1024px is standard lg breakpoint where split view starts)
+                const isMobile = window.innerWidth < 1024;
                 if (!isMobile) {
                     setSelectedJobId(jobs[0].id);
+                    hasAutoSelected.current = true;
                 }
             }
         }

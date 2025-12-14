@@ -133,6 +133,28 @@ export default function CVWizard() {
         }
     };
 
+    const handleSaveDraft = async () => {
+        if (!user?.id) {
+            addToast('You must be logged in to save draft.', 'error');
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            const success = await saveCV(user.id);
+            if (success) {
+                addToast(t('cv.savedraft_success') || 'Draft saved successfully', 'success');
+            } else {
+                addToast('Failed to save draft.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            addToast('An error occurred while saving.', 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const steps: StepConfig[] = [
         { id: 0, titleKey: 'cv.step.personal', descKey: 'cv.step.personal.desc', icon: <User size={18} />, required: true },
         { id: 1, titleKey: 'cv.step.experience', descKey: 'cv.step.experience.desc', icon: <Briefcase size={18} />, required: true },
@@ -189,9 +211,15 @@ export default function CVWizard() {
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Button variant="ghost" leftIcon={<Save size={18} />}>
+                            <Button
+                                variant="ghost"
+                                leftIcon={<Save size={18} />}
+                                onClick={handleSaveDraft}
+                                loading={isSaving}
+                            >
                                 {t('cv.savedraft')}
                             </Button>
+
                             <Button variant="outline" leftIcon={<Eye size={18} />} onClick={() => setShowPreview(!showPreview)}>
                                 {t('cv.preview')}
                             </Button>
@@ -430,4 +458,3 @@ export default function CVWizard() {
         </div>
     );
 }
-

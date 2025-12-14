@@ -89,21 +89,8 @@ function JobsContent() {
         return () => clearTimeout(debounceTimer);
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
-    // AGGRESSIVE FIX: Force clear URL on mobile mount if sticking
-    useEffect(() => {
-        // Run only on client side mount
-        const isMobile = window.innerWidth < 1024;
-
-        // If we are on mobile AND have an ID param (but user just landed here), 
-        // we forcefully clear it to prevent the "sticky drawer" issue.
-        // We use a small timeout to let the initial router state settle.
-        if (isMobile && jobIdParam) {
-            const newParams = new URLSearchParams(searchParams.toString());
-            newParams.delete('id');
-            // REPLACE the current history entry to wipe the stuck ID
-            router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
-        }
-    }, []); // Run ONCE on mount
+    // Removed aggressive ID clearing useEffect to allow proper deep linking and history management
+    // The previous hack at lines 92-106 was interfering with legitimate navigation.
 
     // Ref to block race conditions during closing
     const isClosingRef = useRef(false);
@@ -113,14 +100,9 @@ function JobsContent() {
     const selectedJobId = jobIdParam;
 
     // Navigation Helpers
-    // If we want "Optimistic UI", we can just rely on Next.js 13 router usually being fast enough for params
-    // OR we can implement a transition state if needed, but for now simplicity is key to fixing the bug.
     const handleJobSelect = (jobId: string) => {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set('id', jobId);
-        // Using replace for smoother browsing on mobile? No, Push is better for "Back" button to work (History)
-        // BUT for the "Drawer" pattern, sometimes Replace is preferred if we treat it as a modal.
-        // However, user wants "Back" button to close it. So PUSH is correct (addToHistory).
         router.push(`/jobs?${newParams.toString()}`, { scroll: false });
     };
 
@@ -129,32 +111,12 @@ function JobsContent() {
         e?.preventDefault();
         e?.stopPropagation();
 
-        // 1. Set Lock to prevent useEffect from re-opening (if any exists)
-        // isClosingRef.current = true; // Not using ref anymore due to complete URL-state derivation
-
-        // 2. Navigation
-        // On mobile, "Back" should feel like closing the modal.
-        // If we "Pushed" to get here (via Link), then "Back" should pop the history.
-        // However, if we arrived via Deep Link, "Back" should go to /jobs.
-
-        // Check if we can go back safely?
-        // window.history.length > 2 is a heuristic.
-        // Safer approach: Always Replace to /jobs to guarantee we land on the list.
-        // BUT, user complained about "Freeze" which might be due to Replace Loop.
-        // Let's try Push? No, Push adds to history.
-        // "Back" button implies going UP or BACK.
-
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
 
-        // CRITICAL FIX: Use router.push to /jobs instead of replace? 
-        // No, replace is correct to "Close" without adding "Closed State" to history.
-        // But if the user hit "Back" hardware button, they want to go back.
-        // Let's use router.replace('/jobs') as the standard "Close" action.
-
-        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+        // Use push to ensure reliable navigation and state update
+        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
     };
-
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 
     // Helper to determine role from title/desc

@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useJobStore } from '@/store/useJobStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCVStore } from '@/store/useCVStore';
@@ -48,6 +48,7 @@ function JobsContent() {
     const { user } = useAuthStore();
     const { cvId, loadCV } = useCVStore();
     const router = useRouter();
+    const pathname = usePathname();
     const searchParams = useSearchParams();
     const jobIdParam = searchParams.get('id');
     const { language } = useLanguage();
@@ -129,11 +130,20 @@ function JobsContent() {
     };
 
     // Reset closing state when selectedJobId changes (i.e., when navigation effectively completes)
+    // Reset closing state and handle navigation reset
     useEffect(() => {
         if (!selectedJobId) {
             setIsClosing(false);
         }
-    }, [selectedJobId]);
+
+        // Defensive: Force close drawer if we are on base /jobs path without ID
+        // This handles cases where Sidebar navigation might have happened
+        const currentParams = new URLSearchParams(searchParams.toString());
+        if (pathname === '/jobs' && !currentParams.has('id')) {
+            // Ensure no lingering state
+            setIsClosing(false);
+        }
+    }, [selectedJobId, pathname, searchParams]);
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 

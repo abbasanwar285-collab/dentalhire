@@ -225,7 +225,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
             <aside
                 className={cn(
-                    'fixed start-0 top-0 h-full bg-white dark:bg-gray-900 border-e border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 pt-20',
+                    'fixed start-0 top-0 h-full bg-white dark:bg-gray-900 border-e border-gray-200 dark:border-gray-800 z-[100] transition-all duration-300 pt-20',
                     isCollapsed ? 'w-20' : 'w-64',
                     // Mobile styles: translate off-screen if closed, fully visible if open
                     'transform md:transform-none',

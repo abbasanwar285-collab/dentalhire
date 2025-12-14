@@ -101,7 +101,7 @@ export default function Navbar() {
     return (
         <nav
             className={cn(
-                'fixed top-0 start-0 end-0 z-50 transition-all duration-300',
+                'fixed top-0 start-0 end-0 z-[100] transition-all duration-300',
                 isScrolled
                     ? 'bg-white/80 backdrop-blur-lg shadow-md dark:bg-gray-900/80'
                     : 'bg-transparent'

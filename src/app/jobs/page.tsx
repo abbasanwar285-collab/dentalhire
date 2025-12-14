@@ -125,8 +125,9 @@ function JobsContent() {
         const newQuery = newParams.toString();
         const newPath = newQuery ? `/jobs?${newQuery}` : '/jobs';
 
-        // Use push to create a new history entry (Standard navigation behavior)
-        router.push(newPath, { scroll: false });
+        // Use replace to avoid building a history stack of "Open Drawer" states
+        // This stops the "Back button loop" where back takes you to the drawer again
+        router.replace(newPath, { scroll: false });
     };
 
     // Reset closing state when selectedJobId changes (i.e., when navigation effectively completes)

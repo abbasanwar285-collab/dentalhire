@@ -11,14 +11,25 @@ interface JobCardProps {
     onClick?: () => void;
 }
 
-export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
+import Link from 'next/link';
+
+interface JobCardProps {
+    job: Job;
+    isSelected?: boolean;
+    onClick?: () => void;
+    href?: string;
+    scroll?: boolean;
+}
+
+export default function JobCard({ job, isSelected, onClick, href, scroll = false }: JobCardProps) {
     const { language } = useLanguage();
     const { savedJobs, toggleSavedJob } = useJobStore();
 
     const isSaved = savedJobs.includes(job.id);
 
     const handleSave = (e: React.MouseEvent) => {
-        e.stopPropagation();
+        e.preventDefault(); // Prevent Link navigation
+        e.stopPropagation(); // Stop bubbling
         toggleSavedJob(job.id);
     };
 
@@ -32,11 +43,11 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
         return language === 'ar' ? types[type]?.ar || type : types[type]?.en || type.replace('_', ' ');
     };
 
-    return (
+    const cardContent = (
         <Card
             hover
-            onClick={onClick}
-            className={`cursor-pointer transition-all duration-300 group
+            onClick={!href ? onClick : undefined} // Only bind onClick if NOT using Link (or if Link usage requires it, but usually Link handles click)
+            className={`cursor-pointer transition-all duration-300 group h-full
                 ${isSelected
                     ? 'ring-1 ring-blue-500 border-blue-500 shadow-lg scale-[1.02] bg-blue-50/10 dark:bg-blue-900/10'
                     : 'hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 hover:-translate-y-0.5'
@@ -73,8 +84,9 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
                         </div>
                         <button
                             onClick={handleSave}
+                            type="button" // Explicitly type button to avoid submit issues
                             aria-label={isSaved ? "Unsave job" : "Save job"}
-                            className={`p-2 rounded-full transition-colors ${isSaved
+                            className={`p-2 rounded-full transition-colors z-10 relative ${isSaved
                                 ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
                                 : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
                                 }`}
@@ -145,4 +157,14 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
             </div>
         </Card>
     );
+
+    if (href) {
+        return (
+            <Link href={href} scroll={scroll} className="block h-full" onClick={onClick}>
+                {cardContent}
+            </Link>
+        );
+    }
+
+    return cardContent;
 }

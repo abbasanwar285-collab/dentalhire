@@ -129,10 +129,29 @@ function JobsContent() {
         e?.preventDefault();
         e?.stopPropagation();
 
-        // Simply update URL to remove 'id'.
-        // This causes 'jobIdParam' to become null -> 'selectedJobId' becomes null -> Drawer closes.
+        // 1. Set Lock to prevent useEffect from re-opening (if any exists)
+        // isClosingRef.current = true; // Not using ref anymore due to complete URL-state derivation
+
+        // 2. Navigation
+        // On mobile, "Back" should feel like closing the modal.
+        // If we "Pushed" to get here (via Link), then "Back" should pop the history.
+        // However, if we arrived via Deep Link, "Back" should go to /jobs.
+
+        // Check if we can go back safely?
+        // window.history.length > 2 is a heuristic.
+        // Safer approach: Always Replace to /jobs to guarantee we land on the list.
+        // BUT, user complained about "Freeze" which might be due to Replace Loop.
+        // Let's try Push? No, Push adds to history.
+        // "Back" button implies going UP or BACK.
+
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
+
+        // CRITICAL FIX: Use router.push to /jobs instead of replace? 
+        // No, replace is correct to "Close" without adding "Closed State" to history.
+        // But if the user hit "Back" hardware button, they want to go back.
+        // Let's use router.replace('/jobs') as the standard "Close" action.
+
         router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
     };
 
@@ -559,8 +578,9 @@ function JobsContent() {
                                         <JobCard
                                             key={job.id}
                                             job={job}
-                                            isSelected={selectedJob?.id === job.id}
-                                            onClick={() => handleJobSelect(job.id)}
+                                            isSelected={selectedJobId === job.id}
+                                            href={`/jobs?id=${job.id}`}
+                                            scroll={false}
                                         />
                                     ))}
                                 </div>

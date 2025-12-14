@@ -130,12 +130,12 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             return [
                 { href: `/${currentContext}/dashboard`, label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
                 { href: '/jobs', label: t('sidebar.findjobs') || 'Find Jobs', icon: <Search size={20} /> },
-                { href: `/${currentContext}/cv-builder`, label: t('sidebar.cvbuilder'), icon: <FileText size={20} /> },
+                { href: '/job-seeker/cv-builder', label: t('sidebar.cvbuilder'), icon: <FileText size={20} /> },
                 // Fix: Redirect all job seeker sub-roles to the main job-seeker profile page
                 { href: '/job-seeker/profile', label: t('sidebar.myprofile'), icon: <User size={20} /> },
-                { href: `/${currentContext}/applications`, label: t('sidebar.applications'), icon: <Briefcase size={20} /> },
+                { href: '/job-seeker/applications', label: t('sidebar.applications'), icon: <Briefcase size={20} /> },
                 { href: '/messages', label: t('sidebar.messages'), icon: <MessageSquare size={20} /> },
-                { href: `/${currentContext}/settings`, label: t('sidebar.settings'), icon: <Settings size={20} /> },
+                { href: '/job-seeker/settings', label: t('sidebar.settings'), icon: <Settings size={20} /> },
             ];
         }
 

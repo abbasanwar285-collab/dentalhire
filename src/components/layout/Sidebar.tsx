@@ -57,16 +57,33 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
     // Get current role context from URL or user profile
     const getCurrentContext = () => {
+        if (!pathname) return null;
+
         // e.g. /dentist/dashboard -> dentist
-        const segment = pathname?.split('/')[1];
+        const segments = pathname.split('/');
         const validRoles = ['dentist', 'assistant', 'dental_assistant', 'sales', 'sales_rep', 'secretary', 'media', 'technician', 'dental_technician', 'clinic', 'company', 'lab'];
-        if (segment && validRoles.includes(segment)) {
-            // Normalize some roles
-            if (segment === 'dental_assistant') return 'assistant';
-            if (segment === 'dental_technician') return 'technician';
-            if (segment === 'sales_rep') return 'sales';
-            return segment;
+
+        // Check first few segments for role (handling potential locale prefix)
+        const foundRole = segments.find(s => validRoles.includes(s));
+
+        if (foundRole) {
+            if (foundRole === 'dental_assistant') return 'assistant';
+            if (foundRole === 'dental_technician') return 'technician';
+            if (foundRole === 'sales_rep') return 'sales';
+            return foundRole;
         }
+
+        // Fallback: Use userType from profile if available
+        if (user?.userType) {
+            const type = user.userType;
+            if (validRoles.includes(type)) {
+                if (type === 'dental_assistant') return 'assistant';
+                if (type === 'dental_technician') return 'technician';
+                if (type === 'sales_rep') return 'sales';
+                return type;
+            }
+        }
+
         return null;
     };
 
@@ -200,14 +217,14 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             {/* Mobile Overlay */}
             {isOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity"
+                    className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
                     onClick={onClose}
                 />
             )}
 
             <aside
                 className={cn(
-                    'fixed start-0 top-0 h-full bg-white dark:bg-gray-900 border-e border-gray-200 dark:border-gray-800 z-40 transition-all duration-300 pt-20',
+                    'fixed start-0 top-0 h-full bg-white dark:bg-gray-900 border-e border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 pt-20',
                     isCollapsed ? 'w-20' : 'w-64',
                     // Mobile styles: translate off-screen if closed, fully visible if open
                     'transform md:transform-none',

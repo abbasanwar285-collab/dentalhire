@@ -121,9 +121,11 @@ function JobsContent() {
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
 
+        const newQuery = newParams.toString();
+        const newPath = newQuery ? `/jobs?${newQuery}` : '/jobs';
+
         // Use push to create a new history entry (Standard navigation behavior)
-        // This is often more reliable on mobile than replace for "Back" actions
-        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
+        router.push(newPath, { scroll: false });
     };
 
     // Reset closing state when selectedJobId changes (i.e., when navigation effectively completes)

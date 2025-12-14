@@ -129,6 +129,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
             return [
                 { href: `/${currentContext}/dashboard`, label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
+                { href: '/jobs', label: t('sidebar.findjobs') || 'Find Jobs', icon: <Search size={20} /> },
                 { href: `/${currentContext}/cv-builder`, label: t('sidebar.cvbuilder'), icon: <FileText size={20} /> },
                 // Fix: Redirect all job seeker sub-roles to the main job-seeker profile page
                 { href: '/job-seeker/profile', label: t('sidebar.myprofile'), icon: <User size={20} /> },
@@ -303,6 +304,11 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                                 isCollapsed && 'justify-center px-2'
                                             )}
                                             title={isCollapsed ? link.label : undefined}
+                                            onClick={() => {
+                                                if (window.innerWidth < 768 && onClose) {
+                                                    onClose();
+                                                }
+                                            }}
                                         >
                                             <span className={cn(
                                                 'flex-shrink-0',

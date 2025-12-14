@@ -28,7 +28,8 @@ import {
     Clock,
     Filter,
     SlidersHorizontal,
-    Menu
+    Menu,
+    X
 } from 'lucide-react';
 
 // New Components
@@ -58,6 +59,8 @@ function JobsContent() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'duplicate'>('success');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    // Optimistic UI state for closing drawer immediately
+    const [isClosing, setIsClosing] = useState(false);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -112,13 +115,23 @@ function JobsContent() {
         e?.preventDefault();
         e?.stopPropagation();
 
+        // Optimistic UI: Visually close immediately
+        setIsClosing(true);
+
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
 
-        // Use replace to ensure we "close" the modal in history, 
-        // preventing the "back button loop" issue on mobile.
-        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+        // Use push to create a new history entry (Standard navigation behavior)
+        // This is often more reliable on mobile than replace for "Back" actions
+        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
     };
+
+    // Reset closing state when selectedJobId changes (i.e., when navigation effectively completes)
+    useEffect(() => {
+        if (!selectedJobId) {
+            setIsClosing(false);
+        }
+    }, [selectedJobId]);
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 
@@ -725,7 +738,7 @@ function JobsContent() {
                         )}
 
                         {/* Mobile Job Details Sheet/Drawer */}
-                        <div className={`fixed inset-0 z-50 lg:hidden transition-transform duration-300 transform ${selectedJobId ? 'translate-x-0' : (language === 'ar' ? '-translate-x-full' : 'translate-x-full')} bg-white dark:bg-gray-900 overflow-y-auto`}>
+                        <div className={`fixed inset-0 z-50 lg:hidden transition-transform duration-300 transform ${(selectedJobId && !isClosing) ? 'translate-x-0' : (language === 'ar' ? '-translate-x-full' : 'translate-x-full')} bg-white dark:bg-gray-900 overflow-y-auto`}>
                             {selectedJob && (
                                 <div className="min-h-screen pb-20">
                                     {/* Mobile Header */}
@@ -740,6 +753,14 @@ function JobsContent() {
                                         <h2 className="font-bold text-lg text-gray-900 dark:text-white truncate">
                                             {selectedJob.title}
                                         </h2>
+                                        <button
+                                            onClick={(e) => handleBackToJobs(e)}
+                                            className="p-2 -mr-2 ms-auto rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                                            aria-label="Close"
+                                            type="button"
+                                        >
+                                            <X size={24} />
+                                        </button>
                                     </div>
 
                                     <div className="p-5 space-y-6">

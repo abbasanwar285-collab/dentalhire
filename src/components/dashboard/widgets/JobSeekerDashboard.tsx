@@ -228,15 +228,17 @@ export default function JobSeekerDashboard() {
                         {savedJobItems.length > 0 ? (
                             <div className="space-y-3">
                                 {savedJobItems.slice(0, 3).map(job => (
-                                    <div key={job.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-pointer">
-                                        <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-muted-foreground">
-                                            <Briefcase size={16} />
+                                    <Link key={job.id} href={`/jobs?id=${job.id}`} className="block">
+                                        <div className="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors cursor-pointer">
+                                            <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-muted-foreground">
+                                                <Briefcase size={16} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{job.title}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-300 truncate">{job.location}</p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm text-gray-900 dark:text-white truncate">{job.title}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-300 truncate">{job.location}</p>
-                                        </div>
-                                    </div>
+                                    </Link>
                                 ))}
                                 <Link href="/job-seeker/favorites" className="block text-center text-sm text-blue-600 hover:underline mt-2">
                                     {language === 'ar' ? 'عرض كل المحفوظات' : 'View All Saved'}

@@ -385,6 +385,25 @@ export default function ClinicSearchPage() {
         return role ? role.label : roleId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     };
 
+    const getExperienceLabel = (experience: any[]) => {
+        if (!experience || experience.length === 0) return language === 'ar' ? 'حديث التخرج' : 'Fresh Graduate';
+
+        const totalMonths = experience.reduce((acc, exp) => {
+            if (!exp.startDate) return acc;
+            const start = new Date(exp.startDate);
+            const end = exp.current ? new Date() : (exp.endDate ? new Date(exp.endDate) : new Date());
+            const months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+            return acc + (months > 0 ? months : 0);
+        }, 0);
+
+        if (totalMonths < 12) return language === 'ar' ? 'أقل من سنة' : 'Less than 1 year';
+
+        const years = Math.floor(totalMonths / 12);
+        return language === 'ar'
+            ? `${years} ${years > 2 && years < 11 ? 'سنوات' : 'سنة'} خبرة`
+            : `${years} Year${years > 1 ? 's' : ''} Exp`;
+    };
+
     return (
         <div className="space-y-6 animate-fade-in pb-12">
             {/* Header with Search Bar */}
@@ -762,15 +781,21 @@ export default function ClinicSearchPage() {
                                                 {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
                                             </h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                                                {match.cv?.experience?.[0]?.title || t.dentalProfessional}
+                                                {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
                                             </p>
-                                            <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin size={12} /> {match.cv?.personalInfo?.city || 'Iraq'}
+                                            <div className="flex flex-col gap-1.5 mt-2 text-xs text-gray-500">
+                                                <span className="flex items-center gap-1.5 truncate" title={match.cv?.location?.preferred?.[0] || match.cv?.personalInfo?.city || ''}>
+                                                    <MapPin size={12} className="flex-shrink-0" />
+                                                    {match.cv?.location?.preferred?.[0] || match.cv?.personalInfo?.city || 'Iraq'}
                                                 </span>
-                                                <span className="flex items-center gap-1">
-                                                    <DollarSign size={12} /> {(match.cv?.salary?.expected / 1000).toFixed(0)} ألف د.ع
-                                                </span>
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Briefcase size={12} /> {getExperienceLabel(match.cv.experience)}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                                        <DollarSign size={12} /> {(match.cv?.salary?.expected / 1000).toFixed(0)}k
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className="flex flex-wrap gap-1 mt-3 h-12 overflow-hidden">
                                                 {match.cv?.skills?.slice(0, 3).map((skill: string) => (
@@ -802,7 +827,7 @@ export default function ClinicSearchPage() {
                                                         {match.cv.personalInfo.fullName}
                                                     </h3>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                        {match.cv.experience[0]?.title || t.dentalProfessional} • {match.cv.personalInfo.city}
+                                                        {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
                                                     </p>
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {match.cv.skills.slice(0, 4).map((skill: string) => (
@@ -811,11 +836,11 @@ export default function ClinicSearchPage() {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
-                                                    <span className="flex items-center gap-1">
-                                                        <MapPin size={14} /> {match.cv.personalInfo.city}
+                                                    <span className="flex items-center gap-1" title={match.cv.location.preferred?.[0] || match.cv.personalInfo.city}>
+                                                        <MapPin size={14} /> <span className="truncate max-w-[150px]">{match.cv.location.preferred?.[0] || match.cv.personalInfo.city}</span>
                                                     </span>
                                                     <span className="flex items-center gap-1">
-                                                        <Briefcase size={14} /> {match.cv.experience[0]?.title || t.dentalProfessional}
+                                                        <Briefcase size={14} /> {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
                                                     </span>
                                                     <span className="flex items-center gap-1">
                                                         <DollarSign size={14} /> {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع

@@ -123,7 +123,7 @@ export default function ApplicationsPage() {
                     {userApplications.map((application) => (
                         <div
                             key={application.id}
-                            className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow"
+                            className="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow"
                         >
                             <div className="flex flex-col md:flex-row gap-6 justify-between">
                                 <div className="space-y-4 flex-1">

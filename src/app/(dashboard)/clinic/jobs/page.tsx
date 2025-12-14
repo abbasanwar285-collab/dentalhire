@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react';
 import { useJobStore } from '@/store/useJobStore';
 import { useAuthStore } from '@/store';
-import { Card, Button, Input } from '@/components/shared';
+import { Card, Button, Input, TimeSelect } from '@/components/shared';
 import { useSearchParams } from 'next/navigation';
 import { iraqLocations } from '@/data/iraq_locations';
 import { formatRelativeTime, formatTime } from '@/lib/utils';
@@ -480,37 +480,23 @@ export default function ClinicJobsPage() {
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                     {t.workingHours}
                                 </label>
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
-                                            {t.from}
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={form.workingHours.start}
-                                            onChange={(e) => setForm({
-                                                ...form,
-                                                workingHours: { ...form.workingHours, start: e.target.value }
-                                            })}
-                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                                            aria-label={`${t.workingHours} ${t.from}`}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">
-                                            {t.to}
-                                        </label>
-                                        <input
-                                            type="time"
-                                            value={form.workingHours.end}
-                                            onChange={(e) => setForm({
-                                                ...form,
-                                                workingHours: { ...form.workingHours, end: e.target.value }
-                                            })}
-                                            className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                                            aria-label={`${t.workingHours} ${t.to}`}
-                                        />
-                                    </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <TimeSelect
+                                        label={t.from}
+                                        value={form.workingHours.start}
+                                        onChange={(val) => setForm({
+                                            ...form,
+                                            workingHours: { ...form.workingHours, start: val }
+                                        })}
+                                    />
+                                    <TimeSelect
+                                        label={t.to}
+                                        value={form.workingHours.end}
+                                        onChange={(val) => setForm({
+                                            ...form,
+                                            workingHours: { ...form.workingHours, end: val }
+                                        })}
+                                    />
                                 </div>
                             </div>
 
@@ -538,9 +524,9 @@ export default function ClinicJobsPage() {
             <div className="space-y-4">
                 {clinicJobs.map((job) => (
                     <Card key={job.id}>
-                        <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                                <div className="flex items-center gap-3">
+                        <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                            <div className="flex-1 w-full">
+                                <div className="flex items-center gap-3 flex-wrap">
                                     <h3 className="font-semibold text-gray-900 dark:text-white">
                                         {job.title}
                                     </h3>
@@ -555,7 +541,7 @@ export default function ClinicJobsPage() {
                                         {getStatusLabel(job.status)}
                                     </span>
                                 </div>
-                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                                <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 flex-wrap">
                                     <span className="flex items-center gap-1">
                                         <MapPin size={14} /> {job.location}
                                     </span>
@@ -580,7 +566,7 @@ export default function ClinicJobsPage() {
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-4 mt-3">
+                                <div className="flex items-center gap-4 mt-3 flex-wrap">
                                     <span className="flex items-center gap-1 text-blue-600">
                                         <Users size={16} /> {job.applications} {t.applicants}
                                     </span>
@@ -589,7 +575,7 @@ export default function ClinicJobsPage() {
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 w-full md:w-auto justify-end">
                                 <button
                                     onClick={() => handleEdit(job)}
                                     className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"

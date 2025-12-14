@@ -53,7 +53,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                         id={inputId}
                         type={type}
                         className={cn(
-                            'w-full px-4 py-2.5 text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200',
+                            'w-full px-4 py-2.5 text-base md:text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all duration-200',
                             'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
                             'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50 dark:disabled:bg-gray-900',
                             error

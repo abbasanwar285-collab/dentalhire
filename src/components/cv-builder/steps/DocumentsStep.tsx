@@ -16,9 +16,9 @@ export default function DocumentsStep() {
     const [uploading, setUploading] = useState(false);
 
     const documentTypes = [
+        { type: 'identification', label: language === 'ar' ? 'هوية تعريفية' : 'Identification', icon: <File size={20} />, accept: '.pdf,.jpg,.png' },
         { type: 'resume', label: language === 'ar' ? 'السيرة الذاتية (PDF)' : 'Resume/CV (PDF)', icon: <FileText size={20} />, accept: '.pdf,.doc,.docx' },
         { type: 'certification', label: language === 'ar' ? 'شهادة' : 'Certification', icon: <File size={20} />, accept: '.pdf,.jpg,.png' },
-        { type: 'license', label: language === 'ar' ? 'ترخيص' : 'License', icon: <File size={20} />, accept: '.pdf,.jpg,.png' },
         { type: 'portfolio', label: language === 'ar' ? 'نماذج أعمال' : 'Portfolio/Work Samples', icon: <File size={20} />, accept: '.pdf,.jpg,.png,.zip' },
         { type: 'other', label: language === 'ar' ? 'مستند آخر' : 'Other Document', icon: <File size={20} />, accept: '.pdf,.doc,.docx,.jpg,.png' },
     ];

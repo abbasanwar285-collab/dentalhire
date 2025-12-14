@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import {
   Briefcase,
   Building2,
@@ -120,11 +121,13 @@ export default function HomePage() {
         </div>
       </div>
 
+      <LanguageSwitcher className="fixed top-6 end-6 z-50" />
+
       <div className="w-full max-w-4xl relative z-10">
         {step === 'initial' ? (
           <div className="space-y-12 animate-fade-in">
             <div className="text-center space-y-4">
-              <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
                 {language === 'ar' ? 'مرحباً بك في مستقبل التوظيف' : 'Welcome to the Future of Hiring'}
               </h1>
               <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
@@ -136,10 +139,10 @@ export default function HomePage() {
               {/* Job Seeker Option */}
               <button
                 onClick={() => setStep('role_selection')}
-                className="group relative flex flex-col items-center p-8 md:p-12 rounded-3xl bg-white dark:bg-gray-800 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-500 shadow-xl shadow-gray-200/50 dark:shadow-none hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
+                className="group relative flex flex-col items-center p-6 md:p-12 rounded-3xl bg-white dark:bg-gray-800 border-2 border-transparent hover:border-blue-500 dark:hover:border-blue-500 shadow-xl shadow-gray-200/50 dark:shadow-none hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 transform hover:-translate-y-1"
               >
-                <div className="w-24 h-24 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-8 group-hover:scale-110 transition-transform duration-300">
-                  <Briefcase size={40} strokeWidth={1.5} />
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 md:mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <Briefcase size={32} className="md:w-10 md:h-10" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                   {language === 'ar' ? 'أبحث عن وظيفة' : 'I am looking for a job'}
@@ -156,10 +159,10 @@ export default function HomePage() {
               {/* Clinic Option */}
               <button
                 onClick={() => handleRoleSelect('clinic')}
-                className="group relative flex flex-col items-center p-8 md:p-12 rounded-3xl bg-white dark:bg-gray-800 border-2 border-transparent hover:border-teal-500 dark:hover:border-teal-500 shadow-xl shadow-gray-200/50 dark:shadow-none hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 transform hover:-translate-y-1"
+                className="group relative flex flex-col items-center p-6 md:p-12 rounded-3xl bg-white dark:bg-gray-800 border-2 border-transparent hover:border-teal-500 dark:hover:border-teal-500 shadow-xl shadow-gray-200/50 dark:shadow-none hover:shadow-2xl hover:shadow-teal-500/10 transition-all duration-300 transform hover:-translate-y-1"
               >
-                <div className="w-24 h-24 rounded-2xl bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-8 group-hover:scale-110 transition-transform duration-300">
-                  <Building2 size={40} strokeWidth={1.5} />
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-6 md:mb-8 group-hover:scale-110 transition-transform duration-300">
+                  <Building2 size={32} className="md:w-10 md:h-10" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
                   {language === 'ar' ? 'أبحث عن موظفين' : 'I am looking for employees'}

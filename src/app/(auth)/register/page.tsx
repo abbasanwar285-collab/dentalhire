@@ -267,11 +267,11 @@ function RegisterContent() {
         <div className="w-full">
             <div className="w-full">
                 {/* Language Toggle */}
-                <LanguageSwitcher />
+                <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
                 {/* Main Content Area */}
                 <div className="bg-transparent pt-12">
-                    <div className="p-8">
+                    <div className="p-4 md:p-8">
                         {/* Error Message */}
                         {error && (
                             <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3">
@@ -298,7 +298,7 @@ function RegisterContent() {
                                                 setSelectedRole(role.value as 'job_seeker' | 'clinic');
                                                 setStep(2);
                                             }}
-                                            className="group relative flex-1 min-w-[300px] min-h-[320px] p-10 rounded-[2.5rem] border-2 border-gray-100 dark:border-gray-700 hover:border-transparent transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800 shadow-sm hover:shadow-2xl flex flex-col items-center justify-center transform hover:-translate-y-2"
+                                            className="group relative flex-1 w-full md:w-auto md:min-w-[300px] min-h-[220px] md:min-h-[320px] p-6 md:p-10 rounded-[2rem] border-2 border-gray-100 dark:border-gray-700 hover:border-transparent transition-all duration-300 overflow-hidden bg-white dark:bg-gray-800 shadow-sm hover:shadow-2xl flex flex-col items-center justify-center transform hover:-translate-y-2"
                                         >
                                             <div className={`absolute inset-0 bg-gradient-to-br ${role.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
                                             <div className="relative z-10 flex flex-col items-center text-center space-y-8">
@@ -349,7 +349,7 @@ function RegisterContent() {
                                     </p>
                                 </div>
 
-                                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto py-8">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-5xl mx-auto py-8">
                                     {(selectedRole === 'clinic' ? employerTypes : jobSeekerTypes).map((type) => {
                                         const colorVariants: Record<string, {
                                             border: string;

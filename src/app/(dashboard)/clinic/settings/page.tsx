@@ -1,13 +1,104 @@
 'use client';
 
 import { useAuthStore } from '@/store';
-import { Button } from '@/components/shared';
+import { getSupabaseClient } from '@/lib/supabase';
+import { Button, useToast } from '@/components/shared';
 import { Lock, Building2, CreditCard, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useState } from 'react';
 
 export default function ClinicSettingsPage() {
-    const { user } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
+    const { addToast } = useToast();
+    const [isSaving, setIsSaving] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Local state for fields
+    const [firstName, setFirstName] = useState(user?.profile?.firstName || '');
+    const [lastName, setLastName] = useState(user?.profile?.lastName || '');
+
+    const handlePasswordChange = async () => {
+        if (!newPassword || !confirmPassword) {
+            addToast(
+                language === 'ar' ? 'يرجى إدخال كلمة المرور وتأكيدها' : 'Please enter and confirm password',
+                'error'
+            );
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            addToast(
+                language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
+                'error'
+            );
+            return;
+        }
+
+        if (newPassword.length < 6) {
+            addToast(
+                language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters',
+                'error'
+            );
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            // Import should be handled if getSupabaseClient is not available, but usually stick to store
+            // useAuthStore doesn't expose updateUser directly, so we need to get supabase client
+            const { createClientComponentClient } = require('@supabase/auth-helpers-nextjs');
+            // OR use our lib
+            const { getSupabaseClient } = require('@/lib/supabase');
+            const supabase = getSupabaseClient();
+
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+            if (error) throw error;
+
+            addToast(
+                language === 'ar' ? 'تم تغيير كلمة المرور بنجاح ✨' : 'Password updated successfully ✨',
+                'success'
+            );
+            setNewPassword('');
+            setConfirmPassword('');
+        } catch (error: any) {
+            console.error('Password error:', error);
+            addToast(
+                language === 'ar' ? 'حدث خطأ أثناء تغيير كلمة المرور' : 'Error updating password',
+                'error'
+            );
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
+    const handleSave = async () => {
+        if (!user) return;
+        setIsSaving(true);
+
+        try {
+            await updateProfile({
+                firstName,
+                lastName
+            });
+
+            addToast(
+                language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨',
+                'success'
+            );
+        } catch (error) {
+            console.error('Save error:', error);
+            addToast(
+                language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes',
+                'error'
+            );
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const getUserTypeLabel = () => {
         const type = user?.userType || 'clinic';
@@ -32,9 +123,9 @@ export default function ClinicSettingsPage() {
             lastNameLabel: '(اسم العائلة / اللقب)',
             save: 'حفظ التغييرات',
             subTitle: 'الاشتراك والفوترة',
-            planName: 'الخطة القياسية',
-            planDetails: '$49/شهرياً • تاريخ الفوترة القادم: 1 يناير 2026',
-            manageSub: 'إدارة الاشتراك',
+            planName: 'الخطة المجانية',
+            planDetails: 'مجاني • لا تتطلب الدفع',
+            manageSub: 'الخطة الحالية',
             secTitle: 'الأمان',
             passLabel: 'كلمة المرور',
             passDetails: 'تم التغيير آخر مرة قبل 6 أشهر',
@@ -49,8 +140,8 @@ export default function ClinicSettingsPage() {
             save: 'Save Changes',
             subTitle: 'Subscription & Billing',
             planName: 'Standard Plan',
-            planDetails: '$49/month • Next billing date: Jan 1, 2026',
-            manageSub: 'Manage Subscription',
+            planDetails: 'Free Plan • No billing required',
+            manageSub: 'Current Plan',
             secTitle: 'Security',
             passLabel: 'Password',
             passDetails: 'Last changed 6 months ago',
@@ -89,7 +180,8 @@ export default function ClinicSettingsPage() {
                                 <input
                                     type="text"
                                     aria-label="First Name"
-                                    defaultValue={user?.profile.firstName}
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
@@ -100,13 +192,16 @@ export default function ClinicSettingsPage() {
                                 <input
                                     type="text"
                                     aria-label="Last Name"
-                                    defaultValue={user?.profile.lastName}
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
                         </div>
                         <div className="pt-2">
-                            <Button>{text.save}</Button>
+                            <Button onClick={handleSave} disabled={isSaving}>
+                                {isSaving ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : text.save}
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -127,7 +222,7 @@ export default function ClinicSettingsPage() {
                                 <p className="font-medium text-gray-900 dark:text-white">{text.planName}</p>
                                 <p className="text-sm text-gray-500 dark:text-gray-200">{text.planDetails}</p>
                             </div>
-                            <Button variant="outline">{text.manageSub}</Button>
+                            <Button variant="outline" disabled>{text.manageSub}</Button>
                         </div>
                     </div>
                 </div>
@@ -143,12 +238,36 @@ export default function ClinicSettingsPage() {
                         </div>
                     </div>
                     <div className="p-6 space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="space-y-4">
                             <div>
-                                <p className="font-medium text-gray-900 dark:text-white">{text.passLabel}</p>
-                                <p className="text-sm text-gray-500 dark:text-gray-200">{text.passDetails}</p>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                </label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder={language === 'ar' ? 'أدخل كلمة المرور الجديدة' : 'Enter new password'}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
                             </div>
-                            <Button variant="outline" leftIcon={<Lock size={16} />}>{text.changePass}</Button>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                </label>
+                                <input
+                                    type="password"
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    placeholder={language === 'ar' ? 'أعد إدخال كلمة المرور' : 'Re-enter password'}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div className="pt-2">
+                                <Button onClick={handlePasswordChange} disabled={isChangingPassword} variant="outline" leftIcon={<Lock size={16} />}>
+                                    {isChangingPassword ? (language === 'ar' ? 'جاري التغيير...' : 'Updating...') : text.changePass}
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

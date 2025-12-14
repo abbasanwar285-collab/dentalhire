@@ -37,7 +37,10 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
             hover
             onClick={onClick}
             className={`cursor-pointer transition-all duration-300 group
-                ${isSelected ? 'ring-2 ring-blue-500 shadow-md' : 'hover:shadow-md'}
+                ${isSelected
+                    ? 'ring-1 ring-blue-500 border-blue-500 shadow-lg scale-[1.02] bg-blue-50/10 dark:bg-blue-900/10'
+                    : 'hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 hover:-translate-y-0.5'
+                }
             `}
         >
             <div className="flex items-start gap-4">
@@ -49,9 +52,21 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
                 <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between mb-1">
                         <div>
-                            <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                {job.title}
-                            </h3>
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                                    {language === 'ar' && !job.title.startsWith('مطلوب') ? `مطلوب ${job.title}` : job.title}
+                                </h3>
+                                {(job.score !== undefined && job.score > 0) && (
+                                    <span className={`
+                                        inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold
+                                        ${job.score >= 80 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' :
+                                            job.score >= 50 ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                                'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'}
+                                    `}>
+                                        {job.score}% {language === 'ar' ? 'توافق' : 'Match'}
+                                    </span>
+                                )}
+                            </div>
                             <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                                 {job.clinicName}
                             </p>
@@ -77,9 +92,15 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
                             <DollarSign size={14} className="text-gray-400" />
                             {job.salary.min === 0 && job.salary.max === 0
                                 ? (language === 'ar' ? 'قابل للتفاوض' : 'Negotiable')
-                                : job.employmentType === 'part_time'
-                                    ? `${job.salary.min.toLocaleString()}-${job.salary.max.toLocaleString()} د.ع/${language === 'ar' ? 'ساعة' : 'hr'}`
-                                    : `${(job.salary.min < 1000 ? job.salary.min : (job.salary.min / 1000).toFixed(0))}-${(job.salary.max < 1000 ? job.salary.max : (job.salary.max / 1000).toFixed(0))} ألف د.ع/${language === 'ar' ? 'شهر' : 'mo'}`}
+                                : (
+                                    <span className="flex items-center gap-1">
+                                        <span>{(job.salary.min < 1000 ? job.salary.min : (job.salary.min / 1000).toFixed(0))}</span>
+                                        <span>-</span>
+                                        <span>{(job.salary.max < 1000 ? job.salary.max : (job.salary.max / 1000).toFixed(0))}</span>
+                                        <span>{language === 'ar' ? 'ألف د.ع' : 'k IQD'}</span>
+                                    </span>
+                                )
+                            }
                         </span>
                         <span className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-md">
                             <Briefcase size={14} className="text-gray-400" />
@@ -92,9 +113,13 @@ export default function JobCard({ job, isSelected, onClick }: JobCardProps) {
                             </span>
                         )}
                         {job.workingHours && (
-                            <span className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-md">
+                            <span className="flex items-center gap-1.5 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-md" dir="ltr">
                                 <Clock size={14} className="text-gray-400" />
-                                {job.workingHours.start} - {job.workingHours.end}
+                                <span className="flex items-center gap-1">
+                                    <span>{formatTime(job.workingHours.start, language)}</span>
+                                    <span>-</span>
+                                    <span>{formatTime(job.workingHours.end, language)}</span>
+                                </span>
                             </span>
                         )}
                     </div>

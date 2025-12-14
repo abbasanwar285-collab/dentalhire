@@ -4,8 +4,8 @@
 // DentalHire - Experience Step
 // ============================================
 
-import { useState } from 'react';
-import { useCVStore } from '@/store';
+import { useEffect, useState } from 'react';
+import { useCVStore, useAuthStore } from '@/store';
 import { Button, Input } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Experience } from '@/types';
@@ -13,6 +13,7 @@ import { Plus, Trash2, Building2, MapPin, Calendar, Edit2, X } from 'lucide-reac
 
 export default function ExperienceStep() {
     const { experience, addExperience, updateExperience, removeExperience } = useCVStore();
+    const { user } = useAuthStore();
     const { t, language } = useLanguage();
     const [isEditing, setIsEditing] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
@@ -25,6 +26,29 @@ export default function ExperienceStep() {
         current: false,
         description: '',
     });
+
+    // Auto-fill Job Title based on user role when adding new
+    useEffect(() => {
+        if (!editingId && !form.title && user?.userType) {
+            // Map user types to job titles
+            const jobTitles: Record<string, { ar: string, en: string }> = {
+                'dentist': { ar: 'طبيب أسنان', en: 'Dentist' },
+                'dental_assistant': { ar: 'مساعد طبيب أسنان', en: 'Dental Assistant' },
+                'dental_technician': { ar: 'فني أسنان', en: 'Dental Technician' },
+                'secretary': { ar: 'سكرتير/ة', en: 'Secretary' },
+                'receptionist': { ar: 'موظف استقبال', en: 'Receptionist' },
+                'lab_technician': { ar: 'فني مختبر', en: 'Lab Technician' },
+            };
+
+            const title = jobTitles[user.userType];
+            if (title) {
+                setForm(prev => ({
+                    ...prev,
+                    title: language === 'ar' ? title.ar : title.en
+                }));
+            }
+        }
+    }, [user?.userType, language, editingId, form.title]);
 
     const resetForm = () => {
         setForm({
@@ -77,9 +101,13 @@ export default function ExperienceStep() {
 
     return (
         <div className="space-y-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            <p className="text-gray-600 dark:text-gray-400">
-                {t('cv.exp.intro')}
-            </p>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <strong>{t('common.note')}:</strong> {language === 'ar'
+                        ? 'يرجى كتابة خبراتك العملية السابقة في هذا الحقل. اذكر اسم العيادة أو المركز الذي عملت فيه، مع توضيح المهام التي قمت بها.'
+                        : 'Please list your previous work experience here. Mention the name of the clinic or center you worked at and describe your responsibilities.'}
+                </p>
+            </div>
 
             {/* Experience List */}
             {experience.length > 0 && !isEditing && (
@@ -169,14 +197,14 @@ export default function ExperienceStep() {
                             onChange={(e) => setForm({ ...form, title: e.target.value })}
                         />
                         <Input
-                            label={`${t('cv.exp.company')} *`}
-                            placeholder={t('cv.exp.company.placeholder')}
+                            label={`${language === 'ar' ? 'اسم العيادة / المركز' : 'Clinic / Center Name'} *`}
+                            placeholder={language === 'ar' ? 'عيادة الابتسامة لطب الأسنان' : 'Smile Dental Clinic'}
                             value={form.company || ''}
                             onChange={(e) => setForm({ ...form, company: e.target.value })}
                         />
                         <Input
                             label={t('cv.exp.location')}
-                            placeholder={t('cv.exp.location.placeholder')}
+                            placeholder={language === 'ar' ? 'بغداد، العراق' : 'Baghdad, Iraq'}
                             value={form.location || ''}
                             onChange={(e) => setForm({ ...form, location: e.target.value })}
                         />

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Button, Input } from '@/components/shared';
+import { Card, Button, Input, useToast } from '@/components/shared';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -10,6 +10,7 @@ import { Building2, MapPin, Mail, Phone, Save, CheckCircle } from 'lucide-react'
 export default function LabProfilePage() {
     const { user } = useAuthStore();
     const { language } = useLanguage();
+    const { addToast } = useToast();
     const supabase = getSupabaseClient();
 
     const [isLoading, setIsLoading] = useState(false);
@@ -102,7 +103,16 @@ export default function LabProfilePage() {
 
         if (!error) {
             setIsSaved(true);
+            addToast(
+                language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨',
+                'success'
+            );
             setTimeout(() => setIsSaved(false), 3000);
+        } else {
+            addToast(
+                language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes',
+                'error'
+            );
         }
     };
 

@@ -24,6 +24,7 @@ import {
     Globe
 } from 'lucide-react';
 import { Button } from '@/components/shared';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function ClinicApplicationsPage() {
     const { user } = useAuthStore();
@@ -87,7 +88,40 @@ export default function ClinicApplicationsPage() {
 
     const handleStatusChange = async (applicationId: string, newStatus: string) => {
         const success = await updateApplicationStatus(applicationId, newStatus);
-        if (!success) {
+
+        if (success) {
+            // Find application and CV data to send notification
+            const app = clinicApplications.find(a => a.id === applicationId);
+            // Finding application and CV data
+            const cvUserId = app?.cv?.userId;
+
+            if (cvUserId) {
+                const supabase = getSupabaseClient();
+                const notificationTitle = language === 'ar' ? 'تحديث حالة الطلب' : 'Application Status Update';
+                const statusText = getStatusLabel(newStatus);
+                const jobTitle = app.job?.title || (language === 'ar' ? 'الوظيفة' : 'Job');
+
+                const message = language === 'ar'
+                    ? `تم تغيير حالة طلبك لوظيفة "${jobTitle}" إلى "${statusText}"`
+                    : `Your application status for "${jobTitle}" has been updated to "${statusText}"`;
+
+                const { error: notificationError } = await supabase.from('notifications').insert({
+                    user_id: cvUserId,
+                    title: notificationTitle,
+                    message: message,
+                    type: 'status_change',
+                    related_id: applicationId
+                });
+
+                if (notificationError) {
+                    console.error('Error sending notification:', notificationError);
+                } else {
+                    console.log('Notification sent successfully to user:', cvUserId);
+                }
+            } else {
+                console.error('Cannot send notification: cvUserId is missing for application', applicationId, app);
+            }
+        } else {
             alert(language === 'ar' ? 'فشل تحديث الحالة' : 'Failed to update status');
         }
     };
@@ -224,7 +258,7 @@ export default function ClinicApplicationsPage() {
                                         {/* Details */}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
-                                                {application.cv?.fullName || language === 'ar' ? 'غير متوفر' : 'N/A'}
+                                                {application.cv?.fullName || (language === 'ar' ? 'غير متوفر' : 'N/A')}
                                             </h3>
 
                                             <div className="space-y-1.5 text-sm text-gray-600 dark:text-gray-300">

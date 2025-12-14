@@ -5,6 +5,7 @@ import { AuthProvider } from "@/components/providers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AIAssistant } from "@/components/ai";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ToastProvider } from "@/components/shared";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -61,7 +62,9 @@ export default function RootLayout({
               enableSystem={false}
               disableTransitionOnChange
             >
-              {children}
+              <ToastProvider>
+                {children}
+              </ToastProvider>
             </ThemeProvider>
             <AIAssistant />
           </AuthProvider>

@@ -22,6 +22,7 @@ import {
     Shield,
 } from 'lucide-react';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
+import { NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Navbar() {
@@ -138,49 +139,15 @@ export default function Navbar() {
 
                     {/* Right Side */}
                     <div className="flex items-center gap-2">
-                        <LanguageSwitcher />
+                        {/* Language Switcher - Hidden on mobile, shown in menu */}
+                        <div className="hidden md:block">
+                            <LanguageSwitcher />
+                        </div>
+
                         {isAuthenticated && user ? (
                             <>
                                 {/* Notifications */}
-                                <div className="relative">
-                                    <button
-                                        onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                                        className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                                        aria-label={language === 'ar' ? 'الإشعارات' : 'Notifications'}
-                                    >
-                                        <Bell size={20} className="text-gray-600 dark:text-gray-300" />
-                                        {/* <span className="absolute top-1 end-1 w-2 h-2 bg-red-500 rounded-full"></span> */}
-                                    </button>
-
-                                    {/* Notifications Dropdown */}
-                                    {isNotificationsOpen && (
-                                        <div className="absolute end-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 animate-fade-in-down">
-                                            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
-                                                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                                                    {language === 'ar' ? 'الإشعارات' : 'Notifications'}
-                                                </h3>
-                                            </div>
-                                            <div className="max-h-96 overflow-y-auto">
-                                                <div className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                                                    <Bell size={24} className="mx-auto mb-2 opacity-20" />
-                                                    <p className="text-sm">
-                                                        {language === 'ar' ? 'لا توجد إشعارات جديدة' : 'No new notifications'}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            {/* Footer Removed or kept generic? Kept generic linking to all notifications */}
-                                            <div className="px-4 py-3 border-t border-gray-100 dark:border-gray-700">
-                                                <Link
-                                                    href="/notifications"
-                                                    onClick={() => setIsNotificationsOpen(false)}
-                                                    className="text-sm text-blue-600 hover:text-blue-700 font-medium w-full text-center block"
-                                                >
-                                                    {language === 'ar' ? 'عرض جميع الإشعارات' : 'View all notifications'}
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                                <NotificationBell />
 
                                 {/* Messages */}
                                 <Link
@@ -199,8 +166,8 @@ export default function Navbar() {
                                         aria-label="User profile"
                                     >
                                         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white text-sm font-medium">
-                                            {user.profile.firstName[0]}
-                                            {user.profile.lastName[0]}
+                                            {user.profile?.firstName?.[0] || 'U'}
+                                            {user.profile?.lastName?.[0] || ''}
                                         </div>
                                         <ChevronDown size={16} className="text-gray-500 hidden sm:block" />
                                     </button>
@@ -226,7 +193,7 @@ export default function Navbar() {
                                                 {t('nav.dashboard')}
                                             </Link>
                                             <Link
-                                                href={`${getDashboardLink().replace('/dashboard', '')}/profile`}
+                                                href={`${getDashboardLink().replace(/\/dashboard$/, '')}/profile`}
                                                 className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                                                 onClick={() => setIsProfileOpen(false)}
                                             >
@@ -285,6 +252,11 @@ export default function Navbar() {
                 {isMobileMenuOpen && (
                     <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-800 py-4 animate-fade-in-down">
                         <div className="flex flex-col gap-2">
+                            {/* Language Switcher in Mobile Menu */}
+                            <div className="px-4 py-2">
+                                <LanguageSwitcher />
+                            </div>
+
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.href}

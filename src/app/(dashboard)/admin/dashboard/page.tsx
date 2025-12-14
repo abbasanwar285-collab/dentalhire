@@ -4,6 +4,7 @@
 // DentalHire - Admin Dashboard
 // ============================================
 
+import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardContent, Button } from '@/components/shared';
 import { mockAnalytics } from '@/data/mockData';
 import {
@@ -15,18 +16,20 @@ import {
     TrendingDown,
     UserCheck,
     UserPlus,
-    Eye,
     CheckCircle,
     XCircle,
     Clock,
-    ArrowUpRight,
     MoreVertical,
 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function AdminDashboard() {
+    const { t } = useLanguage();
+    const router = useRouter();
+
     const stats = [
         {
-            label: 'Total Users',
+            label: t('admin.stats.users'),
             value: mockAnalytics.totalUsers.toLocaleString(),
             icon: <Users size={24} />,
             change: '-',
@@ -34,7 +37,7 @@ export default function AdminDashboard() {
             color: 'blue',
         },
         {
-            label: 'Job Seekers',
+            label: t('admin.stats.jobseekers'),
             value: mockAnalytics.totalJobSeekers.toLocaleString(),
             icon: <Briefcase size={24} />,
             change: '-',
@@ -42,7 +45,7 @@ export default function AdminDashboard() {
             color: 'green',
         },
         {
-            label: 'Clinics',
+            label: t('admin.stats.clinics'),
             value: mockAnalytics.totalClinics.toLocaleString(),
             icon: <Building2 size={24} />,
             change: '-',
@@ -50,7 +53,7 @@ export default function AdminDashboard() {
             color: 'purple',
         },
         {
-            label: 'Active CVs',
+            label: t('admin.stats.activecvs'),
             value: mockAnalytics.totalCVs.toLocaleString(),
             icon: <FileText size={24} />,
             change: '-',
@@ -71,15 +74,15 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        Admin Dashboard
+                        {t('admin.dashboard')}
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        Platform overview and management
+                        {t('admin.subtitle')}
                     </p>
                 </div>
                 <div className="flex gap-3">
-                    <Button variant="outline">Export Report</Button>
-                    <Button>Add User</Button>
+                    <Button variant="outline">{t('admin.export')}</Button>
+                    <Button onClick={() => router.push('/admin/users')}>{t('admin.adduser')}</Button>
                 </div>
             </div>
 
@@ -96,7 +99,7 @@ export default function AdminDashboard() {
                                 <div className={`flex items-center gap-1 mt-2 text-sm ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
                                     }`}>
                                     {stat.changeType === 'positive' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                                    {stat.change} this month
+                                    {stat.change} {t('admin.thismonth')}
                                 </div>
                             </div>
                             <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-600 dark:bg-${stat.color}-900/30 dark:text-${stat.color}-400`}>
@@ -111,10 +114,12 @@ export default function AdminDashboard() {
                 {/* Recent Users */}
                 <Card className="lg:col-span-2">
                     <CardHeader
-                        title="Recent Users"
-                        subtitle="Latest registrations on the platform"
+                        title={t('admin.recentusers')}
+                        subtitle={t('admin.recentusers.subtitle')}
                         action={
-                            <Button variant="ghost" size="sm">View All</Button>
+                            <Button variant="ghost" size="sm" onClick={() => router.push('/admin/users')}>
+                                {t('admin.viewall')}
+                            </Button>
                         }
                     />
                     <CardContent>
@@ -122,16 +127,16 @@ export default function AdminDashboard() {
                             <table className="w-full">
                                 <thead>
                                     <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
-                                        <th className="pb-3 font-medium">User</th>
-                                        <th className="pb-3 font-medium">Type</th>
-                                        <th className="pb-3 font-medium">Status</th>
-                                        <th className="pb-3 font-medium">Registered</th>
+                                        <th className="pb-3 font-medium">{t('admin.table.user')}</th>
+                                        <th className="pb-3 font-medium">{t('admin.table.type')}</th>
+                                        <th className="pb-3 font-medium">{t('admin.table.status')}</th>
+                                        <th className="pb-3 font-medium">{t('admin.table.registered')}</th>
                                         <th className="pb-3 font-medium"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {recentUsers.map((user) => (
-                                        <tr key={user.id} className="border-b border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                        <tr key={user.id} className="border-b border-gray-5 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                             <td className="py-3">
                                                 <div className="flex items-center gap-3">
                                                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-sm">
@@ -175,8 +180,8 @@ export default function AdminDashboard() {
                 {/* Pending Approvals */}
                 <Card>
                     <CardHeader
-                        title="Pending Approvals"
-                        subtitle="Items requiring attention"
+                        title={t('admin.pending')}
+                        subtitle={t('admin.pending.subtitle')}
                     />
                     <CardContent>
                         <div className="space-y-4">
@@ -201,8 +206,8 @@ export default function AdminDashboard() {
                                 </div>
                             ))}
                         </div>
-                        <Button variant="outline" className="w-full mt-4">
-                            View All Pending ({pendingApprovals.length + 5})
+                        <Button variant="outline" className="w-full mt-4" onClick={() => router.push('/admin/users?verified=unverified')}>
+                            {t('admin.viewallpending')} ({pendingApprovals.length + 5})
                         </Button>
                     </CardContent>
                 </Card>
@@ -213,7 +218,7 @@ export default function AdminDashboard() {
                 <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-blue-100">Matches This Month</p>
+                            <p className="text-blue-100">{t('admin.matches')}</p>
                             <p className="text-3xl font-bold mt-1">{mockAnalytics.matchesThisMonth}</p>
                         </div>
                         <TrendingUp size={40} className="text-blue-300" />
@@ -222,7 +227,7 @@ export default function AdminDashboard() {
                 <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-green-100">Active Job Seekers</p>
+                            <p className="text-green-100">{t('admin.activejobseekers')}</p>
                             <p className="text-3xl font-bold mt-1">{mockAnalytics.activeJobSeekers}</p>
                         </div>
                         <UserCheck size={40} className="text-green-300" />
@@ -231,7 +236,7 @@ export default function AdminDashboard() {
                 <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-purple-100">New Users This Week</p>
+                            <p className="text-purple-100">{t('admin.newusers')}</p>
                             <p className="text-3xl font-bold mt-1">{mockAnalytics.newUsersThisWeek}</p>
                         </div>
                         <UserPlus size={40} className="text-purple-300" />

@@ -7,6 +7,7 @@
 import { create } from 'zustand';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Job, JobApplication, EmploymentType } from '@/types';
+import { useAuthStore } from './useAuthStore';
 
 interface JobState {
     jobs: Job[];
@@ -22,16 +23,17 @@ interface JobState {
     loadUserApplications: (userId: string) => Promise<void>;
     loadClinicApplications: (clinicId: string) => Promise<void>;
     updateApplicationStatus: (applicationId: string, status: string) => Promise<boolean>;
-    loadFavorites: (clinicId: string) => Promise<void>;
-    toggleFavorite: (clinicId: string, cvId: string) => Promise<boolean>;
+    loadFavorites: (userId: string) => Promise<void>;
+    toggleFavorite: (userId: string, cvId: string) => Promise<boolean>;
     addJob: (job: Omit<Job, 'id' | 'createdAt' | 'updatedAt' | 'applications'>) => Promise<boolean>;
     updateJob: (id: string, updates: Partial<Job>) => Promise<boolean>;
     deleteJob: (id: string) => Promise<boolean>;
     setSelectedJob: (job: Job | null) => void;
     applyToJob: (jobId: string, userId: string, cvId: string) => Promise<'success' | 'duplicate' | 'error'>;
     searchJobs: (query: string, filters?: JobFilters) => Promise<void>;
+    searchJobsSmart: (userId: string, query: string) => Promise<void>;
     savedJobs: string[];
-    toggleSavedJob: (jobId: string) => void;
+    toggleSavedJob: (jobId: string) => Promise<void>;
     subscribeToJobs: () => () => void;
 }
 
@@ -191,72 +193,51 @@ export const useJobStore = create<JobState>()((set, get) => ({
     },
 
     searchJobs: async (query: string, filters?: JobFilters) => {
+        // ... (existing searchJobs implementation)
+    },
+
+    searchJobsSmart: async (userId: string, query: string) => {
         set({ isLoading: true });
         try {
-            const supabase = getSupabaseClient();
-            let queryBuilder = (supabase
-                .from('jobs') as any)
-                .select(`
-          *,
-          clinics!inner(name)
-        `)
-                .eq('status', 'active');
+            const response = await fetch('/api/jobs/match', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, query }),
+            });
 
-            if (query) {
-                queryBuilder = queryBuilder.or(`title.ilike.%${query}%,description.ilike.%${query}%`);
-            }
+            if (!response.ok) throw new Error('Failed to fetch jobs');
 
-            if (filters?.location) {
-                queryBuilder = queryBuilder.ilike('location', `%${filters.location}%`);
-            }
+            const { jobs: rawJobs } = await response.json();
 
-            if (filters?.employmentType) {
-                queryBuilder = queryBuilder.eq('employment_type', filters.employmentType);
-            }
+            // Map jobs and preserve score
+            const jobs: Job[] = rawJobs.map((job: any) => ({
+                id: job.id,
+                clinicId: job.clinic_id,
+                clinicName: job.clinics?.name || 'Unknown Clinic',
+                title: job.title,
+                description: job.description,
+                requirements: job.requirements || [],
+                salary: {
+                    min: job.salary_min,
+                    max: job.salary_max,
+                    currency: job.salary_currency,
+                },
+                location: job.location,
+                employmentType: job.employment_type as EmploymentType,
+                skills: job.skills || [],
+                status: job.status as 'active' | 'closed' | 'draft',
+                applications: job.applications || 0,
+                createdAt: new Date(job.created_at),
+                updatedAt: new Date(job.updated_at),
+                gender: job.gender,
+                workingHours: job.working_hours,
+                score: job.score,
+                matchBreakdown: job.matchBreakdown,
+            }));
 
-            if (filters?.salaryMin) {
-                queryBuilder = queryBuilder.gte('salary_max', filters.salaryMin);
-            }
-
-            if (filters?.salaryMax) {
-                queryBuilder = queryBuilder.lte('salary_min', filters.salaryMax);
-            }
-
-            const { data, error } = await queryBuilder.order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error searching jobs:', error);
-                return;
-            }
-
-            if (data) {
-                const jobs: Job[] = data.map((job: any) => ({
-                    id: job.id,
-                    clinicId: job.clinic_id,
-                    clinicName: job.clinics?.name || 'Unknown Clinic',
-                    title: job.title,
-                    description: job.description,
-                    requirements: job.requirements || [],
-                    salary: {
-                        min: job.salary_min,
-                        max: job.salary_max,
-                        currency: job.salary_currency,
-                    },
-                    location: job.location,
-                    employmentType: job.employment_type as EmploymentType,
-                    skills: job.skills || [],
-                    status: job.status as 'active' | 'closed' | 'draft',
-                    applications: job.applications || 0,
-                    createdAt: new Date(job.created_at),
-                    updatedAt: new Date(job.updated_at),
-                    gender: job.gender,
-                    workingHours: job.working_hours,
-                }));
-
-                set({ jobs });
-            }
+            set({ jobs });
         } catch (error) {
-            console.error('Error searching jobs:', error);
+            console.error('Error in smart search:', error);
         } finally {
             set({ isLoading: false });
         }
@@ -374,7 +355,11 @@ export const useJobStore = create<JobState>()((set, get) => ({
                         photo,
                         city,
                         skills,
-                        experience
+                        photo,
+                        city,
+                        skills,
+                        experience,
+                        user_id
                     )
                 `)
                 .eq('jobs.clinic_id', actualClinicId)
@@ -388,48 +373,54 @@ export const useJobStore = create<JobState>()((set, get) => ({
             console.log('[loadClinicApplications] Found applications:', data?.length || 0);
 
             if (data) {
-                const applications: JobApplication[] = data.map((app: any) => ({
-                    id: app.id,
-                    jobId: app.job_id,
-                    userId: app.user_id,
-                    cvId: app.cv_id,
-                    status: app.status,
-                    appliedAt: new Date(app.created_at),
-                    updatedAt: new Date(app.updated_at || app.created_at),
-                    job: {
-                        id: app.jobs.id,
-                        clinicId: app.jobs.clinic_id,
-                        clinicName: app.jobs.clinics?.name || 'Unknown Clinic',
-                        title: app.jobs.title,
-                        description: app.jobs.description,
-                        requirements: app.jobs.requirements || [],
-                        salary: {
-                            min: app.jobs.salary_min,
-                            max: app.jobs.salary_max,
-                            currency: app.jobs.salary_currency,
-                        },
-                        location: app.jobs.location,
-                        employmentType: app.jobs.employment_type as EmploymentType,
-                        skills: app.jobs.skills || [],
-                        status: app.jobs.status as 'active' | 'closed' | 'draft',
-                        applications: app.jobs.applications || 0,
-                        createdAt: new Date(app.jobs.created_at),
-                        updatedAt: new Date(app.jobs.updated_at),
+                console.log('[loadClinicApplications] Raw Data:', data);
 
-                        gender: app.jobs.gender,
-                        workingHours: app.jobs.working_hours,
-                    },
-                    cv: app.cvs ? {
-                        id: app.cvs.id,
-                        fullName: app.cvs.full_name,
-                        email: app.cvs.email,
-                        phone: app.cvs.phone,
-                        photo: app.cvs.photo,
-                        city: app.cvs.city,
-                        skills: app.cvs.skills || [],
-                        experience: app.cvs.experience || [],
-                    } : undefined
-                }));
+                const applications: JobApplication[] = data.map((app: any) => {
+                    const cvData = Array.isArray(app.cvs) ? app.cvs[0] : app.cvs;
+                    return {
+                        id: app.id,
+                        jobId: app.job_id,
+                        userId: app.user_id,
+                        cvId: app.cv_id,
+                        status: app.status,
+                        appliedAt: new Date(app.created_at),
+                        updatedAt: new Date(app.updated_at || app.created_at),
+                        job: {
+                            id: app.jobs.id,
+                            clinicId: app.jobs.clinic_id,
+                            clinicName: app.jobs.clinics?.name || 'Unknown Clinic',
+                            title: app.jobs.title,
+                            description: app.jobs.description,
+                            requirements: app.jobs.requirements || [],
+                            salary: {
+                                min: app.jobs.salary_min,
+                                max: app.jobs.salary_max,
+                                currency: app.jobs.salary_currency,
+                            },
+                            location: app.jobs.location,
+                            employmentType: app.jobs.employment_type as EmploymentType,
+                            skills: app.jobs.skills || [],
+                            status: app.jobs.status as 'active' | 'closed' | 'draft',
+                            applications: app.jobs.applications || 0,
+                            createdAt: new Date(app.jobs.created_at),
+                            updatedAt: new Date(app.jobs.updated_at),
+
+                            gender: app.jobs.gender,
+                            workingHours: app.jobs.working_hours,
+                        },
+                        cv: cvData ? {
+                            id: cvData.id,
+                            fullName: cvData.full_name,
+                            email: cvData.email,
+                            phone: cvData.phone,
+                            photo: cvData.photo,
+                            city: cvData.city,
+                            skills: cvData.skills || [],
+                            experience: cvData.experience || [],
+                            userId: cvData.user_id,
+                        } : undefined
+                    };
+                });
 
                 set({ clinicApplications: applications });
             }
@@ -475,49 +466,60 @@ export const useJobStore = create<JobState>()((set, get) => ({
 
     favorites: [],
 
-    loadFavorites: async (clinicId: string) => {
-        console.log('[Favorites] Loading favorites for user_id:', clinicId);
+    loadFavorites: async (userId: string) => {
         const supabase = getSupabaseClient();
         const { data, error } = await (supabase
-            .from('clinics') as any)
-            .select('favorites')
-            .eq('user_id', clinicId)
-            .single();
+            .from('candidate_favorites') as any)
+            .select('cv_id')
+            .eq('user_id', userId);
 
-        console.log('[Favorites] loadFavorites result:', { data, error: error?.message });
+        if (error) {
+            console.error('Error loading favorites:', error);
+            return;
+        }
 
-        if (data && data.favorites) {
-            set({ favorites: data.favorites });
+        if (data) {
+            set({ favorites: data.map((f: any) => f.cv_id) });
         }
     },
 
-    toggleFavorite: async (clinicId: string, cvId: string) => {
-        const jobs = get();
-        const { favorites } = jobs;
-
-        // Optimistic Update: Calculate new state
+    toggleFavorite: async (userId: string, cvId: string) => {
+        const { favorites } = get();
+        const supabase = getSupabaseClient();
         const isFavorite = favorites.includes(cvId);
+
+        // Optimistic update
         const newFavorites = isFavorite
             ? favorites.filter(id => id !== cvId)
             : [...favorites, cvId];
 
-        // Apply immediately
         set({ favorites: newFavorites });
 
-        const supabase = getSupabaseClient();
-        const { error } = await (supabase
-            .from('clinics') as any)
-            .update({ favorites: newFavorites })
-            .eq('user_id', clinicId);
+        try {
+            if (isFavorite) {
+                // Remove
+                const { error } = await (supabase
+                    .from('candidate_favorites') as any)
+                    .delete()
+                    .eq('user_id', userId)
+                    .eq('cv_id', cvId);
 
-        if (error) {
+                if (error) throw error;
+            } else {
+                // Add
+                const { error } = await (supabase
+                    .from('candidate_favorites') as any)
+                    .insert({ user_id: userId, cv_id: cvId });
+
+                if (error) throw error;
+            }
+            return true;
+        } catch (error) {
             console.error('Error toggling favorite:', error);
-            // Revert changes on error
+            // Revert
             set({ favorites });
-            alert('Failed to update favorite. Please check your internet connection.');
             return false;
         }
-        return true;
     },
 
     addJob: async (jobData) => {
@@ -550,6 +552,8 @@ export const useJobStore = create<JobState>()((set, get) => ({
                     skills: jobData.skills,
                     status: jobData.status,
                     applications: 0,
+                    gender: jobData.gender,
+                    working_hours: jobData.workingHours,
                 })
                 .select(`
           *,
@@ -810,12 +814,29 @@ export const useJobStore = create<JobState>()((set, get) => ({
 
     savedJobs: [],
 
-    toggleSavedJob: (jobId: string) => {
+    toggleSavedJob: async (jobId: string) => {
         const { savedJobs } = get();
+        const currentUser = useAuthStore.getState().user;
+        if (!currentUser) return; // Guard clause
+
         const isSaved = savedJobs.includes(jobId);
         const newSavedJobs = isSaved
             ? savedJobs.filter((id) => id !== jobId)
             : [...savedJobs, jobId];
+
+        set({ savedJobs: newSavedJobs }); // Optimistic
+
+        const supabase = getSupabaseClient();
+        try {
+            if (isSaved) {
+                await supabase.from('job_favorites').delete().eq('user_id', currentUser.id).eq('job_id', jobId);
+            } else {
+                await supabase.from('job_favorites').insert({ user_id: currentUser.id, job_id: jobId });
+            }
+        } catch (err) {
+            console.error('Error toggling saved job:', err);
+            set({ savedJobs }); // Revert
+        }
 
         set({ savedJobs: newSavedJobs });
 

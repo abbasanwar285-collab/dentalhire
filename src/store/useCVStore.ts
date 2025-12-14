@@ -301,6 +301,16 @@ export const useCVStore = create<CVState>()(
                         }
                     }
 
+                    // Sync city to User Profile
+                    if (state.personalInfo.city) {
+                        // We use the imported auth store to update profile
+                        // This ensures local state and DB are updated
+                        const { useAuthStore } = await import('./useAuthStore');
+                        useAuthStore.getState().updateProfile({
+                            city: state.personalInfo.city
+                        });
+                    }
+
                     return true;
                 } catch (error) {
                     console.error('Error saving CV:', error);

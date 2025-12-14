@@ -4,6 +4,9 @@ import { Card, CardHeader, CardContent, Button } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Users, FileText, Plus, ShoppingBag, Search } from 'lucide-react';
 import Link from 'next/link';
+import { getSupabaseClient } from '@/lib/supabase';
+import { useAuthStore } from '@/store';
+import { useEffect, useState } from 'react';
 
 export default function CompanyDashboard() {
     const { language } = useLanguage();
@@ -33,11 +36,82 @@ export default function CompanyDashboard() {
 
     const text = t[language as keyof typeof t] || t.en;
 
-    const stats = [
+    const [stats, setStats] = useState([
         { label: text.openPositions, value: '0', icon: <FileText size={20} /> },
         { label: text.applications, value: '0', icon: <Users size={20} /> },
         { label: text.topCandidates, value: '0', icon: <ShoppingBag size={20} /> },
-    ];
+    ]);
+
+    const { user } = useAuthStore();
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            if (!user) return;
+            const supabase = getSupabaseClient();
+
+            try {
+                // 1. Get Company/Clinic ID first
+                const { data: clinicData } = await supabase
+                    .from('clinics')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (clinicData) {
+                    const clinicId = clinicData.id;
+
+                    // Execute independent queries in parallel
+                    const [jobsCountRes, jobsRef, cvCountRes] = await Promise.all([
+                        // 1. Open Positions (Active Jobs)
+                        (supabase
+                            .from('jobs') as any)
+                            .select('*', { count: 'exact', head: true })
+                            .eq('clinic_id', clinicId)
+                            .eq('status', 'active'),
+
+                        // 2. Get Job IDs for Applications Count
+                        (supabase
+                            .from('jobs') as any)
+                            .select('id')
+                            .eq('clinic_id', clinicId),
+
+                        // 3. Top Candidates (Active CVs pool)
+                        (supabase
+                            .from('cvs') as any)
+                            .select('*', { count: 'exact', head: true })
+                            .eq('status', 'active')
+                    ]);
+
+                    const actualJobsCount = jobsCountRes.count || 0;
+                    const jobs = jobsRef.data || [];
+                    const cvCount = cvCountRes.count || 0;
+
+                    // 4. Calculate Applications Count (dependent on jobs)
+                    let appCount = 0;
+                    if (jobs.length > 0) {
+                        const jobIds = jobs.map((j: any) => j.id);
+                        const { count } = await supabase
+                            .from('job_applications')
+                            .select('*', { count: 'exact', head: true })
+                            .in('job_id', jobIds);
+                        appCount = count || 0;
+                    }
+
+                    // Update stats with real values
+                    setStats(prev => [
+                        { ...prev[0], value: actualJobsCount.toString() },
+                        { ...prev[1], value: appCount.toString() },
+                        { ...prev[2], value: cvCount.toString() }
+                    ]);
+                }
+
+            } catch (err) {
+                console.error("Error fetching company stats:", err);
+            }
+        };
+
+        fetchStats();
+    }, [user, text]); // Re-fetch if language (text) changes
 
     return (
         <div className="space-y-6">

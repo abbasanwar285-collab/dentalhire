@@ -44,15 +44,15 @@ export default function JobSeekerDashboard() {
             try {
                 // Fetch applications count
                 const { count: appCount, data: apps } = await supabase
-                    .from('applications')
-                    .select('*, job:jobs(title, expand:clinics(name), location)', { count: 'exact' })
+                    .from('job_applications')
+                    .select('*, job:jobs(title, location)', { count: 'exact' }) // Simplified select, ensuring job relation works
                     .eq('applicant_id', user.id)
                     .order('created_at', { ascending: false })
                     .limit(3);
 
-                // Fetch interviews (mock or real status check)
+                // Fetch interviews (real status check)
                 const { count: interviewCount } = await supabase
-                    .from('applications')
+                    .from('job_applications')
                     .select('*', { count: 'exact' })
                     .eq('applicant_id', user.id)
                     .eq('status', 'interview');
@@ -108,7 +108,7 @@ export default function JobSeekerDashboard() {
     return (
         <div className="space-y-8 animate-fade-in">
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {statCards.map((stat, index) => (
                     <Card key={index} hover className="border-none shadow-sm">
                         <div className="flex items-start justify-between">

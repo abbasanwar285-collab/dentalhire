@@ -5,7 +5,9 @@
 // ============================================
 
 import { useEffect } from 'react';
-import { useCVStore } from '@/store';
+import { useCVStore, useAuthStore } from '@/store';
+import { getSupabaseClient } from '@/lib/supabase';
+import { useState } from 'react';
 import { Input } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { User, Mail, Phone, Calendar, MapPin, FileText } from 'lucide-react';
@@ -13,7 +15,79 @@ import { iraqLocations } from '@/data/iraq_locations';
 
 export default function PersonalInfoStep() {
     const { personalInfo, updatePersonalInfo } = useCVStore();
+    const { user } = useAuthStore();
     const { t, language } = useLanguage();
+    const [isUploading, setIsUploading] = useState(false);
+
+    // Handle Photo Upload
+    const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert(language === 'ar' ? 'حجم الملف كبير جداً (أقصى حد 5 ميجابايت)' : 'File too large (max 5MB)');
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const supabase = getSupabaseClient();
+
+            // Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+            const filePath = `cv-photos/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('avatars') // Using 'avatars' bucket as it's standard
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(filePath);
+
+            // 1. Update local store
+            updatePersonalInfo({ photo: publicUrl });
+
+            // 2. Persist to Database immediately if user is logged in
+            if (user?.id) {
+                // First try to find existing CV
+                const { data: existingCV } = await supabase
+                    .from('cvs')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (existingCV) {
+                    await (supabase.from('cvs') as any)
+                        .update({ photo: publicUrl })
+                        .eq('id', existingCV.id);
+                } else {
+                    // Create minimal CV with photo
+                    await (supabase.from('cvs') as any)
+                        .insert({
+                            user_id: user.id,
+                            photo: publicUrl,
+                            full_name: personalInfo.fullName || '',
+                            email: personalInfo.email || user.email || '',
+                            phone: personalInfo.phone || '',
+                            city: personalInfo.city || '',
+                            status: 'draft'
+                        });
+                }
+            }
+
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+            alert(language === 'ar' ? 'فشل رفع الصورة' : 'Failed to upload photo');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     // Set defaults for Iraq
     useEffect(() => {
@@ -23,7 +97,11 @@ export default function PersonalInfoStep() {
         if (!personalInfo.nationality) {
             updatePersonalInfo({ nationality: language === 'ar' ? 'عراقي' : 'Iraqi' });
         }
-    }, [language, personalInfo.phone, personalInfo.nationality, updatePersonalInfo]);
+        // Default City from Profile
+        if (!personalInfo.city && user?.profile?.city) {
+            updatePersonalInfo({ city: user.profile.city });
+        }
+    }, [language, personalInfo.phone, personalInfo.nationality, personalInfo.city, user?.profile?.city, updatePersonalInfo]);
 
     const handleChange = (field: string, value: string) => {
         updatePersonalInfo({ [field]: value });
@@ -167,11 +245,26 @@ export default function PersonalInfoStep() {
                         )}
                     </div>
                     <div>
-                        <button className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                            {t('cv.personal.upload')}
+                        <input
+                            type="file"
+                            id="photo-upload"
+                            className="hidden"
+                            accept="image/png, image/jpeg, image/webp"
+                            onChange={handlePhotoUpload}
+                            disabled={isUploading}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => document.getElementById('photo-upload')?.click()}
+                            disabled={isUploading}
+                            className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isUploading ? t('common.loading') : t('cv.personal.upload')}
                         </button>
                         <p className="text-xs text-gray-500 mt-2">
-                            {t('cv.personal.photoinfo')}
+                            {language === 'ar'
+                                ? '.JPG, .PNG أو .WebP. أقصى حجم 5MB'
+                                : '.JPG, .PNG or .WebP. Max size 5MB'}
                         </p>
                     </div>
                 </div>

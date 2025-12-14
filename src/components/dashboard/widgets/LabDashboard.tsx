@@ -21,39 +21,57 @@ export default function LabDashboard() {
     } = useJobStore();
     const [isLoadingStats, setIsLoadingStats] = useState(true);
 
+    const [stats, setStats] = useState({
+        activeJobs: 0,
+        applications: 0,
+        favorites: 0
+    });
+
     useEffect(() => {
         const fetchStats = async () => {
             if (!user?.id) return;
-
+            const supabase = getSupabaseClient();
             try {
-                // Load applications and favorites (these take userId based on store implementation)
-                loadClinicApplications(user.id);
-                loadFavorites(user.id);
-
-                // Get clinic ID for jobs (loadClinicJobs expects internal clinic ID)
-                const supabase = getSupabaseClient();
-                const { data: clinic } = await supabase
-                    .from('clinics')
-                    .select('id')
+                // 1. Active Jobs
+                const { count: jobsCount } = await supabase
+                    .from('jobs')
+                    .select('*', { count: 'exact', head: true })
                     .eq('user_id', user.id)
-                    .single();
+                    .eq('status', 'open');
 
-                if (clinic) {
-                    await loadClinicJobs((clinic as any).id);
+                // 2. Applications
+                const { data: jobs } = await supabase.from('jobs').select('id').eq('user_id', user.id);
+                let appCount = 0;
+                if (jobs && jobs.length > 0) {
+                    const jobIds = jobs.map(j => j.id);
+                    const { count } = await supabase
+                        .from('job_applications')
+                        .select('*', { count: 'exact', head: true })
+                        .in('job_id', jobIds);
+                    appCount = count || 0;
                 }
+
+                // 3. Favorites/Qualified Techs (counting saved profiles for now, or just CVs if Favorites logic is complex)
+                const { count: favCount } = await supabase
+                    .from('job_favorites') // Assuming this table stores saved candidate profiles for employers too, or use separate table
+                    .select('*', { count: 'exact', head: true })
+                    .eq('user_id', user.id);
+
+                setStats({
+                    activeJobs: jobsCount || 0,
+                    applications: appCount || 0,
+                    favorites: favCount || 0
+                });
+
             } catch (error) {
-                console.error('Error loading dashboard stats:', error);
+                console.error('Error loading lab dashboard stats:', error);
             } finally {
                 setIsLoadingStats(false);
             }
         };
 
         fetchStats();
-    }, [user?.id, loadClinicJobs, loadClinicApplications, loadFavorites]);
-
-    const activeJobsCount = (jobs as any[]).filter(j => j.status === 'active').length;
-    const applicationsCount = clinicApplications.length;
-    const favoritesCount = favorites.length;
+    }, [user?.id]);
 
     const t = {
         ar: {
@@ -76,16 +94,16 @@ export default function LabDashboard() {
 
     const text = t[language as keyof typeof t] || t.en;
 
-    const stats = [
-        { label: text.vacancies, value: isLoadingStats ? '-' : activeJobsCount.toString(), icon: <FileText size={20} /> },
-        { label: text.applications, value: isLoadingStats ? '-' : applicationsCount.toString(), icon: <Users size={20} /> },
-        { label: text.qualifiedTechs, value: isLoadingStats ? '-' : favoritesCount.toString(), icon: <FlaskConical size={20} /> },
+    const dashboardStats = [
+        { label: text.vacancies, value: isLoadingStats ? '-' : stats.activeJobs.toString(), icon: <FileText size={20} /> },
+        { label: text.applications, value: isLoadingStats ? '-' : stats.applications.toString(), icon: <Users size={20} /> },
+        { label: text.qualifiedTechs, value: isLoadingStats ? '-' : stats.favorites.toString(), icon: <FlaskConical size={20} /> },
     ];
 
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {stats.map((stat, i) => (
+                {dashboardStats.map((stat, i) => (
                     <Card key={i}>
                         <div className="flex items-center justify-between">
                             <div>

@@ -25,6 +25,7 @@ export interface UserProfile {
     lastName: string;
     phone?: string;
     avatar?: string;
+    city?: string;
     verified: boolean;
 }
 
@@ -279,6 +280,8 @@ export interface Job {
     workingHours?: { start: string; end: string };
     status: 'active' | 'closed' | 'draft';
     applications: number;
+    score?: number;
+    matchBreakdown?: any;
     createdAt: Date;
     updatedAt: Date;
 }

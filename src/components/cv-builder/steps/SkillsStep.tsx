@@ -9,7 +9,7 @@ import { useCVStore } from '@/store';
 import { Input } from '@/components/shared';
 import { SkillBadge } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { dentalSkills, salesSkills } from '@/data/mockData';
+import { dentalSkills, dentalSkillsAr, salesSkills, salesSkillsAr } from '@/data/mockData';
 import { Search, Plus, Sparkles } from 'lucide-react';
 
 export default function SkillsStep() {
@@ -18,7 +18,9 @@ export default function SkillsStep() {
     const [searchTerm, setSearchTerm] = useState('');
     const [customSkill, setCustomSkill] = useState('');
 
-    const allSuggestions = [...new Set([...dentalSkills, ...salesSkills])];
+    const allSuggestions = language === 'ar'
+        ? [...new Set([...dentalSkillsAr, ...salesSkillsAr])]
+        : [...new Set([...dentalSkills, ...salesSkills])];
 
     const filteredSuggestions = allSuggestions.filter(
         (skill) =>
@@ -33,7 +35,7 @@ export default function SkillsStep() {
         }
     };
 
-    const popularSkills = [
+    const popularSkillsEn = [
         'Patient Care',
         'Dental X-rays',
         'Sterilization',
@@ -43,6 +45,22 @@ export default function SkillsStep() {
         'Patient Education',
         'Dental Software (Dentrix)',
     ];
+
+    const popularSkillsAr = [
+        'العناية بالمرضى',
+        'أشعة الأسنان',
+        'التعقيم',
+        'رسم خريطة الأسنان',
+        'الإنعاش القلبي الرئوي',
+        'مكافحة العدوى',
+        'تثقيف المرضى',
+        'برامج الأسنان (Dentrix)',
+        'التصوير والنشر',
+        'تحضير العازل المطاطي',
+        'إدارة صفحات العيادة',
+    ];
+
+    const popularSkills = language === 'ar' ? popularSkillsAr : popularSkillsEn;
 
     const remaining = 3 - skills.length;
 

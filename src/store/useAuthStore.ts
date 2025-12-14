@@ -100,6 +100,7 @@ export const useAuthStore = create<AuthState>()(
                                 lastName: userData.last_name,
                                 phone: userData.phone,
                                 avatar: userData.avatar,
+                                city: userData.city,
                                 verified: userData.verified,
                             },
                             createdAt: new Date(userData.created_at),
@@ -290,6 +291,7 @@ export const useAuthStore = create<AuthState>()(
                             last_name: updates.lastName,
                             phone: updates.phone,
                             avatar: updates.avatar,
+                            city: updates.city,
                         })
                         .eq('id', user.id);
 
@@ -341,6 +343,7 @@ export const useAuthStore = create<AuthState>()(
                                     lastName: userData.last_name,
                                     phone: userData.phone,
                                     avatar: userData.avatar,
+                                    city: userData.city,
                                     verified: userData.verified,
                                 },
                                 createdAt: new Date(userData.created_at),

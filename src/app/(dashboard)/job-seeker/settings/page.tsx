@@ -2,9 +2,11 @@
 
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/shared';
-import { Bell, Lock, User, Shield } from 'lucide-react';
-import { useState } from 'react';
+import { Button, Input } from '@/components/shared';
+import { Bell, Lock, User, Shield, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { iraqLocations } from '@/data/iraq_locations';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function SettingsPage() {
     const { user } = useAuthStore();
@@ -72,8 +74,112 @@ export default function SettingsPage() {
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
                             />
                         </div>
+                        <div className="pt-4 border-t border-gray-100 dark:border-gray-700">
+                            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                {language === 'ar' ? 'الموقع' : 'Location'}
+                            </h3>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                    {language === 'ar' ? 'المحافظة' : 'Governorate'}
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        name="city"
+                                        aria-label={language === 'ar' ? 'المحافظة' : 'Governorate'}
+                                        defaultValue={user?.profile.city || ''}
+                                        className="w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+                                    >
+                                        <option value="">{language === 'ar' ? 'اختر المحافظة' : 'Select Governorate'}</option>
+                                        {Object.entries(iraqLocations).map(([key, gov]) => (
+                                            <option key={key} value={language === 'ar' ? gov.ar : (gov.en || key)}>
+                                                {language === 'ar' ? gov.ar : (gov.en || key)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <MapPin size={18} className={`absolute ${language === 'ar' ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none`} />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    {language === 'ar'
+                                        ? 'سيتم تحديث موقعك في السيرة الذاتية تلقائياً عند الحفظ.'
+                                        : 'Your CV location will be automatically updated when you save.'}
+                                </p>
+                            </div>
+                        </div>
+
                         <div className="pt-2">
-                            <Button>{language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'}</Button>
+                            <Button
+                                onClick={async (e) => {
+                                    const btn = e.currentTarget;
+                                    const form = btn.closest('.p-6') as HTMLDivElement;
+                                    const inputs = form.querySelectorAll('input, select');
+                                    const values: Record<string, string> = {};
+
+                                    inputs.forEach(input => {
+                                        const el = input as HTMLInputElement | HTMLSelectElement;
+                                        if (el.type !== 'submit' && el.type !== 'button') {
+                                            // Handle mapping name attributes if available, else infer from order/context
+                                            // Or better, add name attributes to inputs above
+                                            if (el.getAttribute('aria-label') === (language === 'ar' ? 'الاسم الأول' : 'First Name')) values.firstName = el.value;
+                                            if (el.getAttribute('aria-label') === (language === 'ar' ? 'اسم العائلة' : 'Last Name')) values.lastName = el.value;
+                                            if (el.tagName === 'SELECT') values.city = el.value;
+                                        }
+                                    });
+
+                                    if (user) {
+                                        btn.disabled = true;
+                                        try {
+                                            // 1. Update Profile using Auth Store
+                                            await useAuthStore.getState().updateProfile({
+                                                firstName: values.firstName,
+                                                lastName: values.lastName,
+                                                city: values.city
+                                            });
+
+                                            // 2. Sync to CV (Profile -> CV)
+                                            // Check if CV exists
+                                            const supabase = getSupabaseClient();
+                                            const { data: cv } = await supabase
+                                                .from('cvs')
+                                                .select('id, personal_info') // Need personal_info to merge
+                                                .eq('user_id', user.id)
+                                                .single();
+
+                                            if (cv) {
+                                                // Create updated personal info object (preserving other fields like phone, bio etc)
+                                                // Wait, we can just update the 'city' column directly if it's a top-level column?
+                                                // Checking useCVStore, it saves: city: state.personalInfo.city || '' column in Insert/Update.
+                                                // It seems 'city' IS a top-level column in 'cvs' table based on PersonalInfoStep logic:
+                                                /*
+                                                    await (supabase.from('cvs') as any)
+                                                        .insert({
+                                                            user_id: user.id,
+                                                            photo: publicUrl,
+                                                            full_name: ...,
+                                                            city: personalInfo.city || '', 
+                                                            ...
+                                                */
+                                                // Yes, 'city' is a top-level column.
+
+                                                await supabase
+                                                    .from('cvs')
+                                                    .update({ city: values.city })
+                                                    .eq('id', cv.id);
+
+                                                console.log('Synced city to CV:', values.city);
+                                            }
+
+                                            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
+                                        } catch (err) {
+                                            console.error(err);
+                                            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
+                                        } finally {
+                                            btn.disabled = false;
+                                        }
+                                    }
+                                }}
+                            >
+                                {language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'}
+                            </Button>
                         </div>
                     </div>
                 </div>

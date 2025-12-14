@@ -12,6 +12,7 @@ import { PageLoader } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EmployerOnboardingModal from '@/components/onboarding/EmployerOnboardingModal';
 import { getSupabaseClient } from '@/lib/supabase';
+import { Menu } from 'lucide-react';
 
 export default function DashboardLayout({
     children,
@@ -23,6 +24,7 @@ export default function DashboardLayout({
     const { language } = useLanguage();
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [checkingProfile, setCheckingProfile] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Check if employer needs to complete profile
     useEffect(() => {
@@ -145,10 +147,31 @@ export default function DashboardLayout({
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            <Navbar />
-            <Sidebar />
-            <main className="ps-64 pt-20 min-h-screen transition-all duration-300">
-                <div className="p-6">
+            <div className="hidden md:block">
+                <Navbar />
+            </div>
+            <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+            {/* Mobile Sticky Header */}
+            <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-30 flex items-center justify-between px-4 transition-all duration-300">
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="p-2 -ms-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                        aria-label={language === 'ar' ? 'فتح القائمة' : 'Open Menu'}
+                    >
+                        <Menu size={24} />
+                    </button>
+                    <span className="font-bold text-lg text-gray-900 dark:text-white">
+                        Dental<span className="text-blue-600">Hire</span>
+                    </span>
+                </div>
+                {/* Placeholder for future actions (e.g. notifications) */}
+                <div className="w-10"></div>
+            </div>
+
+            <main className="md:ps-64 pt-20 md:pt-8 min-h-screen transition-all duration-300">
+                <div className="px-4 md:px-6 pb-20 md:pb-6">
                     {children}
                 </div>
             </main>

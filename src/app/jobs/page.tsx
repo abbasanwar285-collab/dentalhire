@@ -91,7 +91,6 @@ function JobsContent() {
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
     // URL-Driven State Synchronization
-    // URL-Driven State Synchronization
     useEffect(() => {
         if (jobs.length > 0) {
             if (jobIdParam) {
@@ -106,7 +105,10 @@ function JobsContent() {
                 setSelectedJobId(null);
             }
         }
-    }, [jobs, jobIdParam, selectedJobId, searchParams, router]);
+        // CRITICAL FIX: Only depend on external data (jobs) and URL (jobIdParam).
+        // Do NOT depend on selectedJobId or router/searchParams, as that causes race conditions
+        // where the old URL state reverts the optimistic new local state.
+    }, [jobs, jobIdParam]);
 
     // Navigation Helpers
     const handleJobSelect = (jobId: string) => {

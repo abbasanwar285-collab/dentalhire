@@ -30,4 +30,4 @@ const nextConfig = {
 
 export default withPWA(nextConfig);
 
-// Force restart
+// Force restart - Vercel Trigger

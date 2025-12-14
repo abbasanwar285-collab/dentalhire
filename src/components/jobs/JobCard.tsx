@@ -5,11 +5,7 @@ import { Card } from '@/components/shared';
 import { formatRelativeTime, formatTime } from '@/lib/utils';
 import { Building2, MapPin, DollarSign, Clock, Heart, Briefcase, Users } from 'lucide-react';
 
-interface JobCardProps {
-    job: Job;
-    isSelected?: boolean;
-    onClick?: () => void;
-}
+
 
 import Link from 'next/link';
 

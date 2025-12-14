@@ -107,6 +107,19 @@ function JobsContent() {
     };
 
 
+    const handleBackToJobs = (e?: React.MouseEvent) => {
+        // Prevent event bubbling
+        e?.preventDefault();
+        e?.stopPropagation();
+
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete('id');
+
+        // Use replace to ensure we "close" the modal in history, 
+        // preventing the "back button loop" issue on mobile.
+        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+    };
+
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 
     // Helper to determine role from title/desc
@@ -717,18 +730,13 @@ function JobsContent() {
                                 <div className="min-h-screen pb-20">
                                     {/* Mobile Header */}
                                     <div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex items-center gap-3 z-10">
-                                        <Link
-                                            href="/jobs"
-                                            replace
-                                            scroll={false}
+                                        <button
+                                            onClick={(e) => handleBackToJobs(e)}
                                             className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
-                                            onClick={(e) => {
-                                                // Optional: keep strict cleanup if needed, but Link handle navigation mostly
-                                                // We can just let Link do its job.
-                                            }}
+                                            type="button"
                                         >
                                             {language === 'ar' ? <ArrowRight size={24} /> : <ArrowLeft size={24} />}
-                                        </Link>
+                                        </button>
                                         <h2 className="font-bold text-lg text-gray-900 dark:text-white truncate">
                                             {selectedJob.title}
                                         </h2>

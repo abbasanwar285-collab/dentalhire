@@ -4,7 +4,7 @@
 // DentalHire - Jobs Listing Page
 // ============================================
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useJobStore } from '@/store/useJobStore';
@@ -59,7 +59,6 @@ function JobsContent() {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'duplicate'>('success');
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const hasAutoSelected = useRef(false);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -92,6 +91,7 @@ function JobsContent() {
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
     // URL-Driven State Synchronization
+    // URL-Driven State Synchronization
     useEffect(() => {
         if (jobs.length > 0) {
             if (jobIdParam) {
@@ -101,25 +101,9 @@ function JobsContent() {
                     setSelectedJobId(jobFromUrl.id);
                 }
             } else {
-                // If URL has NO ID
-                const isMobile = window.innerWidth < 1024;
-
-                if (isMobile) {
-                    // Mobile: Must be null (List View)
-                    setSelectedJobId(null);
-                } else {
-                    // Desktop: Auto-select first job if not already selected
-                    if (!selectedJobId && !hasAutoSelected.current) {
-                        const firstJobId = jobs[0].id;
-                        setSelectedJobId(firstJobId);
-                        hasAutoSelected.current = true;
-
-                        // Optional: Sync URL for consistency on desktop too
-                        const newParams = new URLSearchParams(searchParams.toString());
-                        newParams.set('id', firstJobId);
-                        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
-                    }
-                }
+                // If URL has NO ID, always clear selection
+                // This prevents "sticky" selection when navigating back
+                setSelectedJobId(null);
             }
         }
     }, [jobs, jobIdParam, selectedJobId, searchParams, router]);
@@ -741,7 +725,7 @@ function JobsContent() {
                         )}
 
                         {/* Mobile Job Details Sheet/Drawer */}
-                        <div className={`fixed inset-0 z-50 md:hidden transition-transform duration-300 transform ${selectedJobId ? 'translate-x-0' : (language === 'ar' ? '-translate-x-full' : 'translate-x-full')} bg-white dark:bg-gray-900 overflow-y-auto`}>
+                        <div className={`fixed inset-0 z-50 lg:hidden transition-transform duration-300 transform ${selectedJobId ? 'translate-x-0' : (language === 'ar' ? '-translate-x-full' : 'translate-x-full')} bg-white dark:bg-gray-900 overflow-y-auto`}>
                             {selectedJob && (
                                 <div className="min-h-screen pb-20">
                                     {/* Mobile Header */}

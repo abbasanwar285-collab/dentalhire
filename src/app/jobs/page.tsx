@@ -4,7 +4,7 @@
 // DentalHire - Jobs Listing Page
 // ============================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useJobStore } from '@/store/useJobStore';
@@ -90,8 +90,14 @@ function JobsContent() {
         return () => clearTimeout(debounceTimer);
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
+    // Ref to block race conditions during closing
+    const isClosingRef = useRef(false);
+
     // URL-Driven State Synchronization
     useEffect(() => {
+        // If we are currently closing, ignore URL updates temporarily
+        if (isClosingRef.current) return;
+
         if (jobs.length > 0) {
             if (jobIdParam) {
                 // If URL has ID, sync local state
@@ -101,17 +107,14 @@ function JobsContent() {
                 }
             } else {
                 // If URL has NO ID, always clear selection
-                // This prevents "sticky" selection when navigating back
                 setSelectedJobId(null);
             }
         }
-        // CRITICAL FIX: Only depend on external data (jobs) and URL (jobIdParam).
-        // Do NOT depend on selectedJobId or router/searchParams, as that causes race conditions
-        // where the old URL state reverts the optimistic new local state.
     }, [jobs, jobIdParam]);
 
     // Navigation Helpers
     const handleJobSelect = (jobId: string) => {
+        isClosingRef.current = false; // Reset lock
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set('id', jobId);
         router.push(`/jobs?${newParams.toString()}`, { scroll: false });
@@ -122,13 +125,21 @@ function JobsContent() {
         e?.preventDefault();
         e?.stopPropagation();
 
-        // Immediate UI Update (Optimistic)
+        // 1. Set Lock to prevent useEffect from re-opening
+        isClosingRef.current = true;
+
+        // 2. Immediate UI Update
         setSelectedJobId(null);
 
-        // Background URL Update
+        // 3. Update URL
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
         router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+
+        // 4. Release lock after delay (enough for router to finish)
+        setTimeout(() => {
+            isClosingRef.current = false;
+        }, 500);
     };
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;

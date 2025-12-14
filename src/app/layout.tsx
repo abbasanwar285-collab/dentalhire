@@ -5,7 +5,7 @@ import { AuthProvider } from "@/components/providers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AIAssistant } from "@/components/ai";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ToastProvider } from "@/components/shared";
+import { ToastProvider, SmartNotificationToast } from "@/components/shared";
 import { BottomNav } from "@/components/layout";
 
 const inter = Inter({
@@ -66,6 +66,7 @@ export default function RootLayout({
                   {children}
                 </ToastProvider>
                 <BottomNav />
+                <SmartNotificationToast />
               </ThemeProvider>
             </div>
             <AIAssistant />

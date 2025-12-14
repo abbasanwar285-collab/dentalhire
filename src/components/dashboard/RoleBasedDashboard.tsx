@@ -68,7 +68,7 @@ export default function RoleBasedDashboard({ role }: RoleBasedDashboardProps) {
                     </p>
                 </div>
                 {!isEmployer && (
-                    <Link href={`/${role}/cv-builder`}>
+                    <Link href="/job-seeker/cv-builder">
                         <Button leftIcon={<FileText size={18} />}>
                             {t('dashboard.editcv')}
                         </Button>
@@ -100,7 +100,7 @@ export default function RoleBasedDashboard({ role }: RoleBasedDashboardProps) {
                                     style={{ width: `${cvCompletion}%` }}
                                 />
                             </div>
-                            <Link href={`/${role}/cv-builder`}>
+                            <Link href="/job-seeker/cv-builder">
                                 <Button size="sm">{t('dashboard.completenow')}</Button>
                             </Link>
                         </div>

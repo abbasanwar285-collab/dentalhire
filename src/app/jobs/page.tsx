@@ -115,10 +115,18 @@ function JobsContent() {
         router.push(`/jobs?${newParams.toString()}`, { scroll: false });
     };
 
-    const handleBackToJobs = () => {
+    const handleBackToJobs = (e?: React.MouseEvent) => {
+        // Prevent event bubbling and default behavior
+        e?.preventDefault();
+        e?.stopPropagation();
+
+        // Immediate UI Update (Optimistic)
+        setSelectedJobId(null);
+
+        // Background URL Update
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
-        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
+        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
     };
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
@@ -731,8 +739,9 @@ function JobsContent() {
                                     {/* Mobile Header */}
                                     <div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex items-center gap-3 z-10">
                                         <button
-                                            onClick={handleBackToJobs}
+                                            onClick={(e) => handleBackToJobs(e)}
                                             className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                                            type="button"
                                         >
                                             {language === 'ar' ? <ArrowRight size={24} /> : <ArrowLeft size={24} />}
                                         </button>

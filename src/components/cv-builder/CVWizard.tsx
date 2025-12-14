@@ -54,8 +54,12 @@ interface StepConfig {
     required: boolean;
 }
 
+import { useEffect } from 'react';
+import { useAuthStore } from '@/store';
+
 export default function CVWizard() {
-    const { currentStep, setStep, nextStep, prevStep, isStepValid, getCompletionPercentage, saveCV } = useCVStore();
+    const { currentStep, setStep, nextStep, prevStep, isStepValid, getCompletionPercentage, saveCV, loadCV } = useCVStore();
+    const { user } = useAuthStore();
     const { t, language } = useLanguage();
     const { addToast } = useToast();
     const router = useRouter();
@@ -68,6 +72,13 @@ export default function CVWizard() {
     const [isSaving, setIsSaving] = useState(false);
 
     const cvState = useCVStore();
+
+    // Load CV Data on Mount
+    useEffect(() => {
+        if (user?.id) {
+            loadCV(user.id);
+        }
+    }, [user?.id, loadCV]);
 
     const handleAnalyze = async () => {
         if (getCompletionPercentage() < 50) {
@@ -101,29 +112,22 @@ export default function CVWizard() {
     };
 
     const handleCompleteCV = async () => {
+        if (!user?.id) {
+            addToast('You must be logged in to save your CV.', 'error');
+            return;
+        }
+
         setIsSaving(true);
         try {
-            // Assuming user ID is available via auth store or context, 
-            // but for now relying on the store's internal logic or passed prop if needed.
-            // However, useCVStore's saveCV requires userId. 
-            // We should get userId from AuthStore.
-            // Since I can't easily change the hook imports without checking the file again, 
-            // I will fetch the user session here or assume the store handles it.
-            // Wait, useCVStore.saveCV expects userId.
-            // I will wrap this in a check.
-
-            // Let's import useAuthStore at the top level to get the user ID.
-            // But I didn't add it in the imports replacement chunk.
-            // I will rely on the fact that I can add lines.
-
-            // Actually, I'll just trigger the modal for now to satisfy the user request immediately.
-            // The actual saving logic handles itself or we can do it after.
-            // The user request emphasizes the MESSAGE.
-
-            setShowCompletionModal(true);
-
+            const success = await saveCV(user.id);
+            if (success) {
+                setShowCompletionModal(true);
+            } else {
+                addToast('Failed to save CV. Please try again.', 'error');
+            }
         } catch (error) {
             console.error(error);
+            addToast('An error occurred while saving.', 'error');
         } finally {
             setIsSaving(false);
         }
@@ -321,7 +325,7 @@ export default function CVWizard() {
                                         <Button
                                             onClick={handleCompleteCV}
                                             rightIcon={<Check size={18} />}
-                                            isLoading={isSaving}
+                                            loading={isSaving}
                                         >
                                             {t('cv.completecv')}
                                         </Button>

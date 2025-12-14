@@ -27,11 +27,13 @@ import {
     BookmarkPlus,
     Clock,
     Filter,
-    SlidersHorizontal
+    SlidersHorizontal,
+    Menu
 } from 'lucide-react';
 
 // New Components
 import JobCard from '@/components/jobs/JobCard';
+import Sidebar from '@/components/layout/Sidebar';
 import JobFilters from '@/components/jobs/JobFilters';
 import JobSearchBar from '@/components/jobs/JobSearchBar';
 import JobEmptyState from '@/components/jobs/JobEmptyState';
@@ -41,7 +43,7 @@ import ApplicationSuccessModal from '@/components/jobs/ApplicationSuccessModal';
 import { Suspense } from 'react';
 
 function JobsContent() {
-    const { jobs, loadJobs, subscribeToJobs, isLoading, savedJobs, toggleSavedJob, applyToJob } = useJobStore();
+    const { jobs, loadJobs, subscribeToJobs, isLoading, savedJobs, toggleSavedJob, applyToJob, searchJobsSmart } = useJobStore();
     const { user } = useAuthStore();
     const { cvId, loadCV } = useCVStore();
     const router = useRouter();
@@ -52,10 +54,11 @@ function JobsContent() {
     // Local State
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
     const [showFilters, setShowFilters] = useState(false);
-    const [selectedJob, setSelectedJob] = useState<Job | null>(jobs[0] || null);
+    const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [isApplying, setIsApplying] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'duplicate'>('success');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     // Filter State
     const [searchQuery, setSearchQuery] = useState('');
@@ -68,35 +71,48 @@ function JobsContent() {
     });
 
     useEffect(() => {
-        loadJobs();
         const unsubscribe = subscribeToJobs();
         return () => {
             unsubscribe();
         };
-    }, [loadJobs, subscribeToJobs]);
+    }, [subscribeToJobs]);
 
     useEffect(() => {
-        if (user) {
-            loadCV(user.id);
-        }
-    }, [user, loadCV]);
+        const debounceTimer = setTimeout(() => {
+            if (user) {
+                loadCV(user.id);
+                searchJobsSmart(user.id, searchQuery);
+            } else {
+                loadJobs();
+            }
+        }, 500); // Debounce search
+
+        return () => clearTimeout(debounceTimer);
+    }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
     useEffect(() => {
         if (jobs.length > 0) {
             if (jobIdParam) {
                 const jobFromUrl = jobs.find(j => j.id === jobIdParam);
                 if (jobFromUrl) {
-                    setSelectedJob(jobFromUrl);
+                    setSelectedJobId(jobFromUrl.id);
                     return;
                 }
             }
 
             // Default select first job if no specific job selected yet
-            if (!selectedJob) {
-                setSelectedJob(jobs[0]);
+            // ONLY if window width is desktop-sized (heuristic)
+            if (!selectedJobId) {
+                // Check for mobile view (768px is standard md breakpoint)
+                const isMobile = window.innerWidth < 768;
+                if (!isMobile) {
+                    setSelectedJobId(jobs[0].id);
+                }
             }
         }
-    }, [jobs, jobIdParam, selectedJob]);
+    }, [jobs, jobIdParam, selectedJobId]);
+
+    const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 
     // Helper to determine role from title/desc
     const getJobRole = (job: Job): string | null => {
@@ -375,32 +391,42 @@ function JobsContent() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Header */}
-            <div className="bg-gradient-to-br from-blue-600 to-teal-600 pb-20 pt-8">
+            <div className="bg-gradient-to-br from-blue-600 to-teal-600 pb-12 md:pb-20 pt-6 md:pt-8">
                 <div className="container-custom">
                     <div className="flex items-center justify-between mb-8 relative z-20">
-                        <Link
-                            href={getBackLink()}
-                            className="flex items-center gap-2 text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg transition-all shadow-sm border border-white/10"
-                        >
-                            {language === 'ar' ? <ArrowRight size={20} /> : <ArrowLeft size={20} />}
-                            <span className="font-medium">{language === 'ar' ? 'الرجوع' : 'Back'}</span>
-                        </Link>
-                        {/* LanguageSwitcher is fixed position, so it doesn't need to be here for layout */}
+                        {/* Right Actions: Back + Menu */}
+                        <div className="flex items-center gap-3">
+                            <Link
+                                href={getBackLink()}
+                                className="flex items-center gap-2 text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm px-4 py-2 rounded-lg transition-all shadow-sm border border-white/10"
+                            >
+                                {language === 'ar' ? <ArrowRight size={20} /> : <ArrowLeft size={20} />}
+                                <span className="font-medium">{language === 'ar' ? 'الرجوع' : 'Back'}</span>
+                            </Link>
+
+                            {/* Mobile Menu Button */}
+                            <button
+                                onClick={() => setIsSidebarOpen(true)}
+                                className="md:hidden p-2 text-white bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg transition-all border border-white/10"
+                            >
+                                <Menu size={24} />
+                            </button>
+                        </div>
                     </div>
 
-                    <h1 className="text-3xl font-bold text-white mb-2">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-2 leading-tight">
                         {language === 'ar' ? 'اعثر على وظيفة أحلامك في طب الأسنان' : 'Find Your Dream Dental Job'}
                     </h1>
-                    <p className="text-blue-100 mb-8 max-w-2xl text-lg">
+                    <p className="text-blue-100 mb-6 md:mb-8 max-w-2xl text-base md:text-lg leading-relaxed">
                         {language === 'ar'
-                            ? 'نحن نساعدك في العثور على أفضل الفرص في مجال طب الأسنان حول العالم.'
-                            : 'We help you find the best dental opportunities around the world.'}
+                            ? 'نحن معك حتى نعثر على وظيفة تناسبك وتناسب مؤهلاتك'
+                            : 'We are with you until we find a job that suits you and your qualifications.'}
                     </p>
 
                     <div className="flex gap-4 items-start">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                             <JobSearchBar
                                 onSearch={setSearchQuery}
                                 initialQuery={searchQuery}
@@ -417,7 +443,9 @@ function JobsContent() {
                 </div>
             </div>
 
-            <div className="container-custom -mt-8 pb-12">
+
+
+            <div className="container-custom -mt-6 md:-mt-8 pb-12">
                 <div className="flex gap-6">
                     {/* Filters Sidebar (Desktop) */}
                     <div className={`hidden md:block transition-all duration-300 ${showFilters ? 'w-80' : 'w-0 overflow-hidden'}`}>
@@ -500,23 +528,23 @@ function JobsContent() {
                                 </Button>
                             </div>
                         ) : filteredJobs.length > 0 ? (
-                            <div className="flex gap-6 h-[calc(100vh-200px)] min-h-[600px]">
+                            <div className="flex flex-col lg:flex-row gap-6 items-start pb-20">
                                 {/* Job List */}
-                                <div className="w-full lg:w-2/5 overflow-y-auto pr-2 space-y-4 pb-20 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+                                <div className="w-full lg:w-2/5 space-y-4">
                                     {filteredJobs.map((job) => (
                                         <JobCard
                                             key={job.id}
                                             job={job}
                                             isSelected={selectedJob?.id === job.id}
-                                            onClick={() => setSelectedJob(job)}
+                                            onClick={() => setSelectedJobId(job.id)}
                                         />
                                     ))}
                                 </div>
 
                                 {/* Job Details (Desktop) */}
-                                <div className="hidden lg:block lg:w-3/5 overflow-y-auto pb-20 scrollbar-thin scrollbar-thumb-gray-200 dark:scrollbar-thumb-gray-700">
+                                <div className="hidden lg:block lg:w-3/5 sticky top-24">
                                     {selectedJob ? (
-                                        <Card className="sticky top-0">
+                                        <Card className="max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
                                             {/* Header */}
                                             <div className="flex items-start justify-between mb-8">
                                                 <div className="flex items-start gap-5">
@@ -525,8 +553,7 @@ function JobsContent() {
                                                     </div>
                                                     <div>
                                                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
-                                                            {language === 'ar' ? 'مطلوب ' : 'Required '}
-                                                            ({selectedJob.title})
+                                                            {language === 'ar' && !selectedJob.title.startsWith('مطلوب') ? `مطلوب ${selectedJob.title}` : selectedJob.title}
                                                         </h2>
                                                         <p className="text-lg text-gray-600 dark:text-gray-400 mb-3">
                                                             {selectedJob.clinicName}
@@ -559,9 +586,26 @@ function JobsContent() {
                                             <div className="grid grid-cols-2 gap-4 mb-8">
                                                 <div className="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700">
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1 opacity-70">{language === 'ar' ? 'الراتب' : 'Salary'}</p>
-                                                    <p className="font-bold text-gray-900 dark:text-white">
-                                                        {getSalaryLabel(selectedJob)}
-                                                    </p>
+                                                    <div className="font-bold text-gray-900 dark:text-white flex items-center justify-start gap-1">
+                                                        {selectedJob.salary.min === 0 && selectedJob.salary.max === 0 ? (
+                                                            <span>{language === 'ar' ? 'قابل للتفاوض' : 'Negotiable'}</span>
+                                                        ) : (
+                                                            <>
+                                                                <span>
+                                                                    {Number(selectedJob.salary.min) < 1000
+                                                                        ? Number(selectedJob.salary.min)
+                                                                        : (Number(selectedJob.salary.min) / 1000).toFixed(0)}
+                                                                </span>
+                                                                <span>-</span>
+                                                                <span>
+                                                                    {Number(selectedJob.salary.max) < 1000
+                                                                        ? Number(selectedJob.salary.max)
+                                                                        : (Number(selectedJob.salary.max) / 1000).toFixed(0)}
+                                                                </span>
+                                                                <span>{language === 'ar' ? 'ألف د.ع' : 'k IQD'}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                                 <div className="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700">
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1 opacity-70">{language === 'ar' ? 'النوع' : 'Type'}</p>
@@ -585,12 +629,17 @@ function JobsContent() {
                                                 </div>
                                                 <div className="p-4 bg-gray-50 dark:bg-gray-700/30 rounded-2xl border border-gray-100 dark:border-gray-700">
                                                     <p className="text-xs text-gray-500 uppercase tracking-wide mb-1 opacity-70">{language === 'ar' ? 'ساعات العمل' : 'Working Hours'}</p>
-                                                    <p className="font-bold text-gray-900 dark:text-white" dir="ltr">
-                                                        {selectedJob.workingHours
-                                                            ? `${selectedJob.workingHours.start} - ${selectedJob.workingHours.end}`
-                                                            : (language === 'ar' ? 'غير محدد' : 'Not specified')
-                                                        }
-                                                    </p>
+                                                    <div className="font-bold text-gray-900 dark:text-white flex items-center justify-start gap-1">
+                                                        {selectedJob.workingHours ? (
+                                                            <>
+                                                                <span>{formatTime(selectedJob.workingHours.start, language)}</span>
+                                                                <span>-</span>
+                                                                <span>{formatTime(selectedJob.workingHours.end, language)}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span>{language === 'ar' ? 'غير محدد' : 'Not specified'}</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -665,6 +714,142 @@ function JobsContent() {
                         ) : (
                             <JobEmptyState onReset={resetFilters} />
                         )}
+
+                        {/* Mobile Job Details Sheet/Drawer */}
+                        <div className={`fixed inset-0 z-50 md:hidden transition-transform duration-300 transform ${selectedJobId ? 'translate-x-0' : (language === 'ar' ? '-translate-x-full' : 'translate-x-full')} bg-white dark:bg-gray-900 overflow-y-auto`}>
+                            {selectedJob && (
+                                <div className="min-h-screen pb-20">
+                                    {/* Mobile Header */}
+                                    <div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex items-center gap-3 z-10">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedJobId(null);
+                                                // Clear ID from URL without refreshing
+                                                const newParams = new URLSearchParams(searchParams.toString());
+                                                newParams.delete('id');
+                                                router.push(`/jobs?${newParams.toString()}`, { scroll: false });
+                                            }}
+                                            className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
+                                        >
+                                            {language === 'ar' ? <ArrowRight size={24} /> : <ArrowLeft size={24} />}
+                                        </button>
+                                        <h2 className="font-bold text-lg text-gray-900 dark:text-white truncate">
+                                            {selectedJob.title}
+                                        </h2>
+                                    </div>
+
+                                    <div className="p-5 space-y-6">
+                                        {/* Job Header Info */}
+                                        <div className="flex flex-col gap-4">
+                                            <div className="w-16 h-16 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                                                <Building2 size={32} />
+                                            </div>
+                                            <div>
+                                                <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
+                                                    {language === 'ar' && !selectedJob.title.startsWith('مطلوب') ? `مطلوب ${selectedJob.title}` : selectedJob.title}
+                                                </h1>
+                                                <p className="text-gray-600 dark:text-gray-400">
+                                                    {selectedJob.clinicName}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Meta Tags */}
+                                        <div className="flex flex-wrap gap-3">
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-600 dark:text-gray-300">
+                                                <MapPin size={14} /> {selectedJob.location}
+                                            </span>
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/20 text-sm font-medium text-blue-600 dark:text-blue-400">
+                                                <Users size={14} /> {selectedJob.applications} {language === 'ar' ? 'متقدمين' : 'applicants'}
+                                            </span>
+                                            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-purple-50 dark:bg-purple-900/20 text-sm font-medium text-purple-600 dark:text-purple-400">
+                                                <Clock size={14} /> {formatRelativeTime(selectedJob.createdAt)}
+                                            </span>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="flex gap-3">
+                                            <Button
+                                                className="flex-1 py-6 text-lg"
+                                                onClick={handleApply}
+                                                disabled={isApplying}
+                                                leftIcon={<BookmarkPlus size={20} />}
+                                            >
+                                                {isApplying
+                                                    ? (language === 'ar' ? 'جاري التقديم...' : 'Applying...')
+                                                    : (language === 'ar' ? 'تقديم الآن' : 'Apply Now')
+                                                }
+                                            </Button>
+                                            <button
+                                                onClick={() => toggleSavedJob(selectedJob.id)}
+                                                className={`p-4 rounded-xl border border-gray-200 dark:border-gray-700 transition-all ${isJobSaved ? 'bg-red-50 text-red-500 border-red-200' : 'text-gray-400'}`}
+                                            >
+                                                <Heart size={24} fill={isJobSaved ? "currentColor" : "none"} />
+                                            </button>
+                                        </div>
+
+                                        <div className="h-px bg-gray-100 dark:bg-gray-800" />
+
+                                        {/* Highlights Grid */}
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                                                <p className="text-xs text-gray-500 mb-1">{language === 'ar' ? 'الراتب' : 'Salary'}</p>
+                                                <p className="font-bold text-gray-900 dark:text-white text-sm">
+                                                    {getSalaryLabel(selectedJob)}
+                                                </p>
+                                            </div>
+                                            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                                                <p className="text-xs text-gray-500 mb-1">{language === 'ar' ? 'النوع' : 'Type'}</p>
+                                                <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
+                                                    {getEmploymentTypeLabel(selectedJob.employmentType)}
+                                                </p>
+                                            </div>
+                                            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                                                <p className="text-xs text-gray-500 mb-1">{language === 'ar' ? 'الجنس' : 'Gender'}</p>
+                                                <p className="font-bold text-gray-900 dark:text-white text-sm capitalize">
+                                                    {selectedJob.gender === 'male'
+                                                        ? (language === 'ar' ? 'ذكر' : 'Male')
+                                                        : (language === 'ar' ? 'أنثى' : 'Female')}
+                                                </p>
+                                            </div>
+                                            <div className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                                                <p className="text-xs text-gray-500 mb-1">{language === 'ar' ? 'ساعات العمل' : 'Working Hours'}</p>
+                                                <p className="font-bold text-gray-900 dark:text-white text-sm">
+                                                    {selectedJob.workingHours
+                                                        ? `${formatTime(selectedJob.workingHours.start, language)} - ${formatTime(selectedJob.workingHours.end, language)}`
+                                                        : (language === 'ar' ? 'غير محدد' : 'Not specified')}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Description */}
+                                        <div>
+                                            <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                                                {language === 'ar' ? 'الوصف الوظيفي' : 'Job Description'}
+                                            </h3>
+                                            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm">
+                                                {selectedJob.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Requirements */}
+                                        <div>
+                                            <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
+                                                {language === 'ar' ? 'المتطلبات' : 'Requirements'}
+                                            </h3>
+                                            <ul className="space-y-2">
+                                                {selectedJob.requirements.map((req, i) => (
+                                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 shrink-0" />
+                                                        <span>{req}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -673,6 +858,12 @@ function JobsContent() {
                 isOpen={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
                 type={modalType}
+            />
+
+            {/* Mobile Sidebar Navigation */}
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
             />
         </div>
     );

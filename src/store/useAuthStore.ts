@@ -32,6 +32,7 @@ interface RegisterData {
     userType: UserType;
     firstName: string;
     lastName: string;
+    phone: string;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -180,6 +181,7 @@ export const useAuthStore = create<AuthState>()(
                                 last_name: data.lastName,
                                 role: data.role,
                                 user_type: data.userType,
+                                phone: data.phone,
                             },
                         },
                     });

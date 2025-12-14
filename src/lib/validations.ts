@@ -92,6 +92,7 @@ export const registerSchema = z.object({
     lastName: z.string().min(2, 'Last name is required'),
     role: z.enum(['job_seeker', 'clinic']),
     userType: z.enum(['dental_assistant', 'sales_rep', 'dentist', 'clinic', 'secretary', 'media', 'company', 'lab', 'dental_technician']),
+    phone: z.string().min(10, 'Please enter a valid phone number'),
     agreeToTerms: z.boolean().refine(val => val === true, 'You must agree to the terms'),
 }).refine(data => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

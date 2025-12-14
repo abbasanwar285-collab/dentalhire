@@ -11,7 +11,7 @@ import { Button, Input } from '@/components/shared';
 import {
     Eye, EyeOff, Mail, Lock, User, ArrowRight, ArrowLeft,
     Briefcase, Building2, Users, ShoppingBag, AlertCircle,
-    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical
+    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical, Phone
 } from 'lucide-react';
 import { UserType } from '@/types';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
@@ -85,6 +85,7 @@ function RegisterContent() {
             userType: selectedType,
             firstName: data.firstName,
             lastName: data.lastName,
+            phone: data.phone,
         });
 
         if (success) {
@@ -270,8 +271,8 @@ function RegisterContent() {
                 <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
                 {/* Main Content Area */}
-                <div className="bg-transparent pt-12">
-                    <div className="p-4 md:p-8">
+                <div className="bg-transparent pt-12 pb-32 min-h-screen overflow-y-auto">
+                    <div className="p-4 md:p-8 relative z-10">
                         {/* Error Message */}
                         {error && (
                             <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3">
@@ -446,6 +447,15 @@ function RegisterContent() {
                                     leftIcon={<Mail size={18} />}
                                     error={errors.email?.message}
                                     {...register('email')}
+                                />
+
+                                <Input
+                                    label="Phone Number"
+                                    type="tel"
+                                    placeholder="0501234567"
+                                    leftIcon={<Phone size={18} />}
+                                    error={errors.phone?.message}
+                                    {...register('phone')}
                                 />
 
                                 <div className="relative">

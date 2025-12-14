@@ -91,28 +91,51 @@ function JobsContent() {
         return () => clearTimeout(debounceTimer);
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
 
+    // URL-Driven State Synchronization
     useEffect(() => {
         if (jobs.length > 0) {
             if (jobIdParam) {
+                // If URL has ID, sync local state
                 const jobFromUrl = jobs.find(j => j.id === jobIdParam);
                 if (jobFromUrl) {
                     setSelectedJobId(jobFromUrl.id);
-                    return;
                 }
-            }
-
-            // Default select first job if no specific job selected yet
-            // ONLY if window width is desktop-sized (heuristic)
-            if (!selectedJobId && !hasAutoSelected.current) {
-                // Check for mobile view (1024px is standard lg breakpoint where split view starts)
+            } else {
+                // If URL has NO ID
                 const isMobile = window.innerWidth < 1024;
-                if (!isMobile) {
-                    setSelectedJobId(jobs[0].id);
-                    hasAutoSelected.current = true;
+
+                if (isMobile) {
+                    // Mobile: Must be null (List View)
+                    setSelectedJobId(null);
+                } else {
+                    // Desktop: Auto-select first job if not already selected
+                    if (!selectedJobId && !hasAutoSelected.current) {
+                        const firstJobId = jobs[0].id;
+                        setSelectedJobId(firstJobId);
+                        hasAutoSelected.current = true;
+
+                        // Optional: Sync URL for consistency on desktop too
+                        const newParams = new URLSearchParams(searchParams.toString());
+                        newParams.set('id', firstJobId);
+                        router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+                    }
                 }
             }
         }
-    }, [jobs, jobIdParam, selectedJobId]);
+    }, [jobs, jobIdParam, selectedJobId, searchParams, router]);
+
+    // Navigation Helpers
+    const handleJobSelect = (jobId: string) => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.set('id', jobId);
+        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
+    };
+
+    const handleBackToJobs = () => {
+        const newParams = new URLSearchParams(searchParams.toString());
+        newParams.delete('id');
+        router.push(`/jobs?${newParams.toString()}`, { scroll: false });
+    };
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;
 
@@ -538,7 +561,7 @@ function JobsContent() {
                                             key={job.id}
                                             job={job}
                                             isSelected={selectedJob?.id === job.id}
-                                            onClick={() => setSelectedJobId(job.id)}
+                                            onClick={() => handleJobSelect(job.id)}
                                         />
                                     ))}
                                 </div>
@@ -724,13 +747,7 @@ function JobsContent() {
                                     {/* Mobile Header */}
                                     <div className="sticky top-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 p-4 flex items-center gap-3 z-10">
                                         <button
-                                            onClick={() => {
-                                                setSelectedJobId(null);
-                                                // Clear ID from URL without refreshing
-                                                const newParams = new URLSearchParams(searchParams.toString());
-                                                newParams.delete('id');
-                                                router.push(`/jobs?${newParams.toString()}`, { scroll: false });
-                                            }}
+                                            onClick={handleBackToJobs}
                                             className="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500"
                                         >
                                             {language === 'ar' ? <ArrowRight size={24} /> : <ArrowLeft size={24} />}

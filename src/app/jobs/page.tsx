@@ -54,7 +54,6 @@ function JobsContent() {
     // Local State
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
     const [showFilters, setShowFilters] = useState(false);
-    const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [isApplying, setIsApplying] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [modalType, setModalType] = useState<'success' | 'duplicate'>('success');
@@ -103,61 +102,38 @@ function JobsContent() {
             newParams.delete('id');
             // REPLACE the current history entry to wipe the stuck ID
             router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
-            // Also sync local state immediately
-            setSelectedJobId(null);
         }
     }, []); // Run ONCE on mount
 
     // Ref to block race conditions during closing
     const isClosingRef = useRef(false);
 
-    // URL-Driven State Synchronization
-    useEffect(() => {
-        // If we are currently closing, ignore URL updates temporarily
-        if (isClosingRef.current) return;
-
-        if (jobs.length > 0) {
-            if (jobIdParam) {
-                // If URL has ID, sync local state
-                const jobFromUrl = jobs.find(j => j.id === jobIdParam);
-                if (jobFromUrl) {
-                    setSelectedJobId(jobFromUrl.id);
-                }
-            } else {
-                // If URL has NO ID, always clear selection
-                setSelectedJobId(null);
-            }
-        }
-    }, [jobs, jobIdParam]);
+    // REFACTOR: Derive Selection directly from URL (Single Source of Truth)
+    // This eliminates race conditions between Local State <-> URL
+    const selectedJobId = jobIdParam;
 
     // Navigation Helpers
+    // If we want "Optimistic UI", we can just rely on Next.js 13 router usually being fast enough for params
+    // OR we can implement a transition state if needed, but for now simplicity is key to fixing the bug.
     const handleJobSelect = (jobId: string) => {
-        isClosingRef.current = false; // Reset lock
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.set('id', jobId);
+        // Using replace for smoother browsing on mobile? No, Push is better for "Back" button to work (History)
+        // BUT for the "Drawer" pattern, sometimes Replace is preferred if we treat it as a modal.
+        // However, user wants "Back" button to close it. So PUSH is correct (addToHistory).
         router.push(`/jobs?${newParams.toString()}`, { scroll: false });
     };
 
     const handleBackToJobs = (e?: React.MouseEvent) => {
-        // Prevent event bubbling and default behavior
+        // Prevent event bubbling
         e?.preventDefault();
         e?.stopPropagation();
 
-        // 1. Set Lock to prevent useEffect from re-opening
-        isClosingRef.current = true;
-
-        // 2. Immediate UI Update
-        setSelectedJobId(null);
-
-        // 3. Update URL - Use Replace to clean history
+        // Simply update URL to remove 'id'.
+        // This causes 'jobIdParam' to become null -> 'selectedJobId' becomes null -> Drawer closes.
         const newParams = new URLSearchParams(searchParams.toString());
         newParams.delete('id');
         router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
-
-        // 4. Release lock after delay (enough for router to finish)
-        setTimeout(() => {
-            isClosingRef.current = false;
-        }, 500);
     };
 
     const selectedJob = jobs.find(j => j.id === selectedJobId) || null;

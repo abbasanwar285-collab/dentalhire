@@ -92,17 +92,21 @@ function JobsContent() {
 
     // AGGRESSIVE FIX: Force clear URL on mobile mount if sticking
     useEffect(() => {
+        // Run only on client side mount
         const isMobile = window.innerWidth < 1024;
-        if (isMobile && jobIdParam) {
-            // If we land on mobile with an ID, check if it was intended. 
-            // For now, let's aggressively clear it to solve the "stuck" issue.
-            // A better approach would be to check navigation type, but history API is limited.
-            // We only clear if it seems to be an initial load (not a user interaction).
 
-            // Actually, simply clearing selectedJobId here while the other effect syncs might race.
-            // Let's rely on the user having to click.
+        // If we are on mobile AND have an ID param (but user just landed here), 
+        // we forcefully clear it to prevent the "sticky drawer" issue.
+        // We use a small timeout to let the initial router state settle.
+        if (isMobile && jobIdParam) {
+            const newParams = new URLSearchParams(searchParams.toString());
+            newParams.delete('id');
+            // REPLACE the current history entry to wipe the stuck ID
+            router.replace(`/jobs?${newParams.toString()}`, { scroll: false });
+            // Also sync local state immediately
+            setSelectedJobId(null);
         }
-    }, []);
+    }, []); // Run ONCE on mount
 
     // Ref to block race conditions during closing
     const isClosingRef = useRef(false);

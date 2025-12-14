@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AIAssistant } from "@/components/ai";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ToastProvider } from "@/components/shared";
+import { BottomNav } from "@/components/layout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -54,16 +55,19 @@ export default function RootLayout({
       <body className={`${inter.variable} ${cairo.variable} font-sans antialiased`}>
         <LanguageProvider>
           <AuthProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="dark"
-              enableSystem={false}
-              disableTransitionOnChange
-            >
-              <ToastProvider>
-                {children}
-              </ToastProvider>
-            </ThemeProvider>
+            <div className="pb-16 lg:pb-0"> {/* Global padding for Bottom Nav */}
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="dark"
+                enableSystem={false}
+                disableTransitionOnChange
+              >
+                <ToastProvider>
+                  {children}
+                </ToastProvider>
+                <BottomNav />
+              </ThemeProvider>
+            </div>
             <AIAssistant />
           </AuthProvider>
         </LanguageProvider>

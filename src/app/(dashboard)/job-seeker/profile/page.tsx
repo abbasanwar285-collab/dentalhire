@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef, useState } from 'react';
 import { useAuthStore, useCVStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';

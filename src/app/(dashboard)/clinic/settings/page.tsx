@@ -2,74 +2,60 @@
 
 import { useAuthStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Button, useToast } from '@/components/shared';
+import { Button } from '@/components/shared';
 import { Lock, Building2, CreditCard, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ClinicSettingsPage() {
     const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
-    const { addToast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
     // Local state for fields
-    const [firstName, setFirstName] = useState(user?.profile?.firstName || '');
-    const [lastName, setLastName] = useState(user?.profile?.lastName || '');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+
+    // Initialize state from user data
+    useEffect(() => {
+        if (user?.profile) {
+            setFirstName(user.profile.firstName || '');
+            setLastName(user.profile.lastName || '');
+        }
+    }, [user]);
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
-            addToast(
-                language === 'ar' ? 'يرجى إدخال كلمة المرور وتأكيدها' : 'Please enter and confirm password',
-                'error'
-            );
+            alert(language === 'ar' ? 'يرجى إدخال كلمة المرور وتأكيدها' : 'Please enter and confirm password');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            addToast(
-                language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match',
-                'error'
-            );
+            alert(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
             return;
         }
 
         if (newPassword.length < 6) {
-            addToast(
-                language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters',
-                'error'
-            );
+            alert(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
             return;
         }
 
         setIsChangingPassword(true);
         try {
-            // Import should be handled if getSupabaseClient is not available, but usually stick to store
-            // useAuthStore doesn't expose updateUser directly, so we need to get supabase client
-            const { createClientComponentClient } = require('@supabase/auth-helpers-nextjs');
-            // OR use our lib
-            const { getSupabaseClient } = require('@/lib/supabase');
             const supabase = getSupabaseClient();
-
             const { error } = await supabase.auth.updateUser({ password: newPassword });
 
             if (error) throw error;
 
-            addToast(
-                language === 'ar' ? 'تم تغيير كلمة المرور بنجاح ✨' : 'Password updated successfully ✨',
-                'success'
-            );
+            alert(language === 'ar' ? 'تم تغيير كلمة المرور بنجاح ✨' : 'Password updated successfully ✨');
             setNewPassword('');
             setConfirmPassword('');
         } catch (error: any) {
             console.error('Password error:', error);
-            addToast(
-                language === 'ar' ? 'حدث خطأ أثناء تغيير كلمة المرور' : 'Error updating password',
-                'error'
-            );
+            alert(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message);
         } finally {
             setIsChangingPassword(false);
         }
@@ -85,16 +71,10 @@ export default function ClinicSettingsPage() {
                 lastName
             });
 
-            addToast(
-                language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨',
-                'success'
-            );
+            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨');
         } catch (error) {
             console.error('Save error:', error);
-            addToast(
-                language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes',
-                'error'
-            );
+            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
         } finally {
             setIsSaving(false);
         }

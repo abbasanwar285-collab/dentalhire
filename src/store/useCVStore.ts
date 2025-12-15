@@ -229,8 +229,11 @@ export const useCVStore = create<CVState>()(
 
             loadCV: async (userId: string) => {
                 const state = get();
-                if (state.isDirty) {
-                    console.log('Skipping CV load due to unsaved changes');
+                // Only skip if we have a loaded CV and unsaved changes.
+                // If cvId is null, it means we are initializing (e.g. new device/fresh load),
+                // so we should overwrite potential defaults/local storage garbage with DB data.
+                if (state.isDirty && state.cvId) {
+                    console.log('Skipping CV load due to unsaved changes on existing CV');
                     return;
                 }
 

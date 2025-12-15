@@ -372,131 +372,140 @@ export default function CVWizard() {
                             <div className="animate-fade-in">
                                 {renderStep()}
                             </div>
+                        </div> {/* End of Scrollable Content Area */}
 
-                            {/* Navigation Buttons */}
-                            <div className="mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                                <Button
-                                    variant="ghost"
-                                    onClick={prevStep}
-                                    disabled={currentStep === 0}
-                                    leftIcon={<ChevronLeft size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
-                                >
-                                    {t('cv.previous')}
-                                </Button>
+                        {/* Navigation Buttons - Sticky Footer on Mobile */}
+                        <div className={cn(
+                            "mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between",
+                            isMobileStepOpen ? "sticky bottom-0 bg-white dark:bg-gray-800 p-4 mt-0 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10" : ""
+                        )}>
+                            <Button
+                                variant="ghost"
+                                onClick={prevStep}
+                                disabled={currentStep === 0}
+                                leftIcon={<ChevronLeft size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
+                            >
+                                {t('cv.previous')}
+                            </Button>
 
-                                <div className="flex items-center gap-3">
-                                    {!steps[currentStep].required && (
-                                        <Button variant="ghost" onClick={nextStep}>
-                                            {t('cv.skip')}
-                                        </Button>
-                                    )}
-                                    {currentStep === steps.length - 1 ? (
-                                        <Button
-                                            onClick={handleCompleteCV}
-                                            rightIcon={<Check size={18} />}
-                                            loading={isSaving}
-                                        >
-                                            {t('cv.completecv')}
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            onClick={nextStep}
-                                            disabled={!canProceed}
-                                            rightIcon={<ChevronRight size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
-                                        >
-                                            {t('cv.continue')}
-                                        </Button>
-                                    )}
-                                </div>
+                            <div className="flex items-center gap-3">
+                                {!steps[currentStep].required && (
+                                    <Button variant="ghost" onClick={nextStep}>
+                                        {t('cv.skip')}
+                                    </Button>
+                                )}
+                                {currentStep === steps.length - 1 ? (
+                                    <Button
+                                        onClick={handleCompleteCV}
+                                        rightIcon={<Check size={18} />}
+                                        loading={isSaving}
+                                    >
+                                        {t('cv.completecv')}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={nextStep}
+                                        disabled={!canProceed}
+                                        rightIcon={<ChevronRight size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
+                                    >
+                                        {t('cv.continue')}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Analysis Modal */}
-            {showAnalysis && analysisResults && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in">
-                        <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
-                            <h3 className="font-bold flex items-center gap-2">
-                                <Sparkles size={18} /> AI CV Analysis
-                            </h3>
-                            <button onClick={() => setShowAnalysis(false)} className="text-white/80 hover:text-white" aria-label="Close">
-                                <X size={20} />
-                            </button>
-                        </div>
-                        <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-                            <div>
-                                <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                                    Summary
-                                </h4>
-                                <p className="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm border-l-4 border-purple-500">
-                                    {analysisResults.summary}
-                                </p>
-                            </div>
-
-                            <div>
-                                <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                                    Improvement Tips
-                                </h4>
-                                <ul className="space-y-3">
-                                    {analysisResults.tips?.map((tip, idx) => (
-                                        <li key={idx} className="flex gap-3 text-sm text-gray-700 dark:text-gray-300">
-                                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center font-bold text-xs">
-                                                {idx + 1}
-                                            </span>
-                                            <span>{tip}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-700">
-                                <Button onClick={() => setShowAnalysis(false)} className="w-full">
-                                    Close & Apply Changes
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Completion Modal */}
-            {showCompletionModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
-                    <Confetti />
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all">
-                        <div className="p-8 text-center space-y-6">
-                            <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
-                                <Sparkles size={40} className="text-green-600 dark:text-green-400" />
-                            </div>
-
-                            <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                {language === 'ar' ? 'تم حفظ معلوماتك بنجاح!' : 'Information Saved Successfully!'}
-                            </h3>
-
-                            <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-                                {language === 'ar'
-                                    ? 'نشكرك على إكمال سيرتك الذاتية. نتمنى لك التوفيق في الحصول على الوظيفة المناسبة التي تطمح إليها.'
-                                    : 'Thank you for completing your CV. We wish you the best of luck in finding the perfect job that matches your aspirations.'}
-                            </p>
-
-                            <div className="pt-4">
-                                <Button
-                                    onClick={() => {
-                                        setShowCompletionModal(false);
-                                        router.push('/job-seeker/dashboard');
-                                    }}
-                                    className="w-full py-6 text-lg"
-                                >
-                                    {language === 'ar' ? 'الذهاب إلى لوحة التحكم' : 'Go to Dashboard'}
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
+            </div >
+
+        {/* Analysis Modal */ }
+    {
+        showAnalysis && analysisResults && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in">
+                    <div className="p-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gradient-to-r from-purple-500 to-indigo-600 text-white">
+                        <h3 className="font-bold flex items-center gap-2">
+                            <Sparkles size={18} /> AI CV Analysis
+                        </h3>
+                        <button onClick={() => setShowAnalysis(false)} className="text-white/80 hover:text-white" aria-label="Close">
+                            <X size={20} />
+                        </button>
+                    </div>
+                    <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                Summary
+                            </h4>
+                            <p className="text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg text-sm border-l-4 border-purple-500">
+                                {analysisResults.summary}
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                                Improvement Tips
+                            </h4>
+                            <ul className="space-y-3">
+                                {analysisResults.tips?.map((tip, idx) => (
+                                    <li key={idx} className="flex gap-3 text-sm text-gray-700 dark:text-gray-300">
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center font-bold text-xs">
+                                            {idx + 1}
+                                        </span>
+                                        <span>{tip}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className="pt-4 mt-2 border-t border-gray-100 dark:border-gray-700">
+                            <Button onClick={() => setShowAnalysis(false)} className="w-full">
+                                Close & Apply Changes
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    {/* Completion Modal */ }
+    {
+        showCompletionModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-fade-in backdrop-blur-sm">
+                <Confetti />
+                <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative transform scale-100 transition-all">
+                    <div className="p-8 text-center space-y-6">
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-slow">
+                            <Sparkles size={40} className="text-green-600 dark:text-green-400" />
+                        </div>
+
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                            {language === 'ar' ? 'تم حفظ معلوماتك بنجاح!' : 'Information Saved Successfully!'}
+                        </h3>
+
+                        <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
+                            {language === 'ar'
+                                ? 'نشكرك على إكمال سيرتك الذاتية. نتمنى لك التوفيق في الحصول على الوظيفة المناسبة التي تطمح إليها.'
+                                : 'Thank you for completing your CV. We wish you the best of luck in finding the perfect job that matches your aspirations.'}
+                        </p>
+
+                        <div className="pt-4">
+                            <Button
+                                onClick={() => {
+                                    setShowCompletionModal(false);
+                                    router.push('/job-seeker/dashboard');
+                                }}
+                                className="w-full py-6 text-lg"
+                            >
+                                {language === 'ar' ? 'الذهاب إلى لوحة التحكم' : 'Go to Dashboard'}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+        </div >
     );
 }

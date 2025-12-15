@@ -4,8 +4,8 @@
 // DentalHire - CV Builder Wizard Component
 // ============================================
 
-import { useState } from 'react';
-import { useCVStore } from '@/store';
+import { useState, useEffect, useRef } from 'react';
+import { useCVStore, useAuthStore } from '@/store';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,6 +31,8 @@ import {
     Eye,
     Sparkles,
     X,
+    ArrowLeft,
+    Menu,
 } from 'lucide-react';
 
 // Step Components
@@ -54,9 +56,6 @@ interface StepConfig {
     required: boolean;
 }
 
-import { useEffect } from 'react';
-import { useAuthStore } from '@/store';
-
 export default function CVWizard() {
     const { currentStep, setStep, nextStep, prevStep, isStepValid, isStepCompleted, getCompletionPercentage, saveCV, loadCV } = useCVStore();
     const { user } = useAuthStore();
@@ -70,6 +69,9 @@ export default function CVWizard() {
     const [analysisResults, setAnalysisResults] = useState<{ tips: string[]; summary: string } | null>(null);
     const [showCompletionModal, setShowCompletionModal] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    // New state for mobile step overlay
+    const [isMobileStepOpen, setIsMobileStepOpen] = useState(false);
+    const overlayRef = useRef<HTMLDivElement>(null);
 
     const cvState = useCVStore();
 
@@ -79,6 +81,13 @@ export default function CVWizard() {
             loadCV(user.id);
         }
     }, [user?.id, loadCV]);
+
+    // Scroll to top of overlay when step changes
+    useEffect(() => {
+        if (isMobileStepOpen && overlayRef.current) {
+            overlayRef.current.scrollTop = 0;
+        }
+    }, [currentStep, isMobileStepOpen]);
 
     const handleAnalyze = async () => {
         if (getCompletionPercentage() < 50) {
@@ -235,8 +244,8 @@ export default function CVWizard() {
                         </div>
                     </div>
 
-                    {/* Progress Bar */}
-                    <div className="mt-6">
+                    {/* Progress Bar - Hidden when mobile step is open to save space/focus */}
+                    <div className={cn("mt-6", isMobileStepOpen ? "hidden lg:block" : "block")}>
                         <div className="flex items-center justify-between text-sm mb-2">
                             <span className="text-gray-600 dark:text-gray-400">{t('cv.progress')}</span>
                             <span className="font-medium text-blue-600">{completion}% {t('cv.complete')}</span>
@@ -253,7 +262,8 @@ export default function CVWizard() {
 
                 <div className="grid lg:grid-cols-4 gap-8">
                     {/* Sidebar - Steps Navigation */}
-                    <div className="lg:col-span-1">
+                    {/* Hide sidebar on mobile if a step is open */}
+                    <div className={cn("lg:col-span-1", isMobileStepOpen ? "hidden lg:block" : "block")}>
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sticky top-24">
                             <nav className="space-y-1">
                                 {steps.map((step) => {
@@ -263,7 +273,11 @@ export default function CVWizard() {
                                     return (
                                         <button
                                             key={step.id}
-                                            onClick={() => setStep(step.id)}
+                                            onClick={() => {
+                                                setStep(step.id);
+                                                setIsMobileStepOpen(true);
+                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                            }}
                                             className={cn(
                                                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-start transition-all',
                                                 isActive
@@ -306,10 +320,38 @@ export default function CVWizard() {
                     </div>
 
                     {/* Main Content */}
-                    <div className="lg:col-span-3">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8">
-                            {/* Step Header */}
-                            <div className="mb-6 pb-6 border-b border-gray-100 dark:border-gray-700">
+                    <div
+                        ref={overlayRef}
+                        className={cn(
+                            "lg:col-span-3 transition-all duration-300",
+                            // Mobile Overlay Styles
+                            isMobileStepOpen
+                                ? "fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 overflow-y-auto p-4 sm:p-6"
+                                : "hidden lg:block"
+                        )}
+                    >
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 md:p-8 min-h-[500px]">
+
+                            {/* Mobile Back Button */}
+                            <div className="lg:hidden mb-6 pb-4 border-b border-gray-100 dark:border-gray-700 flex items-center gap-3">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => setIsMobileStepOpen(false)}
+                                    className="p-0 -ml-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                                >
+                                    <div className="flex items-center gap-1">
+                                        <ArrowLeft size={20} className={language === 'ar' ? 'rotate-180' : ''} />
+                                        <span>{t('common.back') || 'Back'}</span>
+                                    </div>
+                                </Button>
+                                <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex-1 text-center pr-8">
+                                    {t(steps[currentStep].titleKey)}
+                                </h3>
+                            </div>
+
+                            {/* Step Header (Desktop mainly, but kept for structure) */}
+                            <div className="mb-6 pb-6 border-b border-gray-100 dark:border-gray-700 hidden lg:block">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
                                         {steps[currentStep].icon}
@@ -371,6 +413,7 @@ export default function CVWizard() {
                     </div>
                 </div>
             </div>
+
             {/* Analysis Modal */}
             {showAnalysis && analysisResults && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

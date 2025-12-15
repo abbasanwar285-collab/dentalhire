@@ -1,17 +1,17 @@
 import { useRef, useState } from 'react';
 import { useAuthStore, useCVStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/shared';
+import { Button, useToast } from '@/components/shared';
 import { User, Mail, Phone, Calendar, Edit, FileText, CheckCircle, Camera, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { uploadAvatar } from '@/lib/storage';
-import { toast } from 'react-hot-toast';
 
 export default function JobSeekerProfilePage() {
     const { user, updateProfile } = useAuthStore();
     const { getCompletionPercentage } = useCVStore();
     const { language } = useLanguage();
+    const { addToast } = useToast();
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,12 +36,12 @@ export default function JobSeekerProfilePage() {
 
         // Validation
         if (file.size > 5 * 1024 * 1024) {
-            toast.error(language === 'ar' ? 'حجم الصورة يجب أن لا يتجاوز 5 ميجابايت' : 'Image size must be less than 5MB');
+            addToast(language === 'ar' ? 'حجم الصورة يجب أن لا يتجاوز 5 ميجابايت' : 'Image size must be less than 5MB', 'error');
             return;
         }
 
         if (!file.type.startsWith('image/')) {
-            toast.error(language === 'ar' ? 'يرجى اختيار ملف صورة صالح' : 'Please select a valid image file');
+            addToast(language === 'ar' ? 'يرجى اختيار ملف صورة صالح' : 'Please select a valid image file', 'error');
             return;
         }
 
@@ -51,13 +51,13 @@ export default function JobSeekerProfilePage() {
 
             if (result?.url) {
                 await updateProfile({ avatar: result.url });
-                toast.success(language === 'ar' ? 'تم تحديث الصورة الشخصية' : 'Profile picture updated successfully');
+                addToast(language === 'ar' ? 'تم تحديث الصورة الشخصية' : 'Profile picture updated successfully', 'success');
             } else {
                 throw new Error('Upload failed');
             }
         } catch (error) {
             console.error(error);
-            toast.error(language === 'ar' ? 'حدث خطأ أثناء رفع الصورة' : 'Failed to upload image');
+            addToast(language === 'ar' ? 'حدث خطأ أثناء رفع الصورة' : 'Failed to upload image', 'error');
         } finally {
             setIsUploading(false);
         }

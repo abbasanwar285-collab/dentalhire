@@ -278,6 +278,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 id: job.id,
                 clinicId: job.clinic_id,
                 clinicName: job.clinics?.name || 'Unknown Clinic',
+                clinicLogo: job.clinics?.logo,
                 title: job.title,
                 description: job.description,
                 requirements: job.requirements || [],

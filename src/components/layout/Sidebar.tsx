@@ -55,6 +55,18 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
         }
     }, [pathname]);
 
+    // Lock body scroll when sidebar is open on mobile
+    useEffect(() => {
+        if (isOpen && window.innerWidth < 768) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
     // Get current role context from URL or user profile
     const getCurrentContext = () => {
         if (!pathname) return null;

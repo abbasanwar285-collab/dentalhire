@@ -1,16 +1,19 @@
-'use client';
-
+import { useRef, useState } from 'react';
 import { useAuthStore, useCVStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/shared';
-import { User, Mail, Phone, Calendar, Edit, FileText, CheckCircle } from 'lucide-react';
+import { User, Mail, Phone, Calendar, Edit, FileText, CheckCircle, Camera, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { uploadAvatar } from '@/lib/storage';
+import { toast } from 'react-hot-toast';
 
 export default function JobSeekerProfilePage() {
-    const { user } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
     const { getCompletionPercentage } = useCVStore();
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     if (!user || !user.profile) {
         return <div>{language === 'ar' ? 'جاري تحميل الملف الشخصي...' : 'Loading profile...'}</div>;
@@ -27,6 +30,39 @@ export default function JobSeekerProfilePage() {
         });
     };
 
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validation
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error(language === 'ar' ? 'حجم الصورة يجب أن لا يتجاوز 5 ميجابايت' : 'Image size must be less than 5MB');
+            return;
+        }
+
+        if (!file.type.startsWith('image/')) {
+            toast.error(language === 'ar' ? 'يرجى اختيار ملف صورة صالح' : 'Please select a valid image file');
+            return;
+        }
+
+        setIsUploading(true);
+        try {
+            const result = await uploadAvatar(file, user.id);
+
+            if (result?.url) {
+                await updateProfile({ avatar: result.url });
+                toast.success(language === 'ar' ? 'تم تحديث الصورة الشخصية' : 'Profile picture updated successfully');
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error(language === 'ar' ? 'حدث خطأ أثناء رفع الصورة' : 'Failed to upload image');
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
     return (
         <div className="space-y-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -37,7 +73,7 @@ export default function JobSeekerProfilePage() {
                 <div className="h-32 bg-gradient-to-r from-blue-500 to-teal-500"></div>
                 <div className="px-6 pb-6">
                     <div className="relative flex justify-between items-end -mt-12 mb-6">
-                        <div className="relative">
+                        <div className="relative group">
                             <div className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 overflow-hidden relative">
                                 {avatar ? (
                                     <Image
@@ -51,9 +87,32 @@ export default function JobSeekerProfilePage() {
                                         <User size={40} />
                                     </div>
                                 )}
+
+                                {/* Upload Overlay */}
+                                <div
+                                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer z-10"
+                                    onClick={() => !isUploading && fileInputRef.current?.click()}
+                                >
+                                    {isUploading ? (
+                                        <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                    ) : (
+                                        <Camera className="w-6 h-6 text-white" />
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Hidden Input */}
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                className="hidden"
+                                accept="image/*"
+                                onChange={handleFileChange}
+                                disabled={isUploading}
+                            />
+
                             {verified && (
-                                <div className={`absolute bottom-0 ${language === 'ar' ? 'left-0' : 'right-0'} bg-white dark:bg-gray-800 rounded-full p-1 border border-gray-100 dark:border-gray-700`} title={language === 'ar' ? 'ملف موثق' : 'Verified Profile'}>
+                                <div className={`absolute bottom-0 ${language === 'ar' ? 'left-0' : 'right-0'} bg-white dark:bg-gray-800 rounded-full p-1 border border-gray-100 dark:border-gray-700 z-20`} title={language === 'ar' ? 'ملف موثق' : 'Verified Profile'}>
                                     <CheckCircle size={20} className="text-blue-500" fill="currentColor" />
                                 </div>
                             )}

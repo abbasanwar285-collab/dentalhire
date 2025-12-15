@@ -45,6 +45,10 @@ interface CVState {
     nextStep: () => void;
     prevStep: () => void;
 
+    // State Tracking
+    isDirty: boolean;
+    setIsDirty: (isDirty: boolean) => void;
+
     // Personal Info
     updatePersonalInfo: (data: Partial<PersonalInfo>) => void;
 
@@ -115,45 +119,60 @@ export const useCVStore = create<CVState>()(
             isLoading: false,
             isSaving: false,
             cvId: null,
+            isDirty: false,
 
             setStep: (step) => set({ currentStep: step }),
             nextStep: () => set((state) => ({ currentStep: Math.min(state.currentStep + 1, 8) })),
             prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) })),
+            setIsDirty: (isDirty) => set({ isDirty }),
 
             updatePersonalInfo: (data) =>
-                set((state) => ({ personalInfo: { ...state.personalInfo, ...data } })),
+                set((state) => ({
+                    personalInfo: { ...state.personalInfo, ...data },
+                    isDirty: true
+                })),
 
             addExperience: (exp) =>
                 set((state) => ({
                     experience: [...state.experience, { ...exp, id: generateId() }],
+                    isDirty: true
                 })),
             updateExperience: (id, exp) =>
                 set((state) => ({
                     experience: state.experience.map((e) => (e.id === id ? { ...e, ...exp } : e)),
+                    isDirty: true
                 })),
             removeExperience: (id) =>
                 set((state) => ({
                     experience: state.experience.filter((e) => e.id !== id),
+                    isDirty: true
                 })),
 
             addSkill: (skill) =>
                 set((state) => ({
                     skills: state.skills.includes(skill) ? state.skills : [...state.skills, skill],
+                    isDirty: true
                 })),
             removeSkill: (skill) =>
-                set((state) => ({ skills: state.skills.filter((s) => s !== skill) })),
+                set((state) => ({
+                    skills: state.skills.filter((s) => s !== skill),
+                    isDirty: true
+                })),
 
             addCertification: (cert) =>
                 set((state) => ({
                     certifications: [...state.certifications, { ...cert, id: generateId() }],
+                    isDirty: true
                 })),
             updateCertification: (id, cert) =>
                 set((state) => ({
                     certifications: state.certifications.map((c) => (c.id === id ? { ...c, ...cert } : c)),
+                    isDirty: true
                 })),
             removeCertification: (id) =>
                 set((state) => ({
                     certifications: state.certifications.filter((c) => c.id !== id),
+                    isDirty: true
                 })),
 
             addLanguage: (lang) =>
@@ -161,33 +180,59 @@ export const useCVStore = create<CVState>()(
                     languages: state.languages.some((l) => l.language === lang.language)
                         ? state.languages
                         : [...state.languages, lang],
+                    isDirty: true
                 })),
             updateLanguage: (index, lang) =>
                 set((state) => {
                     const newLanguages = [...state.languages];
                     newLanguages[index] = lang;
-                    return { languages: newLanguages };
+                    return {
+                        languages: newLanguages,
+                        isDirty: true
+                    };
                 }),
             removeLanguage: (language) =>
                 set((state) => ({
                     languages: state.languages.filter((l) => l.language !== language),
+                    isDirty: true
                 })),
 
             updateSalary: (data) =>
-                set((state) => ({ salary: { ...state.salary, ...data } })),
+                set((state) => ({
+                    salary: { ...state.salary, ...data },
+                    isDirty: true
+                })),
 
             updateLocation: (data) =>
-                set((state) => ({ location: { ...state.location, ...data } })),
+                set((state) => ({
+                    location: { ...state.location, ...data },
+                    isDirty: true
+                })),
 
             updateAvailability: (data) =>
-                set((state) => ({ availability: { ...state.availability, ...data } })),
+                set((state) => ({
+                    availability: { ...state.availability, ...data },
+                    isDirty: true
+                })),
 
             addDocument: (doc) =>
-                set((state) => ({ documents: [...state.documents, doc] })),
+                set((state) => ({
+                    documents: [...state.documents, doc],
+                    isDirty: true
+                })),
             removeDocument: (id) =>
-                set((state) => ({ documents: state.documents.filter((d) => d.id !== id) })),
+                set((state) => ({
+                    documents: state.documents.filter((d) => d.id !== id),
+                    isDirty: true
+                })),
 
             loadCV: async (userId: string) => {
+                const state = get();
+                if (state.isDirty) {
+                    console.log('Skipping CV load due to unsaved changes');
+                    return;
+                }
+
                 set({ isLoading: true });
                 try {
                     const supabase = getSupabaseClient();
@@ -204,6 +249,7 @@ export const useCVStore = create<CVState>()(
                     if (data) {
                         set({
                             cvId: data.id,
+                            isDirty: false, // Data from DB is clean
                             personalInfo: {
                                 fullName: data.full_name,
                                 email: data.email,
@@ -300,6 +346,9 @@ export const useCVStore = create<CVState>()(
                             set({ cvId: data.id });
                         }
                     }
+
+                    // Mark as clean after save
+                    set({ isDirty: false });
 
                     // Sync city to User Profile
                     if (state.personalInfo.city) {

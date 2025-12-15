@@ -103,36 +103,28 @@ export default function ClinicDashboard() {
             if (!user) return;
 
             try {
-                // 1. Get Total Candidates (Total CVs)
-                const { count: cvCount } = await supabase
-                    .from('cvs')
-                    .select('*', { count: 'exact', head: true });
+                setLoading(true);
 
-                // 2. Get Saved Profiles (Favorites)
-                // Assuming favorites are stored in a way accessible to current user
-                // Actually useJobStore handles it, but let's double check DB if store is empty or just use store.
-                // We'll rely on store.favorites.length OR fetch if store isn't populated yet.
-                let favCount = favorites.length;
-                if (favCount === 0) {
-                    const { count } = await supabase
-                        .from('job_favorites') // Verify table name, usually job_favorites or similar? 
-                        // Wait, previous sessions mentioned `favorites` table? Or `job_favorites`?
-                        // Let's assume user.id is in a favorites table. 
-                        // Actually, let's use the valid table from previous tasks `favorites` vs `job_favorites`.
-                        // I see `favorites` in `useJobStore` usually implies job favorites.
-                        // For candidates, it might be `cv_favorites`? 
-                        // The user can "Save Profile". Let's check `toggleFavorite` implementation in `useJobStore`...
-                        // Ah, I don't have time to check everything. I'll mock 0 if not sure, but I should try.
-                        // I'll stick to fetching recent 3 CVs for "Top Matches".
-                        .select('*', { count: 'exact', head: true })
-                        .eq('user_id', user.id);
-                    favCount = count || 0;
+                // 1. Fetch Stats from RPC
+                const { data: statsData, error: statsError } = await supabase
+                    .rpc('get_dashboard_stats', {
+                        p_user_id: user.id,
+                        p_role: 'clinic'
+                    });
+
+                let totalCandidates = 0;
+                let savedProfiles = 0;
+
+                if (!statsError && statsData) {
+                    totalCandidates = statsData.total_candidates || 0;
+                    savedProfiles = statsData.saved_profiles || 0;
                 }
 
-                // 3. Fetch Top Candidates (Recent CVs)
+                // 2. Fetch Top Candidates (Recent CVs)
                 const { data: recentCVs } = await supabase
                     .from('cvs')
                     .select('*, users(user_type)')
+                    .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(3);
 
@@ -145,16 +137,36 @@ export default function ClinicDashboard() {
                             city: cv.city,
                         },
                         experience: cv.experience || [],
-                        rating: cv.rating || 0 // Assuming rating exists
+                        rating: cv.rating || 0
                     }));
                     setTopCandidates(mapped);
                 }
 
                 setStats([
-                    { label: t.totalCandidates, value: cvCount?.toString() || '0', icon: <Users size={20} />, change: '+12%' },
-                    { label: t.savedProfiles, value: favCount.toString(), icon: <Heart size={20} />, change: '+2%' },
-                    { label: t.profileViews, value: '24', icon: <Eye size={20} />, change: '+5%' }, // Mock for now
-                    { label: t.messages, value: '3', icon: <MessageSquare size={20} />, change: '+1' }, // Mock for now
+                    {
+                        label: t.totalCandidates,
+                        value: totalCandidates.toString(),
+                        icon: <Users size={20} />,
+                        change: language === 'ar' ? 'نشط' : 'Active'
+                    },
+                    {
+                        label: t.savedProfiles,
+                        value: savedProfiles.toString(),
+                        icon: <Heart size={20} />,
+                        change: language === 'ar' ? 'المفضلة' : 'Favorites'
+                    },
+                    {
+                        label: t.profileViews,
+                        value: '24', // Placeholder: Need analytics table
+                        icon: <Eye size={20} />,
+                        change: '+5%'
+                    },
+                    {
+                        label: t.messages,
+                        value: '3', // Placeholder: Need messages count query
+                        icon: <MessageSquare size={20} />,
+                        change: '+1'
+                    },
                 ]);
 
             } catch (error) {
@@ -165,7 +177,7 @@ export default function ClinicDashboard() {
         };
 
         fetchDashboardData();
-    }, [user, favorites]);
+    }, [user, favorites, language, t]);
 
     return (
         <div className="space-y-6 animate-fade-in">

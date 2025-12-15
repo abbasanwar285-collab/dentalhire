@@ -10,6 +10,12 @@ export default function AssistantDashboard() {
     const { user } = useAuthStore();
 
     const [nearbyJobs, setNearbyJobs] = useState<{ id: string; title: string; clinic: string; dist: string; salary: string }[]>([]);
+    const [statsData, setStatsData] = useState({
+        nearby_jobs: 0,
+        avg_salary: 0,
+        profile_views: 0
+    });
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchStatsAndJobs = async () => {

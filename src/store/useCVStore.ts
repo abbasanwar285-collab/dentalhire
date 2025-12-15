@@ -351,14 +351,18 @@ export const useCVStore = create<CVState>()(
                     // Mark as clean after save
                     set({ isDirty: false });
 
-                    // Sync city to User Profile
-                    if (state.personalInfo.city) {
+                    // Sync city, phone, and photo to User Profile
+                    if (state.personalInfo.city || state.personalInfo.phone || state.personalInfo.photo) {
                         // We use the imported auth store to update profile
                         // This ensures local state and DB are updated
                         const { useAuthStore } = await import('./useAuthStore');
-                        useAuthStore.getState().updateProfile({
-                            city: state.personalInfo.city
-                        });
+
+                        const updates: any = {};
+                        if (state.personalInfo.city) updates.city = state.personalInfo.city;
+                        if (state.personalInfo.phone) updates.phone = state.personalInfo.phone;
+                        if (state.personalInfo.photo) updates.avatar = state.personalInfo.photo;
+
+                        useAuthStore.getState().updateProfile(updates);
                     }
 
                     return true;

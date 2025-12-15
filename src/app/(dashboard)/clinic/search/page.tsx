@@ -521,13 +521,6 @@ export default function ClinicSearchPage() {
                         </div>
                     </Card>
 
-                    {selectedCandidate && (
-                        <CVDetailsModal
-                            isOpen={!!selectedCandidate}
-                            onClose={() => setSelectedCV(null)}
-                            cv={selectedCandidate.cv}
-                        />
-                    )}
                 </div>
             ) : (
                 <div className="flex flex-col md:flex-row gap-6">
@@ -917,6 +910,13 @@ export default function ClinicSearchPage() {
                     </div>
                 </div >
             )}
-        </div >
+            {selectedCandidate && (
+                <CVDetailsModal
+                    isOpen={!!selectedCandidate}
+                    onClose={() => setSelectedCV(null)}
+                    cv={selectedCandidate.cv}
+                />
+            )}
+        </div>
     );
 }

@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Button } from '@/components/shared';
+import { Button, useToast } from '@/components/shared';
 import { Lock, Building2, CreditCard, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 export default function ClinicSettingsPage() {
     const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
+    const { addToast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
@@ -29,17 +30,17 @@ export default function ClinicSettingsPage() {
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
-            alert(language === 'ar' ? 'يرجى إدخال كلمة المرور وتأكيدها' : 'Please enter and confirm password');
+            addToast(language === 'ar' ? 'يرجى إدخال كلمة المرور وتأكيدها' : 'Please enter and confirm password', 'warning');
             return;
         }
 
         if (newPassword !== confirmPassword) {
-            alert(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
+            addToast(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match', 'warning');
             return;
         }
 
         if (newPassword.length < 6) {
-            alert(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
+            addToast(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters', 'warning');
             return;
         }
 
@@ -50,12 +51,12 @@ export default function ClinicSettingsPage() {
 
             if (error) throw error;
 
-            alert(language === 'ar' ? 'تم تغيير كلمة المرور بنجاح ✨' : 'Password updated successfully ✨');
+            addToast(language === 'ar' ? 'تم تغيير كلمة المرور بنجاح ✨' : 'Password updated successfully ✨', 'success');
             setNewPassword('');
             setConfirmPassword('');
         } catch (error: any) {
             console.error('Password error:', error);
-            alert(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message);
+            addToast(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message, 'error');
         } finally {
             setIsChangingPassword(false);
         }
@@ -71,10 +72,10 @@ export default function ClinicSettingsPage() {
                 lastName
             });
 
-            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨');
+            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨', 'success');
         } catch (error) {
             console.error('Save error:', error);
-            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
+            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
         } finally {
             setIsSaving(false);
         }

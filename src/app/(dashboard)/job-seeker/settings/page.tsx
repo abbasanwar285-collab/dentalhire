@@ -2,15 +2,16 @@
 
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button, Input } from '@/components/shared';
-import { Bell, Lock, User, Shield, MapPin, Check, Save } from 'lucide-react';
+import { Button, useToast } from '@/components/shared';
+import { Bell, Lock, User, Shield, MapPin, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { iraqLocations } from '@/data/iraq_locations';
 import { getSupabaseClient } from '@/lib/supabase';
 
 export default function SettingsPage() {
     const { user, updateProfile } = useAuthStore();
-    const { language, t } = useLanguage();
+    const { language } = useLanguage();
+    const { addToast } = useToast();
 
     // Form States
     const [firstName, setFirstName] = useState('');
@@ -77,10 +78,10 @@ export default function SettingsPage() {
                     .eq('id', cv.id);
             }
 
-            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
+            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully', 'success');
         } catch (error) {
             console.error('Error saving profile:', error);
-            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
+            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
         } finally {
             setIsSavingProfile(false);
         }
@@ -98,17 +99,17 @@ export default function SettingsPage() {
             console.error('Error updating notification settings:', error);
             // Revert on error
             setEmailNotifications(!checked);
-            alert(language === 'ar' ? 'فشل تحديث الإعدادات' : 'Failed to update settings');
+            addToast(language === 'ar' ? 'فشل تحديث الإعدادات' : 'Failed to update settings', 'error');
         }
     };
 
     const handleChangePassword = async () => {
         if (newPassword.length < 6) {
-            alert(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
+            addToast(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters', 'warning');
             return;
         }
         if (newPassword !== confirmPassword) {
-            alert(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
+            addToast(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match', 'warning');
             return;
         }
 
@@ -121,13 +122,13 @@ export default function SettingsPage() {
 
             if (error) throw error;
 
-            alert(language === 'ar' ? 'تم تحديث كلمة المرور بنجاح' : 'Password updated successfully');
+            addToast(language === 'ar' ? 'تم تحديث كلمة المرور بنجاح' : 'Password updated successfully', 'success');
             setNewPassword('');
             setConfirmPassword('');
             setIsChangingPassword(false);
         } catch (error: any) {
             console.error('Error updating password:', error);
-            alert(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message);
+            addToast(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message, 'error');
         } finally {
             setIsSavingPassword(false);
         }

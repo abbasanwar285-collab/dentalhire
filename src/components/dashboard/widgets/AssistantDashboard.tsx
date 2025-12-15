@@ -1,15 +1,76 @@
+import { useEffect, useState } from 'react';
 import { Card, CardHeader, CardContent, Button } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Briefcase, Eye, DollarSign, MapPin, CheckCircle2, Award, Zap } from 'lucide-react';
+import { Briefcase, Eye, DollarSign, MapPin, CheckCircle2, Award } from 'lucide-react';
+import { useAuthStore } from '@/store';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function AssistantDashboard() {
     const { language } = useLanguage();
+    const { user } = useAuthStore();
+
+    const [statsData, setStatsData] = useState({
+        nearby_jobs: 0,
+        avg_salary: 0,
+        profile_views: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            if (!user) return;
+            const supabase = getSupabaseClient();
+            try {
+                // Call the new RPC
+                const { data, error } = await supabase
+                    .rpc('get_dashboard_stats', {
+                        p_user_id: user.id,
+                        p_role: 'job_seeker' // Force job_seeker logic for assistants
+                    });
+
+                if (error) throw error;
+                if (data) {
+                    setStatsData({
+                        nearby_jobs: data.nearby_jobs || 0,
+                        avg_salary: data.avg_salary || 0,
+                        profile_views: data.profile_views || 0
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to fetch dashboard stats:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [user]);
 
     const stats = [
-        { label: language === 'ar' ? 'الوظائف القريبة' : 'Nearby Jobs', value: '0', icon: <MapPin size={20} />, change: '5 km radius' },
-        { label: language === 'ar' ? 'الراتب المتوقع' : 'Est. Salary', value: '0 د.ع', icon: <DollarSign size={20} />, change: 'Monthly' },
-        { label: language === 'ar' ? 'مشاهدات العيادات' : 'Clinic Views', value: '0', icon: <Eye size={20} />, change: '0%' },
-        { label: language === 'ar' ? 'جاهزية الملف' : 'Profile Ready', value: '0%', icon: <Award size={20} />, change: 'Low' },
+        {
+            label: language === 'ar' ? 'الوظائف القريبة' : 'Nearby Jobs',
+            value: loading ? '-' : statsData.nearby_jobs.toString(),
+            icon: <MapPin size={20} />,
+            change: language === 'ar' ? 'نطاق مدينتك' : 'Your City'
+        },
+        {
+            label: language === 'ar' ? 'الراتب المتوقع' : 'Est. Salary',
+            value: loading ? '-' : (statsData.avg_salary > 0 ? `${statsData.avg_salary.toLocaleString()} د.ع` : 'N/A'),
+            icon: <DollarSign size={20} />,
+            change: 'Monthly'
+        },
+        {
+            label: language === 'ar' ? 'مشاهدات العيادات' : 'Clinic Views',
+            value: loading ? '-' : statsData.profile_views.toString(),
+            icon: <Eye size={20} />,
+            change: language === 'ar' ? 'آخر 30 يوم' : 'Last 30 days'
+        },
+        {
+            label: language === 'ar' ? 'جاهزية الملف' : 'Profile Ready',
+            value: '85%', // Keep static or implement separate logic
+            icon: <Award size={20} />,
+            change: 'High'
+        },
     ];
 
     const nearbyJobs: { title: string; clinic: string; dist: string; salary: string }[] = [];

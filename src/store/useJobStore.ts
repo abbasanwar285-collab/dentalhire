@@ -32,6 +32,7 @@ interface JobState {
     searchJobs: (query: string, filters?: JobFilters) => Promise<void>;
     searchJobsSmart: (userId: string, query: string) => Promise<void>;
     savedJobs: string[];
+    loadSavedJobs: (userId: string) => Promise<void>;
     toggleSavedJob: (jobId: string) => Promise<void>;
     subscribeToJobs: () => () => void;
 }
@@ -494,97 +495,30 @@ export const useJobStore = create<JobState>()((set, get) => ({
     updateApplicationStatus: async (applicationId: string, status: string) => {
         try {
             const supabase = getSupabaseClient();
-            console.log('[updateApplicationStatus] Starting update for:', applicationId, 'to', status);
+            console.log('[updateApplicationStatus] Calling RPC for:', applicationId, 'to', status);
 
-            // 1. Get basic application info first
-            const { data: appData, error: appError } = await (supabase
-                .from('job_applications') as any)
-                .select('user_id, job_id')
-                .eq('id', applicationId)
-                .single();
+            const { data, error } = await supabase.rpc('update_application_status', {
+                app_id: applicationId,
+                new_status: status
+            });
 
-            if (appError) {
-                console.error('[updateApplicationStatus] Error fetching application basic info:', appError);
-            }
+            if (error) {
+                console.error('[updateApplicationStatus] RPC Error:', error);
 
-            // 2. Update status
-            const { error: updateError } = await (supabase
-                .from('job_applications') as any)
-                .update({
-                    status,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', applicationId);
+                // FALLBACK: If RPC fails (e.g. not applied yet), try client-side update only (no notif guarantee)
+                console.log('[updateApplicationStatus] Attempting fallback client-side update...');
+                const { error: fallbackError } = await (supabase
+                    .from('job_applications') as any)
+                    .update({ status, updated_at: new Date().toISOString() })
+                    .eq('id', applicationId);
 
-            if (updateError) {
-                console.error('[updateApplicationStatus] Error updating status:', updateError);
-                return false;
-            }
-
-            console.log('[updateApplicationStatus] Status updated successfully');
-
-            // 3. Create Notification
-            if (appData) {
-                try {
-                    // Fetch job details separately to avoid join permission issues
-                    const { data: jobData } = await (supabase
-                        .from('jobs') as any)
-                        .select('title, clinic_id, clinics(name)')
-                        .eq('id', appData.job_id)
-                        .single();
-
-                    const jobTitle = jobData?.title || 'Job Application';
-                    const clinicName = jobData?.clinics?.name || 'Clinic';
-
-                    // Map status to message
-                    let message = '';
-                    let title = '';
-
-                    switch (status) {
-                        case 'accepted':
-                            title = 'Application Accepted! 🎉';
-                            message = `Congratulations! Your application for "${jobTitle}" at ${clinicName} has been accepted.`;
-                            break;
-                        case 'rejected':
-                            title = 'Application Update';
-                            message = `Your application for "${jobTitle}" at ${clinicName} has been updated to rejected.`;
-                            break;
-                        case 'interview':
-                            title = 'Interview Invitation 📅';
-                            message = `${clinicName} would like to interview you for the "${jobTitle}" position. Check your messages!`;
-                            break;
-                        case 'shortlisted':
-                            title = 'Shortlisted! 🌟';
-                            message = `You have been shortlisted for the "${jobTitle}" position at ${clinicName}.`;
-                            break;
-                        default:
-                            title = 'Application Status Updated';
-                            message = `Your application status for "${jobTitle}" has been updated to ${status}.`;
-                    }
-
-                    console.log('[updateApplicationStatus] Attempting to insert notification for user:', appData.user_id);
-
-                    const { error: notifError } = await (supabase.from('notifications') as any).insert({
-                        user_id: appData.user_id,
-                        title,
-                        message,
-                        type: 'status_change',
-                        read: false,
-                        data: { applicationId, status, jobTitle, clinicName }
-                    });
-
-                    if (notifError) {
-                        console.error('[updateApplicationStatus] Notification Insert Error:', notifError);
-                    } else {
-                        console.log('[updateApplicationStatus] Notification sent successfully');
-                    }
-
-                } catch (err) {
-                    console.error('[updateApplicationStatus] Error preparing notification:', err);
+                if (fallbackError) {
+                    console.error('[updateApplicationStatus] Fallback failed:', fallbackError);
+                    return false;
                 }
             }
 
-            // Update local state
+            // Update local state regardless of method
             set((state) => ({
                 clinicApplications: state.clinicApplications.map((app) =>
                     app.id === applicationId

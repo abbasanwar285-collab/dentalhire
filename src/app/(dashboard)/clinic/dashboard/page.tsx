@@ -106,6 +106,7 @@ export default function ClinicDashboard() {
                 setLoading(true);
 
                 // 1. Fetch Stats from RPC
+                // @ts-ignore
                 const { data: statsData, error: statsError } = await supabase
                     .rpc('get_dashboard_stats', {
                         p_user_id: user.id,

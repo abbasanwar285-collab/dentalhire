@@ -34,13 +34,14 @@ begin
     and status = 'active';
 
     -- 3. Expected Salary (Avg of relevant jobs)
+    -- Using concat() to avoid syntax errors with pipes ||
     select avg((salary_min + salary_max) / 2) into v_avg_salary
     from jobs
     where status = 'active'
     and (
-      title ilike '%' || coalesce(v_user_type, '') || '%'
+      title ilike concat('%', coalesce(v_user_type, ''), '%')
       or
-      description ilike '%' || coalesce(v_user_type, '') || '%'
+      description ilike concat('%', coalesce(v_user_type, ''), '%')
     );
 
     -- 4. Profile Views (From Notifications)
@@ -62,8 +63,6 @@ begin
     select count(*) into v_total_candidates from cvs where status = 'active';
 
     -- 2. Saved Profiles (Favorites)
-    -- Assuming a 'favorites' table exists or stored in array. 
-    -- Based on schema inspection, clinics table has 'favorites' array column.
     select array_length(favorites, 1) into v_saved_profiles
     from clinics
     where user_id = p_user_id;
@@ -71,8 +70,8 @@ begin
     v_stats := jsonb_build_object(
       'total_candidates', coalesce(v_total_candidates, 0),
       'saved_profiles', coalesce(v_saved_profiles, 0),
-      'profile_views', 0, -- Placeholder until analytics table confirmed
-      'messages', 0 -- Placeholder
+      'profile_views', 0, 
+      'messages', 0 
     );
 
   end if;

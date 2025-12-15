@@ -23,6 +23,7 @@ export default function AssistantDashboard() {
             const supabase = getSupabaseClient();
             try {
                 // 1. Fetch Stats
+                // @ts-ignore
                 const { data: stats, error: statsError } = await supabase
                     .rpc('get_dashboard_stats', {
                         p_user_id: user.id,

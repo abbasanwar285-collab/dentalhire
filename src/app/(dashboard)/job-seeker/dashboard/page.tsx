@@ -30,6 +30,23 @@ export default function JobSeekerDashboard() {
 
     return (
         <div className="relative">
+            {/* DEBUG PANEL V2 */}
+            <div dir="ltr" className="bg-red-50 border-2 border-red-500 p-4 mb-6 rounded-lg text-xs font-mono text-red-800 shadow-lg">
+                <h3 className="font-bold text-lg mb-2">⚠️ DEBUG DATA V2</h3>
+                <div className="grid grid-cols-2 gap-2">
+                    <p><span className="font-bold">User ID:</span> {user?.id || 'NULL'}</p>
+                    <p><span className="font-bold">Notifications:</span> {notifications.length}</p>
+                    <p><span className="font-bold">Loading:</span> {isLoading.toString()}</p>
+                    <p><span className="font-bold">Error:</span> {error || 'None'}</p>
+                </div>
+                <button
+                    onClick={() => user && fetchNotifications(user.id)}
+                    className="mt-3 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                >
+                    Refetch (RPC V2)
+                </button>
+            </div>
+
             <RoleBasedDashboard role={role} />
         </div>
     );

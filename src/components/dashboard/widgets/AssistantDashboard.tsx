@@ -92,7 +92,9 @@ export default function AssistantDashboard() {
         },
         {
             label: language === 'ar' ? 'الراتب المتوقع' : 'Est. Salary',
-            value: loading ? '-' : (statsData.avg_salary > 0 ? `${statsData.avg_salary.toLocaleString()} د.ع` : 'N/A'),
+            value: loading ? '-' : (statsData.avg_salary > 0
+                ? `${statsData.avg_salary.toLocaleString()} ${language === 'ar' ? 'د.ع' : 'IQD'}`
+                : (language === 'ar' ? 'غير متوفر' : 'N/A')),
             icon: <DollarSign size={20} />,
             change: 'Monthly'
         },

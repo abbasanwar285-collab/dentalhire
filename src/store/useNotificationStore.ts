@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { getSupabaseClient } from '@/lib/supabase';
+import { useAuthStore } from './useAuthStore';
 
 export type NotificationType =
     | 'job_match'
@@ -80,6 +81,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
     markAsRead: async (id: string) => {
         const supabase = getSupabaseClient();
+        const { user } = useAuthStore.getState(); // Get current user for security check
 
         // Optimistic update
         const notifications = get().notifications.map(n =>
@@ -89,12 +91,23 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         set({ notifications, unreadCount });
 
         try {
-            await (supabase
-                .from('notifications') as any)
-                .update({ read: true })
-                .eq('id', id);
+            if (user?.id) {
+                // Use Reliable RPC
+                // @ts-ignore
+                const { error } = await supabase.rpc('mark_notification_read_v2', {
+                    p_notification_id: id,
+                    p_user_id: user.id
+                });
+                if (error) throw error;
+            } else {
+                // Fallback (unlikely to work if RLS is broken, but standard)
+                await (supabase.from('notifications') as any)
+                    .update({ read: true })
+                    .eq('id', id);
+            }
         } catch (error) {
             console.error('Error marking notification as read:', error);
+            // Revert optimistic update on error?? No, keep it for UX, it will sync next fetch.
         }
     },
 
@@ -105,11 +118,20 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         set({ notifications, unreadCount: 0 });
 
         try {
-            await (supabase
-                .from('notifications') as any)
-                .update({ read: true })
-                .eq('user_id', userId)
-                .eq('read', false);
+            // Use Reliable RPC
+            // @ts-ignore
+            const { error } = await supabase.rpc('mark_all_notifications_read_v2', {
+                p_user_id: userId
+            });
+
+            if (error) {
+                // Fallback
+                await (supabase.from('notifications') as any)
+                    .update({ read: true })
+                    .eq('user_id', userId)
+                    .eq('read', false);
+            }
+
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
         }

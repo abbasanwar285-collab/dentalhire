@@ -1,8 +1,8 @@
 'use client';
 
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Briefcase, LayoutDashboard, Menu, User, LogIn, ClipboardList } from 'lucide-react';
+import { Home, Briefcase, LayoutDashboard, LogIn, ClipboardList, UserPlus } from 'lucide-react';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -10,13 +10,15 @@ import { useEffect, useState } from 'react';
 
 export default function BottomNav() {
     const pathname = usePathname();
-    const router = useRouter();
-    const { user, isAuthenticated } = useAuthStore();
+    const { user } = useAuthStore();
     const { t, language } = useLanguage();
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
-    // Hide on scroll down, show on scroll up (optional native feel)
+    // Robust auth check
+    const isAuthenticated = !!user;
+
+    // Hide on scroll
     useEffect(() => {
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
@@ -27,7 +29,6 @@ export default function BottomNav() {
             }
             setLastScrollY(currentScrollY);
         };
-
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
@@ -59,19 +60,21 @@ export default function BottomNav() {
             icon: Briefcase,
             isActive: pathname.startsWith('/jobs'),
         },
+        // Item 3: Dashboard (Auth) or Login (Guest)
         {
             label: isAuthenticated ? (language === 'ar' ? 'لوحتي' : 'Dashboard') : (language === 'ar' ? 'دخول' : 'Login'),
             href: isAuthenticated ? getDashboardLink() : '/login',
             icon: isAuthenticated ? LayoutDashboard : LogIn,
             isActive: pathname.includes('/dashboard') || pathname === '/login',
         },
+        // Item 4: Applications (Auth) or Register (Guest) - Replaces Profile
         {
-            label: language === 'ar' ? 'طلباتي' : 'My Applications',
+            label: isAuthenticated ? (language === 'ar' ? 'طلباتي' : 'My Applications') : (language === 'ar' ? 'حساب جديد' : 'Register'),
             href: isAuthenticated
                 ? (user?.role === 'clinic' ? '/clinic/applications' : '/job-seeker/applications')
-                : '/login',
-            icon: ClipboardList,
-            isActive: pathname.includes('/applications'),
+                : '/register',
+            icon: isAuthenticated ? ClipboardList : UserPlus,
+            isActive: pathname.includes('/applications') || pathname === '/register',
         },
     ];
 
@@ -79,7 +82,7 @@ export default function BottomNav() {
         <nav
             dir={language === 'ar' ? 'rtl' : 'ltr'}
             className={cn(
-                'fixed bottom-0 left-0 right-0 bg-white/90 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-800 z-[100] transition-transform duration-300 lg:hidden pb-safe',
+                'fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-[100] transition-transform duration-300 lg:hidden pb-safe shadow-[0_-5px_10px_rgba(0,0,0,0.05)]',
                 !isVisible ? 'translate-y-full' : 'translate-y-0'
             )}
         >
@@ -89,7 +92,7 @@ export default function BottomNav() {
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            'flex flex-col items-center justify-center gap-1 h-full w-full app-touch transition-colors',
+                            'flex flex-col items-center justify-center gap-1 h-full w-full app-touch transition-all duration-200 active:scale-95',
                             item.isActive
                                 ? 'text-blue-600 dark:text-blue-500'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
@@ -100,7 +103,9 @@ export default function BottomNav() {
                             strokeWidth={item.isActive ? 2.5 : 2}
                             className={cn('transition-transform duration-200', item.isActive && 'scale-110')}
                         />
-                        <span className="text-[10px] font-medium">{item.label}</span>
+                        <span className="text-[10px] font-medium truncate w-full text-center px-1 font-cairo">
+                            {item.label}
+                        </span>
                     </Link>
                 ))}
             </div>

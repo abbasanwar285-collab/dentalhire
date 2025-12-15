@@ -48,6 +48,7 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
 
         try {
             // Use RPC V2 with explicit parameter
+            // @ts-ignore - Types not generated for new RPC yet
             const { data, error } = await supabase
                 .rpc('get_my_notifications_v2', { p_user_id: userId });
 

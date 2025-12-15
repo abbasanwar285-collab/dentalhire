@@ -269,6 +269,7 @@ export interface Job {
     id: string;
     clinicId: string;
     clinicName: string;
+    clinicLogo?: string;
     title: string;
     description: string;
     requirements: string[];

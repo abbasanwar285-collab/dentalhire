@@ -52,8 +52,16 @@ export default function JobCard({ job, isSelected, onClick, href, scroll = false
         >
             <div className="flex items-start gap-4">
                 {/* Clinic Logo Placeholder */}
-                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800">
-                    <Building2 size={24} />
+                <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-50 to-teal-50 dark:from-blue-900/20 dark:to-teal-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 border border-blue-100 dark:border-blue-800 overflow-hidden relative">
+                    {job.clinicLogo ? (
+                        <img
+                            src={job.clinicLogo}
+                            alt={job.clinicName}
+                            className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <Building2 size={24} />
+                    )}
                 </div>
 
                 <div className="flex-1 min-w-0">

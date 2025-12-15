@@ -57,7 +57,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 .from('jobs') as any)
                 .select(`
           *,
-          clinics!inner(name)
+          clinics!inner(name, logo)
         `)
                 .eq('status', 'active')
                 .order('created_at', { ascending: false });
@@ -72,6 +72,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                     id: job.id,
                     clinicId: job.clinic_id,
                     clinicName: job.clinics?.name || 'Unknown Clinic',
+                    clinicLogo: job.clinics?.logo,
                     title: job.title,
                     description: job.description,
                     requirements: job.requirements || [],
@@ -119,7 +120,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 .from('jobs') as any)
                 .select(`
           *,
-          clinics!inner(name)
+          clinics!inner(name, logo)
         `)
                 .eq('clinic_id', clinicId)
                 .order('created_at', { ascending: false });
@@ -163,6 +164,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                     id: job.id,
                     clinicId: job.clinic_id,
                     clinicName: job.clinics?.name || 'Unknown Clinic',
+                    clinicLogo: job.clinics?.logo,
                     title: job.title,
                     description: job.description,
                     requirements: job.requirements || [],
@@ -200,7 +202,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
             .from('jobs') as any)
             .select(`
           *,
-          clinics!inner(name)
+          clinics!inner(name, logo)
         `)
             .eq('status', 'active')
             .order('created_at', { ascending: false });
@@ -234,6 +236,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 id: job.id,
                 clinicId: job.clinic_id,
                 clinicName: job.clinics?.name || 'Unknown Clinic',
+                clinicLogo: job.clinics?.logo,
                 title: job.title,
                 description: job.description,
                 requirements: job.requirements || [],

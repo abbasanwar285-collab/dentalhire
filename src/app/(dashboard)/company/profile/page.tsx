@@ -125,6 +125,8 @@ export default function CompanyProfilePage() {
 
     const handleImageUpload = async (url: string) => {
         await updateProfile({ avatar: url });
+        // Also update clinic logo
+        await supabase.from('clinics').update({ logo: url }).eq('user_id', user.id);
     };
 
     const cities = [

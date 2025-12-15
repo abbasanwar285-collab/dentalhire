@@ -583,8 +583,16 @@ function JobsContent() {
                                             {/* Header */}
                                             <div className="flex items-start justify-between mb-8">
                                                 <div className="flex items-start gap-5">
-                                                    <div className="w-20 h-20 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                                                        <Building2 size={40} />
+                                                    <div className="w-20 h-20 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 overflow-hidden relative border border-blue-100 dark:border-blue-800">
+                                                        {selectedJob.clinicLogo ? (
+                                                            <img
+                                                                src={selectedJob.clinicLogo}
+                                                                alt={selectedJob.clinicName}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        ) : (
+                                                            <Building2 size={40} />
+                                                        )}
                                                     </div>
                                                     <div>
                                                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
@@ -779,8 +787,16 @@ function JobsContent() {
                                     <div className="p-5 space-y-6">
                                         {/* Job Header Info */}
                                         <div className="flex flex-col gap-4">
-                                            <div className="w-16 h-16 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                                                <Building2 size={32} />
+                                            <div className="w-16 h-16 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 overflow-hidden relative border border-blue-100 dark:border-blue-800">
+                                                {selectedJob.clinicLogo ? (
+                                                    <img
+                                                        src={selectedJob.clinicLogo}
+                                                        alt={selectedJob.clinicName}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                ) : (
+                                                    <Building2 size={32} />
+                                                )}
                                             </div>
                                             <div>
                                                 <h1 className="text-xl font-bold text-gray-900 dark:text-white mb-1">

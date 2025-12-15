@@ -120,6 +120,9 @@ export default function LabProfilePage() {
 
     const handleImageUpload = async (url: string) => {
         await updateProfile({ avatar: url });
+        if (user?.id) {
+            await (supabase.from('clinics') as any).update({ logo: url }).eq('user_id', user.id);
+        }
     };
 
     const cities = [

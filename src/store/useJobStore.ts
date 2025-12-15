@@ -7,7 +7,6 @@
 import { create } from 'zustand';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Job, JobApplication, EmploymentType } from '@/types';
-import { useAuthStore } from './useAuthStore';
 
 interface JobState {
     jobs: Job[];
@@ -656,6 +655,75 @@ export const useJobStore = create<JobState>()((set, get) => ({
             // Revert
             set({ favorites });
             return false;
+        }
+    },
+
+    savedJobs: [],
+
+    loadSavedJobs: async (userId: string) => {
+        const supabase = getSupabaseClient();
+        const { data, error } = await (supabase
+            .from('job_favorites') as any)
+            .select('job_id')
+            .eq('user_id', userId);
+
+        if (error) {
+            console.error('Error loading saved jobs:', error);
+            return;
+        }
+
+        if (data) {
+            set({ savedJobs: data.map((f: any) => f.job_id) });
+        }
+    },
+
+    toggleSavedJob: async (jobId: string) => {
+        const { savedJobs } = get();
+        // We need userId. Ideally passed as arg, but page.tsx signature is just (jobId).
+        // We can get it from auth store or session... but we don't use useAuthStore here loosely.
+        // However, standard pattern: page component checks auth.
+        // Let's assume we can get session or fail if not authed.
+        // Actually, toggleSavedJob in store usually needs userId OR we use getSupabaseClient().auth.getUser()?
+
+        const supabase = getSupabaseClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            console.error('Cannot toggle saved job: User not logged in');
+            return;
+        }
+
+        const isSaved = savedJobs.includes(jobId);
+
+        // Optimistic update
+        const newSaved = isSaved
+            ? savedJobs.filter(id => id !== jobId)
+            : [...savedJobs, jobId];
+
+        set({ savedJobs: newSaved });
+
+        try {
+            if (isSaved) {
+                // Remove
+                const { error } = await (supabase
+                    .from('job_favorites') as any)
+                    .delete()
+                    .eq('user_id', user.id)
+                    .eq('job_id', jobId);
+
+                if (error) throw error;
+            } else {
+                // Add
+                const { error } = await (supabase
+                    .from('job_favorites') as any)
+                    .insert({ user_id: user.id, job_id: jobId });
+
+                if (error) throw error;
+            }
+        } catch (error) {
+            console.error('Error toggling saved job:', error);
+            // Revert
+            set({ savedJobs });
         }
     },
 

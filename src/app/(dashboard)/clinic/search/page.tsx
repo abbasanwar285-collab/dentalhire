@@ -801,8 +801,9 @@ export default function ClinicSearchPage() {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                            <h3 className="font-semibold text-gray-900 dark:text-white truncate flex items-center gap-1">
                                                 {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
+                                                {match.cv?.personalInfo?.verified && <CheckCircle size={16} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
                                             </h3>
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                                                 {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
@@ -847,8 +848,9 @@ export default function ClinicSearchPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-gray-900 dark:text-white">
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-1">
                                                         {match.cv.personalInfo.fullName}
+                                                        {match.cv.personalInfo.verified && <CheckCircle size={16} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
                                                     </h3>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}

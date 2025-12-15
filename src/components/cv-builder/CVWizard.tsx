@@ -58,7 +58,7 @@ import { useEffect } from 'react';
 import { useAuthStore } from '@/store';
 
 export default function CVWizard() {
-    const { currentStep, setStep, nextStep, prevStep, isStepValid, getCompletionPercentage, saveCV, loadCV } = useCVStore();
+    const { currentStep, setStep, nextStep, prevStep, isStepValid, isStepCompleted, getCompletionPercentage, saveCV, loadCV } = useCVStore();
     const { user } = useAuthStore();
     const { t, language } = useLanguage();
     const { addToast } = useToast();
@@ -258,8 +258,7 @@ export default function CVWizard() {
                             <nav className="space-y-1">
                                 {steps.map((step) => {
                                     const isActive = currentStep === step.id;
-                                    const isComplete = isStepValid(step.id);
-                                    const isPast = step.id < currentStep;
+                                    const isComplete = isStepCompleted(step.id);
 
                                     return (
                                         <button
@@ -277,12 +276,12 @@ export default function CVWizard() {
                                                     'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors',
                                                     isActive
                                                         ? 'bg-blue-500 text-white'
-                                                        : isComplete || isPast
+                                                        : isComplete
                                                             ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'
                                                             : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                                                 )}
                                             >
-                                                {isComplete || isPast ? <Check size={16} /> : step.icon}
+                                                {isComplete ? <Check size={16} /> : step.icon}
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p

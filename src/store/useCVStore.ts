@@ -90,6 +90,7 @@ interface CVState {
 
     // Validation
     isStepValid: (step: number) => boolean;
+    isStepCompleted: (step: number) => boolean;
     getCompletionPercentage: () => number;
 }
 
@@ -383,8 +384,8 @@ export const useCVStore = create<CVState>()(
                         return state.experience.length > 0;
                     case 2: // Skills
                         return state.skills.length >= 3;
-                    case 3: // Certifications
-                        return true; // Optional
+                    case 3: // Certifications (Optional but valid)
+                        return true;
                     case 4: // Languages
                         return state.languages.length > 0;
                     case 5: // Salary
@@ -393,8 +394,39 @@ export const useCVStore = create<CVState>()(
                         return (state.location.preferred?.length || 0) > 0;
                     case 7: // Availability
                         return !!state.availability.type;
-                    case 8: // Documents
-                        return true; // Optional
+                    case 8: // Documents (Optional but valid)
+                        return true;
+                    default:
+                        return false;
+                }
+            },
+
+            isStepCompleted: (step) => {
+                const state = get();
+                switch (step) {
+                    case 0: // Personal Info
+                        return !!(
+                            state.personalInfo.fullName &&
+                            state.personalInfo.email &&
+                            state.personalInfo.phone &&
+                            state.personalInfo.city
+                        );
+                    case 1: // Experience
+                        return state.experience.length > 0;
+                    case 2: // Skills
+                        return state.skills.length >= 3;
+                    case 3: // Certifications (Optional - strictly check for data)
+                        return state.certifications.length > 0;
+                    case 4: // Languages
+                        return state.languages.length > 0;
+                    case 5: // Salary
+                        return !!(state.salary.expected && state.salary.currency);
+                    case 6: // Location
+                        return (state.location.preferred?.length || 0) > 0;
+                    case 7: // Availability
+                        return !!state.availability.type;
+                    case 8: // Documents (Optional - strictly check for data)
+                        return state.documents.length > 0;
                     default:
                         return false;
                 }

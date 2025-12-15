@@ -193,7 +193,68 @@ export const useJobStore = create<JobState>()((set, get) => ({
     },
 
     searchJobs: async (query: string, filters?: JobFilters) => {
-        // ... (existing searchJobs implementation)
+        set({ isLoading: true });
+        const supabase = getSupabaseClient();
+
+        let builder = (supabase
+            .from('jobs') as any)
+            .select(`
+          *,
+          clinics!inner(name)
+        `)
+            .eq('status', 'active')
+            .order('created_at', { ascending: false });
+
+        if (query.trim()) {
+            builder = builder.ilike('title', `%${query}%`);
+        }
+
+        if (filters?.location) {
+            builder = builder.ilike('location', `%${filters.location}%`);
+        }
+
+        if (filters?.employmentType) {
+            builder = builder.eq('employment_type', filters.employmentType);
+        }
+
+        if (filters?.salaryMin) {
+            builder = builder.gte('salary_min', filters.salaryMin);
+        }
+
+        const { data, error } = await builder;
+
+        if (error) {
+            console.error('Error searching jobs:', error);
+            set({ isLoading: false });
+            return;
+        }
+
+        if (data) {
+            const jobs: Job[] = data.map((job: any) => ({
+                id: job.id,
+                clinicId: job.clinic_id,
+                clinicName: job.clinics?.name || 'Unknown Clinic',
+                title: job.title,
+                description: job.description,
+                requirements: job.requirements || [],
+                salary: {
+                    min: job.salary_min,
+                    max: job.salary_max,
+                    currency: job.salary_currency,
+                },
+                location: job.location,
+                employmentType: job.employment_type as EmploymentType,
+                skills: job.skills || [],
+                status: job.status as 'active' | 'closed' | 'draft',
+                applications: job.applications || 0,
+                createdAt: new Date(job.created_at),
+                updatedAt: new Date(job.updated_at),
+                gender: job.gender,
+                workingHours: job.working_hours,
+            }));
+
+            set({ jobs, isLoading: false });
+        }
     },
 
     searchJobsSmart: async (userId: string, query: string) => {
@@ -434,28 +495,21 @@ export const useJobStore = create<JobState>()((set, get) => ({
     updateApplicationStatus: async (applicationId: string, status: string) => {
         try {
             const supabase = getSupabaseClient();
+            console.log('[updateApplicationStatus] Starting update for:', applicationId, 'to', status);
 
-            // 1. Get application details first (to know who to notify)
-            const { data: application, error: fetchError } = await (supabase
+            // 1. Get basic application info first
+            const { data: appData, error: appError } = await (supabase
                 .from('job_applications') as any)
-                .select(`
-                    user_id,
-                    jobs (
-                        title,
-                        clinics (
-                            name
-                        )
-                    )
-                `)
+                .select('user_id, job_id')
                 .eq('id', applicationId)
                 .single();
 
-            if (fetchError || !application) {
-                console.error('Error fetching application for notification:', fetchError);
+            if (appError) {
+                console.error('[updateApplicationStatus] Error fetching application basic info:', appError);
             }
 
             // 2. Update status
-            const { error } = await (supabase
+            const { error: updateError } = await (supabase
                 .from('job_applications') as any)
                 .update({
                     status,
@@ -463,50 +517,72 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 })
                 .eq('id', applicationId);
 
-            if (error) {
-                console.error('Error updating application status:', error);
+            if (updateError) {
+                console.error('[updateApplicationStatus] Error updating status:', updateError);
                 return false;
             }
 
-            // 3. Create Notification if update successful
-            if (application) {
-                const jobTitle = application.jobs?.title || 'Job';
-                const clinicName = application.jobs?.clinics?.name || 'Clinic';
+            console.log('[updateApplicationStatus] Status updated successfully');
 
-                // Map status to user-friendly message
-                let message = '';
-                let title = '';
+            // 3. Create Notification
+            if (appData) {
+                try {
+                    // Fetch job details separately to avoid join permission issues
+                    const { data: jobData } = await (supabase
+                        .from('jobs') as any)
+                        .select('title, clinic_id, clinics(name)')
+                        .eq('id', appData.job_id)
+                        .single();
 
-                switch (status) {
-                    case 'accepted':
-                        title = 'Application Accepted! 🎉';
-                        message = `Congratulations! Your application for "${jobTitle}" at ${clinicName} has been accepted.`;
-                        break;
-                    case 'rejected':
-                        title = 'Application Update';
-                        message = `Your application for "${jobTitle}" at ${clinicName} has been updated to rejected.`;
-                        break;
-                    case 'interview':
-                        title = 'Interview Invitation 📅';
-                        message = `${clinicName} would like to interview you for the "${jobTitle}" position. Check your messages!`;
-                        break;
-                    case 'shortlisted':
-                        title = 'Shortlisted! 🌟';
-                        message = `You have been shortlisted for the "${jobTitle}" position at ${clinicName}.`;
-                        break;
-                    default:
-                        title = 'Application Status Updated';
-                        message = `Your application status for "${jobTitle}" has been updated to ${status}.`;
+                    const jobTitle = jobData?.title || 'Job Application';
+                    const clinicName = jobData?.clinics?.name || 'Clinic';
+
+                    // Map status to message
+                    let message = '';
+                    let title = '';
+
+                    switch (status) {
+                        case 'accepted':
+                            title = 'Application Accepted! 🎉';
+                            message = `Congratulations! Your application for "${jobTitle}" at ${clinicName} has been accepted.`;
+                            break;
+                        case 'rejected':
+                            title = 'Application Update';
+                            message = `Your application for "${jobTitle}" at ${clinicName} has been updated to rejected.`;
+                            break;
+                        case 'interview':
+                            title = 'Interview Invitation 📅';
+                            message = `${clinicName} would like to interview you for the "${jobTitle}" position. Check your messages!`;
+                            break;
+                        case 'shortlisted':
+                            title = 'Shortlisted! 🌟';
+                            message = `You have been shortlisted for the "${jobTitle}" position at ${clinicName}.`;
+                            break;
+                        default:
+                            title = 'Application Status Updated';
+                            message = `Your application status for "${jobTitle}" has been updated to ${status}.`;
+                    }
+
+                    console.log('[updateApplicationStatus] Attempting to insert notification for user:', appData.user_id);
+
+                    const { error: notifError } = await (supabase.from('notifications') as any).insert({
+                        user_id: appData.user_id,
+                        title,
+                        message,
+                        type: 'status_change',
+                        read: false,
+                        data: { applicationId, status, jobTitle, clinicName }
+                    });
+
+                    if (notifError) {
+                        console.error('[updateApplicationStatus] Notification Insert Error:', notifError);
+                    } else {
+                        console.log('[updateApplicationStatus] Notification sent successfully');
+                    }
+
+                } catch (err) {
+                    console.error('[updateApplicationStatus] Error preparing notification:', err);
                 }
-
-                await (supabase.from('notifications') as any).insert({
-                    user_id: application.user_id,
-                    title,
-                    message,
-                    type: 'status_change',
-                    read: false,
-                    data: { applicationId, status, jobTitle, clinicName }
-                });
             }
 
             // Update local state
@@ -520,7 +596,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
 
             return true;
         } catch (error) {
-            console.error('Error updating application status:', error);
+            console.error('[updateApplicationStatus] Fatal Error:', error);
             return false;
         }
     },
@@ -862,64 +938,10 @@ export const useJobStore = create<JobState>()((set, get) => ({
                     }
                 }
             )
-            .subscribe((status) => {
-                console.log('Realtime subscription status:', status);
-            });
+            .subscribe();
 
-        // Return unsubscribe function
         return () => {
-            console.log('Unsubscribing from jobs...');
             supabase.removeChannel(channel);
         };
-    },
-
-    savedJobs: [],
-
-    toggleSavedJob: async (jobId: string) => {
-        const { savedJobs } = get();
-        const currentUser = useAuthStore.getState().user;
-        if (!currentUser) return; // Guard clause
-
-        const isSaved = savedJobs.includes(jobId);
-        const newSavedJobs = isSaved
-            ? savedJobs.filter((id) => id !== jobId)
-            : [...savedJobs, jobId];
-
-        set({ savedJobs: newSavedJobs }); // Optimistic
-
-        const supabase = getSupabaseClient();
-        try {
-            if (isSaved) {
-                await supabase.from('job_favorites').delete().eq('user_id', currentUser.id).eq('job_id', jobId);
-            } else {
-                await supabase.from('job_favorites').insert({ user_id: currentUser.id, job_id: jobId });
-            }
-        } catch (err) {
-            console.error('Error toggling saved job:', err);
-            set({ savedJobs }); // Revert
-        }
-
-        set({ savedJobs: newSavedJobs });
-
-        // Persist to localStorage
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.setItem('savedJobs', JSON.stringify(newSavedJobs));
-            } catch (e) {
-                console.error('Failed to save jobs to localStorage', e);
-            }
-        }
-    },
-}));
-
-// Initialize saved jobs from local storage on client side
-if (typeof window !== 'undefined') {
-    try {
-        const saved = localStorage.getItem('savedJobs');
-        if (saved) {
-            useJobStore.getState().savedJobs = JSON.parse(saved);
-        }
-    } catch (e) {
-        console.error('Failed to load saved jobs from localStorage', e);
     }
-}
+}));

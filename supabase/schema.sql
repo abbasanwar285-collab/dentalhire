@@ -216,6 +216,13 @@ CREATE POLICY "Anyone can view active jobs" ON jobs
 CREATE POLICY "Clinics can manage own jobs" ON jobs
     FOR ALL USING (clinic_id IN (SELECT id FROM clinics WHERE user_id IN (SELECT id FROM users WHERE auth_id = auth.uid())));
 
+-- Clinics policies
+CREATE POLICY "Users can update their own clinic details" ON clinics
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Public profiles are viewable by everyone" ON clinics
+    FOR SELECT USING (true);
+
 -- Messages policies
 CREATE POLICY "Users can view own conversations" ON conversations
     FOR SELECT USING (auth.uid()::text = ANY(participants::text[]));

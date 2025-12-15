@@ -527,7 +527,15 @@ export default function ClinicSearchPage() {
                                                     </span>
                                                 )}
                                             </div>
-                                            <p className="text-xs text-gray-500">{m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}</p>
+                                            <p className="text-xs text-gray-500">
+                                                {m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}
+                                                {m.cv.experience[0]?.company && (
+                                                    <span className="block text-[10px] text-gray-400 mt-0.5">
+                                                        {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                        {m.cv.experience[0].company}
+                                                    </span>
+                                                )}
+                                            </p>
                                             <div className="flex items-center justify-between">
                                                 <MatchScore score={m.score} size="sm" />
                                                 <span className="text-xs font-medium">{(m.cv.salary.expected / 1000).toFixed(0)} ألف د.ع</span>
@@ -835,6 +843,14 @@ export default function ClinicSearchPage() {
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                                                 {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
                                             </p>
+                                            {match.cv?.experience?.[0]?.company && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-500 truncate mt-1">
+                                                    {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                                                        {match.cv.experience[0].company}
+                                                    </span>
+                                                </p>
+                                            )}
                                             <div className="flex flex-col gap-1.5 mt-2 text-xs text-gray-500">
                                                 <span className="flex items-center gap-1.5 truncate" title={match.cv?.location?.preferred?.[0] || match.cv?.personalInfo?.city || ''}>
                                                     <MapPin size={12} className="flex-shrink-0" />
@@ -888,6 +904,12 @@ export default function ClinicSearchPage() {
                                                     </div>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
+                                                        {match.cv.experience[0]?.company && (
+                                                            <span className="block mt-1 text-xs text-gray-500">
+                                                                {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                                <span className="font-medium">{match.cv.experience[0].company}</span>
+                                                            </span>
+                                                        )}
                                                     </p>
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {match.cv.skills.slice(0, 4).map((skill: string) => (

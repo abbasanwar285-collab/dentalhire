@@ -435,6 +435,26 @@ export const useJobStore = create<JobState>()((set, get) => ({
         try {
             const supabase = getSupabaseClient();
 
+            // 1. Get application details first (to know who to notify)
+            const { data: application, error: fetchError } = await (supabase
+                .from('job_applications') as any)
+                .select(`
+                    user_id,
+                    jobs (
+                        title,
+                        clinics (
+                            name
+                        )
+                    )
+                `)
+                .eq('id', applicationId)
+                .single();
+
+            if (fetchError || !application) {
+                console.error('Error fetching application for notification:', fetchError);
+            }
+
+            // 2. Update status
             const { error } = await (supabase
                 .from('job_applications') as any)
                 .update({
@@ -446,6 +466,47 @@ export const useJobStore = create<JobState>()((set, get) => ({
             if (error) {
                 console.error('Error updating application status:', error);
                 return false;
+            }
+
+            // 3. Create Notification if update successful
+            if (application) {
+                const jobTitle = application.jobs?.title || 'Job';
+                const clinicName = application.jobs?.clinics?.name || 'Clinic';
+
+                // Map status to user-friendly message
+                let message = '';
+                let title = '';
+
+                switch (status) {
+                    case 'accepted':
+                        title = 'Application Accepted! 🎉';
+                        message = `Congratulations! Your application for "${jobTitle}" at ${clinicName} has been accepted.`;
+                        break;
+                    case 'rejected':
+                        title = 'Application Update';
+                        message = `Your application for "${jobTitle}" at ${clinicName} has been updated to rejected.`;
+                        break;
+                    case 'interview':
+                        title = 'Interview Invitation 📅';
+                        message = `${clinicName} would like to interview you for the "${jobTitle}" position. Check your messages!`;
+                        break;
+                    case 'shortlisted':
+                        title = 'Shortlisted! 🌟';
+                        message = `You have been shortlisted for the "${jobTitle}" position at ${clinicName}.`;
+                        break;
+                    default:
+                        title = 'Application Status Updated';
+                        message = `Your application status for "${jobTitle}" has been updated to ${status}.`;
+                }
+
+                await (supabase.from('notifications') as any).insert({
+                    user_id: application.user_id,
+                    title,
+                    message,
+                    type: 'status_change',
+                    read: false,
+                    data: { applicationId, status, jobTitle, clinicName }
+                });
             }
 
             // Update local state

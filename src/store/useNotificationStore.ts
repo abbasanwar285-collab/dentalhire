@@ -47,13 +47,26 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         const supabase = getSupabaseClient();
 
         try {
+            // Use RPC to bypass potential RLS issues on SELECT
             const { data, error } = await supabase
-                .from('notifications')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
+                .rpc('get_my_notifications');
 
-            if (error) throw error;
+            // Fallback to standard select if RPC fails or returns 0 items (double check)
+            if (error) {
+                console.error('RPC fetch failed, retrying with standard select:', error);
+                const { data: fallbackData, error: fallbackError } = await supabase
+                    .from('notifications')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+
+                if (fallbackError) throw fallbackError;
+
+                const notifications = fallbackData as any[];
+                const unreadCount = notifications.filter(n => !n.read).length;
+                set({ notifications, unreadCount, isLoading: false });
+                return;
+            }
 
             const notifications = data as any[];
             const unreadCount = notifications.filter(n => !n.read).length;

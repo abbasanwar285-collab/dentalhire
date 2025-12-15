@@ -187,6 +187,7 @@ export default function ClinicSearchPage() {
         role: language === 'ar' ? 'المسمى الوظيفي' : 'Role',
         minimumExperience: language === 'ar' ? 'الحد الأدنى للخبرة' : 'Minimum Experience',
         any: language === 'ar' ? 'أقل من سنة' : 'Less than a year',
+        anyRange: language === 'ar' ? 'أي نطاق' : 'Any Range',
         yearsPlus: language === 'ar' ? 'سنوات +' : 'years +',
         salaryRange: language === 'ar' ? 'نطاق الراتب' : 'Salary Range',
         min: language === 'ar' ? 'الحد الأدنى' : 'Min',
@@ -671,7 +672,7 @@ export default function ClinicSearchPage() {
                                             {t.salaryRange}
                                         </label>
                                         <select
-                                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000}`}
+                                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
                                             onChange={(e) => {
                                                 const [min, max] = e.target.value.split('-').map(Number);
                                                 setFilter('salaryMin', min);
@@ -680,7 +681,7 @@ export default function ClinicSearchPage() {
                                             className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
                                             style={{ backgroundImage: 'none' }}
                                         >
-                                            <option value="0-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.any}</option>
+                                            <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
                                             <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
                                             <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
                                             <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>

@@ -330,7 +330,7 @@ export default function CVWizard() {
                             "lg:col-span-3 transition-all duration-300",
                             // Mobile Overlay Styles
                             isMobileStepOpen
-                                ? "fixed inset-0 z-50 bg-gray-50 dark:bg-gray-900 flex flex-col h-[100dvh]"
+                                ? "fixed inset-0 z-[105] bg-gray-50 dark:bg-gray-900 flex flex-col h-[100dvh]"
                                 : "hidden lg:block"
                         )}
                     >
@@ -392,7 +392,7 @@ export default function CVWizard() {
                             {/* Navigation Buttons - Sticky Footer on Mobile */}
                             <div className={cn(
                                 "mt-8 pt-6 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between",
-                                isMobileStepOpen ? "sticky bottom-0 bg-white dark:bg-gray-800 p-4 mt-0 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10" : ""
+                                isMobileStepOpen ? "sticky bottom-0 bg-white dark:bg-gray-800 p-4 pb-safe mt-0 border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-10" : ""
                             )}>
                                 <Button
                                     variant="ghost"

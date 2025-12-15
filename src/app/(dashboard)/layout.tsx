@@ -12,7 +12,9 @@ import { PageLoader, NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EmployerOnboardingModal from '@/components/onboarding/EmployerOnboardingModal';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Menu } from 'lucide-react';
+import { Menu, Bell } from 'lucide-react';
+import Link from 'next/link';
+import { useNotificationStore } from '@/store/useNotificationStore';
 
 export default function DashboardLayout({
     children,
@@ -25,6 +27,7 @@ export default function DashboardLayout({
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [checkingProfile, setCheckingProfile] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { unreadCount, fetchNotifications } = useNotificationStore();
 
     // Check if employer needs to complete profile
     useEffect(() => {
@@ -128,7 +131,12 @@ export default function DashboardLayout({
                 }
             }
         }
-    }, [isAuthenticated, isLoading, router, user]);
+
+        // Fetch notifications for badge
+        if (user) {
+            fetchNotifications(user.id);
+        }
+    }, [isAuthenticated, isLoading, router, user, fetchNotifications]);
 
     const handleOnboardingComplete = async () => {
         setShowOnboarding(false);
@@ -166,9 +174,20 @@ export default function DashboardLayout({
                         Dental<span className="text-blue-600">Hire</span>
                     </span>
                 </div>
-                {/* Placeholder for future actions (e.g. notifications) */}
-                <div className="flex items-center">
-                    <NotificationBell />
+                {/* Actions */}
+                <div className="flex items-center gap-2">
+                    <Link
+                        href="/notifications"
+                        aria-label={language === 'ar' ? 'الإشعارات' : 'Notifications'}
+                        className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                        <Bell size={20} />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 rounded-full animate-pulse shadow-sm">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
+                    </Link>
                 </div>
             </div>
 

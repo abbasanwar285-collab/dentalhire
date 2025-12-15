@@ -1,8 +1,6 @@
-'use client';
-
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Briefcase, LayoutDashboard, LogIn, ClipboardList, UserPlus } from 'lucide-react';
+import { Home, Briefcase, LayoutDashboard, LogIn, ClipboardList, UserPlus, User } from 'lucide-react';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -47,12 +45,27 @@ export default function BottomNav() {
         return `/${dashboard}/dashboard`;
     };
 
+    const getProfileLink = () => {
+        if (!user) return '/login';
+
+        if (user.role === 'job_seeker') {
+            return '/job-seeker/profile';
+        }
+
+        // For employers (clinic, company, lab)
+        const type = user.userType || 'clinic';
+        if (['company', 'lab'].includes(type)) {
+            return `/${type}/profile`;
+        }
+        return '/clinic/profile';
+    };
+
     const navItems = [
         {
-            label: t('nav.home'),
-            href: '/',
-            icon: Home,
-            isActive: pathname === '/',
+            label: isAuthenticated ? (language === 'ar' ? 'ملفي' : 'Profile') : t('nav.home'),
+            href: isAuthenticated ? getProfileLink() : '/',
+            icon: isAuthenticated ? User : Home,
+            isActive: isAuthenticated ? pathname.includes('/profile') : pathname === '/',
         },
         {
             label: language === 'ar' ? 'الوظائف' : 'Jobs',
@@ -67,7 +80,7 @@ export default function BottomNav() {
             icon: isAuthenticated ? LayoutDashboard : LogIn,
             isActive: pathname.includes('/dashboard') || pathname === '/login',
         },
-        // Item 4: Applications (Auth) or Register (Guest) - Replaces Profile
+        // Item 4: Applications (Auth) or Register (Guest)
         {
             label: isAuthenticated ? (language === 'ar' ? 'طلباتي' : 'My Applications') : (language === 'ar' ? 'حساب جديد' : 'Register'),
             href: isAuthenticated

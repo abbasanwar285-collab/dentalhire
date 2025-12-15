@@ -507,9 +507,14 @@ export default function ClinicSearchPage() {
                                     title: m.cv.personalInfo.fullName,
                                     content: (
                                         <div className="space-y-2">
-                                            <div className="flex items-center gap-1">
+                                            <div className="flex items-center justify-between gap-2">
                                                 <h4 className="font-semibold text-sm">{m.cv.personalInfo.fullName}</h4>
-                                                {m.cv.personalInfo.verified && <CheckCircle size={14} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
+                                                {m.cv.personalInfo.verified && (
+                                                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-medium border border-blue-100">
+                                                        <CheckCircle size={10} />
+                                                        {language === 'ar' ? 'موثق' : 'Verified'}
+                                                    </span>
+                                                )}
                                             </div>
                                             <p className="text-xs text-gray-500">{m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}</p>
                                             <div className="flex items-center justify-between">
@@ -801,10 +806,17 @@ export default function ClinicSearchPage() {
                                                     </button>
                                                 </div>
                                             </div>
-                                            <h3 className="font-semibold text-gray-900 dark:text-white truncate flex items-center gap-1">
-                                                {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
-                                                {match.cv?.personalInfo?.verified && <CheckCircle size={16} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
-                                            </h3>
+                                            <div className="flex items-center justify-between gap-2 w-full">
+                                                <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                                    {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
+                                                </h3>
+                                                {match.cv?.personalInfo?.verified && (
+                                                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                                        <CheckCircle size={12} />
+                                                        {language === 'ar' ? 'موثق' : 'Verified'}
+                                                    </span>
+                                                )}
+                                            </div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                                                 {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
                                             </p>
@@ -848,10 +860,17 @@ export default function ClinicSearchPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-1">
-                                                        {match.cv.personalInfo.fullName}
-                                                        {match.cv.personalInfo.verified && <CheckCircle size={16} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
-                                                    </h3>
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                                                            {match.cv.personalInfo.fullName}
+                                                        </h3>
+                                                        {match.cv.personalInfo.verified && (
+                                                            <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                                                <CheckCircle size={12} />
+                                                                {language === 'ar' ? 'موثق' : 'Verified'}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
                                                     </p>

@@ -136,7 +136,10 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                         >
                                             {cv.personalInfo?.fullName || cv.full_name || (language === 'ar' ? 'مرشح' : 'Candidate')}
                                             {(cv.personalInfo?.verified || cv.verified) && (
-                                                <CheckCircle size={24} className="inline-block ms-2 text-blue-500 fill-white dark:fill-gray-900" />
+                                                <div className="inline-flex items-center gap-1 ms-3 px-3 py-1 rounded-full bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-base font-medium text-white">
+                                                    <CheckCircle size={16} className="text-blue-200" />
+                                                    {language === 'ar' ? 'موثق' : 'Verified'}
+                                                </div>
                                             )}
                                         </motion.h2>
                                         <motion.div

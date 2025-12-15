@@ -529,10 +529,10 @@ export default function ClinicSearchPage() {
                                             </div>
                                             <p className="text-xs text-gray-500">
                                                 {m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}
-                                                {m.cv.experience[0]?.company && (
-                                                    <span className="block text-[10px] text-gray-400 mt-0.5">
+                                                {m.cv.experience && m.cv.experience.length > 0 && (
+                                                    <span className="block text-[10px] text-gray-400 mt-0.5 line-clamp-2">
                                                         {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
-                                                        {m.cv.experience[0].company}
+                                                        {m.cv.experience.map(e => e.company).join(language === 'ar' ? '، ' : ', ')}
                                                     </span>
                                                 )}
                                             </p>
@@ -843,11 +843,11 @@ export default function ClinicSearchPage() {
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                                                 {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
                                             </p>
-                                            {match.cv?.experience?.[0]?.company && (
-                                                <p className="text-xs text-gray-500 dark:text-gray-500 truncate mt-1">
+                                            {match.cv?.experience && match.cv.experience.length > 0 && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
                                                     {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
                                                     <span className="font-medium text-gray-700 dark:text-gray-300">
-                                                        {match.cv.experience[0].company}
+                                                        {match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}
                                                     </span>
                                                 </p>
                                             )}
@@ -904,10 +904,10 @@ export default function ClinicSearchPage() {
                                                     </div>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
-                                                        {match.cv.experience[0]?.company && (
-                                                            <span className="block mt-1 text-xs text-gray-500">
+                                                        {match.cv.experience && match.cv.experience.length > 0 && (
+                                                            <span className="block mt-1 text-xs text-gray-500 line-clamp-1" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
                                                                 {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
-                                                                <span className="font-medium">{match.cv.experience[0].company}</span>
+                                                                <span className="font-medium">{match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}</span>
                                                             </span>
                                                         )}
                                                     </p>

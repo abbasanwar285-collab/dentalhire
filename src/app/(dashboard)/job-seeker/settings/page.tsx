@@ -3,15 +3,135 @@
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button, Input } from '@/components/shared';
-import { Bell, Lock, User, Shield, MapPin } from 'lucide-react';
+import { Bell, Lock, User, Shield, MapPin, Check, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { iraqLocations } from '@/data/iraq_locations';
 import { getSupabaseClient } from '@/lib/supabase';
 
 export default function SettingsPage() {
-    const { user } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
     const { language, t } = useLanguage();
+
+    // Form States
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [city, setCity] = useState('');
+
+    // Notification State
     const [emailNotifications, setEmailNotifications] = useState(true);
+
+    // Password State
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
+    // Loading States
+    const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+    // Initialize state from user data
+    useEffect(() => {
+        if (user) {
+            setFirstName(user.profile.firstName || '');
+            setLastName(user.profile.lastName || '');
+            setCity(user.profile.city || '');
+        }
+    }, [user]);
+
+    // Load notification settings from metadata
+    useEffect(() => {
+        const loadSettings = async () => {
+            const supabase = getSupabaseClient();
+            const { data: { user: authUser } } = await supabase.auth.getUser();
+            if (authUser?.user_metadata?.email_notifications !== undefined) {
+                setEmailNotifications(authUser.user_metadata.email_notifications);
+            }
+        };
+        loadSettings();
+    }, []);
+
+    const handleSaveProfile = async () => {
+        if (!user) return;
+        setIsSavingProfile(true);
+
+        try {
+            // 1. Update User Profile (Store + DB)
+            await updateProfile({
+                firstName,
+                lastName,
+                city
+            });
+
+            // 2. Sync to CV (Profile -> CV)
+            const supabase = getSupabaseClient();
+            const { data: cv } = await supabase
+                .from('cvs')
+                .select('id')
+                .eq('user_id', user.id)
+                .single();
+
+            if (cv) {
+                await (supabase
+                    .from('cvs') as any)
+                    .update({ city: city })
+                    .eq('id', cv.id);
+            }
+
+            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
+        } finally {
+            setIsSavingProfile(false);
+        }
+    };
+
+    const handleToggleNotifications = async (checked: boolean) => {
+        setEmailNotifications(checked);
+        try {
+            const supabase = getSupabaseClient();
+            const { error } = await supabase.auth.updateUser({
+                data: { email_notifications: checked }
+            });
+            if (error) throw error;
+        } catch (error) {
+            console.error('Error updating notification settings:', error);
+            // Revert on error
+            setEmailNotifications(!checked);
+            alert(language === 'ar' ? 'فشل تحديث الإعدادات' : 'Failed to update settings');
+        }
+    };
+
+    const handleChangePassword = async () => {
+        if (newPassword.length < 6) {
+            alert(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
+            return;
+        }
+
+        setIsSavingPassword(true);
+        try {
+            const supabase = getSupabaseClient();
+            const { error } = await supabase.auth.updateUser({
+                password: newPassword
+            });
+
+            if (error) throw error;
+
+            alert(language === 'ar' ? 'تم تحديث كلمة المرور بنجاح' : 'Password updated successfully');
+            setNewPassword('');
+            setConfirmPassword('');
+            setIsChangingPassword(false);
+        } catch (error: any) {
+            console.error('Error updating password:', error);
+            alert(language === 'ar' ? 'خطأ في تحديث كلمة المرور: ' + error.message : 'Error updating password: ' + error.message);
+        } finally {
+            setIsSavingPassword(false);
+        }
+    };
 
     return (
         <div className="space-y-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -46,7 +166,8 @@ export default function SettingsPage() {
                                 <input
                                     type="text"
                                     aria-label={language === 'ar' ? 'الاسم الأول' : 'First Name'}
-                                    defaultValue={user?.profile.firstName}
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
@@ -57,7 +178,8 @@ export default function SettingsPage() {
                                 <input
                                     type="text"
                                     aria-label={language === 'ar' ? 'اسم العائلة' : 'Last Name'}
-                                    defaultValue={user?.profile.lastName}
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
@@ -69,7 +191,7 @@ export default function SettingsPage() {
                             <input
                                 type="email"
                                 aria-label={language === 'ar' ? 'البريد الإلكتروني' : 'Email Address'}
-                                defaultValue={user?.email}
+                                value={user?.email || ''}
                                 disabled
                                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-500 cursor-not-allowed"
                             />
@@ -84,9 +206,9 @@ export default function SettingsPage() {
                                 </label>
                                 <div className="relative">
                                     <select
-                                        name="city"
                                         aria-label={language === 'ar' ? 'المحافظة' : 'Governorate'}
-                                        defaultValue={user?.profile.city || ''}
+                                        value={city}
+                                        onChange={(e) => setCity(e.target.value)}
                                         className="w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
                                     >
                                         <option value="">{language === 'ar' ? 'اختر المحافظة' : 'Select Governorate'}</option>
@@ -108,77 +230,13 @@ export default function SettingsPage() {
 
                         <div className="pt-2">
                             <Button
-                                onClick={async (e) => {
-                                    const btn = e.currentTarget;
-                                    const form = btn.closest('.p-6') as HTMLDivElement;
-                                    const inputs = form.querySelectorAll('input, select');
-                                    const values: Record<string, string> = {};
-
-                                    inputs.forEach(input => {
-                                        const el = input as HTMLInputElement | HTMLSelectElement;
-                                        if (el.type !== 'submit' && el.type !== 'button') {
-                                            // Handle mapping name attributes if available, else infer from order/context
-                                            // Or better, add name attributes to inputs above
-                                            if (el.getAttribute('aria-label') === (language === 'ar' ? 'الاسم الأول' : 'First Name')) values.firstName = el.value;
-                                            if (el.getAttribute('aria-label') === (language === 'ar' ? 'اسم العائلة' : 'Last Name')) values.lastName = el.value;
-                                            if (el.tagName === 'SELECT') values.city = el.value;
-                                        }
-                                    });
-
-                                    if (user) {
-                                        btn.disabled = true;
-                                        try {
-                                            // 1. Update Profile using Auth Store
-                                            await useAuthStore.getState().updateProfile({
-                                                firstName: values.firstName,
-                                                lastName: values.lastName,
-                                                city: values.city
-                                            });
-
-                                            // 2. Sync to CV (Profile -> CV)
-                                            // Check if CV exists
-                                            const supabase = getSupabaseClient();
-                                            const { data: cv } = await supabase
-                                                .from('cvs')
-                                                .select('id, personal_info') // Need personal_info to merge
-                                                .eq('user_id', user.id)
-                                                .single();
-
-                                            if (cv) {
-                                                // Create updated personal info object (preserving other fields like phone, bio etc)
-                                                // Wait, we can just update the 'city' column directly if it's a top-level column?
-                                                // Checking useCVStore, it saves: city: state.personalInfo.city || '' column in Insert/Update.
-                                                // It seems 'city' IS a top-level column in 'cvs' table based on PersonalInfoStep logic:
-                                                /*
-                                                    await (supabase.from('cvs') as any)
-                                                        .insert({
-                                                            user_id: user.id,
-                                                            photo: publicUrl,
-                                                            full_name: ...,
-                                                            city: personalInfo.city || '', 
-                                                            ...
-                                                */
-                                                // Yes, 'city' is a top-level column.
-
-                                                await supabase
-                                                    .from('cvs')
-                                                    .update({ city: values.city })
-                                                    .eq('id', cv.id);
-
-                                                console.log('Synced city to CV:', values.city);
-                                            }
-
-                                            alert(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully');
-                                        } catch (err) {
-                                            console.error(err);
-                                            alert(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes');
-                                        } finally {
-                                            btn.disabled = false;
-                                        }
-                                    }
-                                }}
+                                onClick={handleSaveProfile}
+                                disabled={isSavingProfile}
+                                leftIcon={isSavingProfile ? undefined : <Save size={18} />}
                             >
-                                {language === 'ar' ? 'حفظ التغييرات' : 'Save Changes'}
+                                {isSavingProfile
+                                    ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...')
+                                    : (language === 'ar' ? 'حفظ التغييرات' : 'Save Changes')}
                             </Button>
                         </div>
                     </div>
@@ -209,9 +267,8 @@ export default function SettingsPage() {
                             <label className="relative inline-flex items-center cursor-pointer">
                                 <input
                                     type="checkbox"
-                                    aria-label={language === 'ar' ? 'تبديل إشعارات البريد الإلكتروني' : 'Toggle Email Notifications'}
                                     checked={emailNotifications}
-                                    onChange={(e) => setEmailNotifications(e.target.checked)}
+                                    onChange={(e) => handleToggleNotifications(e.target.checked)}
                                     className="sr-only peer"
                                 />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
@@ -242,10 +299,66 @@ export default function SettingsPage() {
                                     {language === 'ar' ? 'تم تغييرها منذ 3 أشهر' : 'Last changed 3 months ago'}
                                 </p>
                             </div>
-                            <Button variant="outline" leftIcon={<Lock size={16} />}>
-                                {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
-                            </Button>
+                            {!isChangingPassword && (
+                                <Button
+                                    variant="outline"
+                                    leftIcon={<Lock size={16} />}
+                                    onClick={() => setIsChangingPassword(true)}
+                                >
+                                    {language === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}
+                                </Button>
+                            )}
                         </div>
+
+                        {isChangingPassword && (
+                            <div className="bg-gray-50 dark:bg-gray-700/20 p-4 rounded-lg space-y-3 animate-in fade-in slide-in-from-top-2">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        {language === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        placeholder={language === 'ar' ? 'أدخل كلمة المرور الجديدة' : 'Enter new password'}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        {language === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}
+                                    </label>
+                                    <input
+                                        type="password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        placeholder={language === 'ar' ? 'أعد إدخال كلمة المرور' : 'Re-enter password'}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div className="flex items-center gap-2 pt-2">
+                                    <Button
+                                        onClick={handleChangePassword}
+                                        disabled={isSavingPassword}
+                                        size="sm"
+                                    >
+                                        {isSavingPassword ? (language === 'ar' ? 'جاري التحديث...' : 'Updating...') : (language === 'ar' ? 'تحديث كلمة المرور' : 'Update Password')}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        onClick={() => {
+                                            setIsChangingPassword(false);
+                                            setNewPassword('');
+                                            setConfirmPassword('');
+                                        }}
+                                        disabled={isSavingPassword}
+                                        size="sm"
+                                    >
+                                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

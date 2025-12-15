@@ -2,15 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store';
-import { Button } from '@/components/shared';
+import { Button, ProfileImageUpload } from '@/components/shared';
 import { Building2, MapPin, Globe, Edit, CheckCircle, Phone, Mail } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function ClinicProfilePage() {
-    const { user } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
     const [clinic, setClinic] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -32,6 +31,10 @@ export default function ClinicProfilePage() {
         };
         fetchClinic();
     }, [user]);
+
+    const handleImageUpload = async (url: string) => {
+        await updateProfile({ avatar: url });
+    };
 
     if (!user || loading) {
         return (
@@ -68,18 +71,14 @@ export default function ClinicProfilePage() {
                 <div className="px-8 pb-8">
                     <div className="relative flex flex-col sm:flex-row justify-between items-end -mt-16 mb-6 gap-4">
                         <div className="relative">
-                            <div className="w-32 h-32 rounded-xl border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 overflow-hidden relative shadow-md flex items-center justify-center">
-                                {user.profile.avatar ? (
-                                    <Image
-                                        src={user.profile.avatar}
-                                        alt={user.profile.firstName}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                ) : (
-                                    <Building2 size={48} className="text-gray-400" />
-                                )}
-                            </div>
+                            <ProfileImageUpload
+                                userId={user.id}
+                                currentImageUrl={user.profile.avatar}
+                                onUpload={handleImageUpload}
+                                altText={user.profile.firstName}
+                                size="lg"
+                                type="company"
+                            />
                         </div>
                         <Link href="/clinic/settings">
                             <Button variant="outline" leftIcon={<Edit size={16} />}>

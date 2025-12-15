@@ -18,3 +18,4 @@ export * from './SmartNotificationToast';
 export * from './NotificationBell';
 export * from './Toast';
 export * from './TimeSelect';
+export { default as ProfileImageUpload } from './ProfileImageUpload';

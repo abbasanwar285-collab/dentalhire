@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, Button, Input, useToast } from '@/components/shared';
+import { Card, Button, Input, useToast, ProfileImageUpload } from '@/components/shared';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Building2, MapPin, Mail, Phone, Save, CheckCircle } from 'lucide-react';
 
 export default function LabProfilePage() {
-    const { user } = useAuthStore();
+    const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
     const { addToast } = useToast();
     const supabase = getSupabaseClient();
@@ -37,6 +37,7 @@ export default function LabProfilePage() {
             save: 'حفظ التغييرات',
             saving: 'جاري الحفظ...',
             saved: 'تم الحفظ بنجاح!',
+            photoLabel: 'صورة المختبر / الشعار'
         },
         en: {
             title: 'Lab Info',
@@ -50,6 +51,7 @@ export default function LabProfilePage() {
             save: 'Save Changes',
             saving: 'Saving...',
             saved: 'Saved Successfully!',
+            photoLabel: 'Lab Photo / Logo'
         },
     };
 
@@ -116,6 +118,10 @@ export default function LabProfilePage() {
         }
     };
 
+    const handleImageUpload = async (url: string) => {
+        await updateProfile({ avatar: url });
+    };
+
     const cities = [
         { value: 'baghdad', ar: 'بغداد', en: 'Baghdad' },
         { value: 'basra', ar: 'البصرة', en: 'Basra' },
@@ -127,6 +133,8 @@ export default function LabProfilePage() {
         { value: 'kirkuk', ar: 'كركوك', en: 'Kirkuk' },
         { value: 'mosul', ar: 'الموصل', en: 'Mosul' },
     ];
+
+    if (!user) return null;
 
     return (
         <div className="max-w-2xl mx-auto space-y-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -140,6 +148,20 @@ export default function LabProfilePage() {
 
             <Card>
                 <div className="p-6 space-y-6">
+                    {/* Profile Image */}
+                    <div className="flex flex-col items-center sm:items-start gap-4 pb-6 border-b border-gray-100 dark:border-gray-700">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {text.photoLabel}
+                        </label>
+                        <ProfileImageUpload
+                            userId={user.id}
+                            currentImageUrl={user.profile.avatar}
+                            onUpload={handleImageUpload}
+                            altText={labData.name || 'Lab Logo'}
+                            type="company"
+                        />
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                             {text.labName}

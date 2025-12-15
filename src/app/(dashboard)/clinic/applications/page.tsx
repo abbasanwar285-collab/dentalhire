@@ -179,6 +179,7 @@ export default function ClinicApplicationsPage() {
                                     value={selectedJob}
                                     onChange={(e) => setSelectedJob(e.target.value)}
                                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    aria-label={language === 'ar' ? 'تصفية حسب الوظيفة' : 'Filter by Job'}
                                 >
                                     <option value="all">{language === 'ar' ? 'جميع الوظائف' : 'All Jobs'}</option>
                                     {uniqueJobs.map((job) => (
@@ -201,6 +202,7 @@ export default function ClinicApplicationsPage() {
                                     value={selectedStatus}
                                     onChange={(e) => setSelectedStatus(e.target.value)}
                                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    aria-label={language === 'ar' ? 'تصفية حسب الحالة' : 'Filter by Status'}
                                 >
                                     <option value="all">{language === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
                                     <option value="pending">{getStatusLabel('pending')}</option>
@@ -325,6 +327,7 @@ export default function ClinicApplicationsPage() {
                                             style={{
                                                 backgroundImage: 'none'
                                             }}
+                                            aria-label={language === 'ar' ? 'تحديث حالة الطلب' : 'Update Application Status'}
                                         >
                                             <option value="pending" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('pending')}</option>
                                             <option value="reviewed" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('reviewed')}</option>

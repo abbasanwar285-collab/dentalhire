@@ -310,7 +310,8 @@ export default function ClinicJobsPage() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4">
+            {/* Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card>
                     <div className="text-center">
                         <p className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -343,6 +344,7 @@ export default function ClinicJobsPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 leftIcon={<Search size={18} />}
+                aria-label={t.searchJobs}
             />
 
             {/* Job Form Modal */}

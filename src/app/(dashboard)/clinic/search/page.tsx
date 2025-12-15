@@ -39,6 +39,13 @@ export default function ClinicSearchPage() {
     const supabase = getSupabaseClient();
     const { filters, setFilter, clearFilters, results, setResults, viewMode, setViewMode } = useSearchStore();
     const [showFilters, setShowFilters] = useState(true);
+
+    // Mobile check to collapse filters by default
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setShowFilters(false);
+        }
+    }, []);
     const [selectedCV, setSelectedCV] = useState<string | null>(null);
     const [mapView, setMapView] = useState(false);
     const { language } = useLanguage();

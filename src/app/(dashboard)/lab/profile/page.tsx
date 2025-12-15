@@ -170,9 +170,11 @@ export default function LabProfilePage() {
                             {text.labName}
                         </label>
                         <Input
+                            placeholder={text.labName}
                             value={labData.name}
                             onChange={(e) => setLabData({ ...labData, name: e.target.value })}
                             leftIcon={<Building2 size={18} />}
+                            aria-label={text.labName}
                         />
                     </div>
 
@@ -205,9 +207,11 @@ export default function LabProfilePage() {
                             {text.address}
                         </label>
                         <Input
+                            placeholder={text.address}
                             value={labData.address}
                             onChange={(e) => setLabData({ ...labData, address: e.target.value })}
                             leftIcon={<MapPin size={18} />}
+                            aria-label={text.address}
                         />
                     </div>
 
@@ -216,10 +220,12 @@ export default function LabProfilePage() {
                             {text.email}
                         </label>
                         <Input
+                            placeholder={text.email}
                             type="email"
                             value={labData.email}
                             onChange={(e) => setLabData({ ...labData, email: e.target.value })}
                             leftIcon={<Mail size={18} />}
+                            aria-label={text.email}
                         />
                     </div>
 
@@ -228,9 +234,11 @@ export default function LabProfilePage() {
                             {text.phone}
                         </label>
                         <Input
+                            placeholder={text.phone}
                             value={labData.phone}
                             onChange={(e) => setLabData({ ...labData, phone: e.target.value })}
                             leftIcon={<Phone size={18} />}
+                            aria-label={text.phone}
                         />
                     </div>
 

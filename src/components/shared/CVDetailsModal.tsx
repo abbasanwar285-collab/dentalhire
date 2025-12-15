@@ -14,8 +14,8 @@ import {
     DollarSign,
     Globe,
     Clock,
-    Download,
     Share2,
+    CheckCircle,
     CheckCircle2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -135,6 +135,9 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                             className="text-3xl font-bold text-white mb-2 shadow-sm"
                                         >
                                             {cv.personalInfo?.fullName || cv.full_name || (language === 'ar' ? 'مرشح' : 'Candidate')}
+                                            {(cv.personalInfo?.verified || cv.verified) && (
+                                                <CheckCircle size={24} className="inline-block ms-2 text-blue-500 fill-white dark:fill-gray-900" />
+                                            )}
                                         </motion.h2>
                                         <motion.div
                                             initial={{ opacity: 0, y: 20 }}

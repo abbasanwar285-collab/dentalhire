@@ -61,6 +61,7 @@ export interface PersonalInfo {
     city: string;
     photo?: string;
     bio?: string;
+    verified?: boolean;
 }
 
 export interface Experience {

@@ -23,7 +23,8 @@ import {
     Building2,
     User,
     Stethoscope,
-    Heart
+    Heart,
+    CheckCircle
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -79,10 +80,10 @@ export default function ClinicSearchPage() {
         const fetchCVs = async () => {
             setIsLoading(true);
             try {
-                // Join with users table to get user_type
+                // Join with users table to get user_type and verified status
                 const { data, error } = await supabase
                     .from('cvs')
-                    .select('*, users(user_type)');
+                    .select('*, users(user_type, verified)');
 
                 if (error) {
                     console.error('Error fetching CVs:', error);
@@ -98,6 +99,7 @@ export default function ClinicSearchPage() {
                             personalInfo: {
                                 fullName: cv.full_name,
                                 email: cv.email,
+                                verified: cv.users?.verified, // Map verified status
                                 phone: cv.phone,
                                 city: cv.city,
                                 bio: cv.bio,
@@ -505,6 +507,10 @@ export default function ClinicSearchPage() {
                                     title: m.cv.personalInfo.fullName,
                                     content: (
                                         <div className="space-y-2">
+                                            <div className="flex items-center gap-1">
+                                                <h4 className="font-semibold text-sm">{m.cv.personalInfo.fullName}</h4>
+                                                {m.cv.personalInfo.verified && <CheckCircle size={14} className="text-blue-500 fill-blue-50 dark:fill-blue-900/10" />}
+                                            </div>
                                             <p className="text-xs text-gray-500">{m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}</p>
                                             <div className="flex items-center justify-between">
                                                 <MatchScore score={m.score} size="sm" />

@@ -226,6 +226,7 @@ export function filterAndMatchCVs(
         location?: string;
         experienceMin?: number;
         experienceMax?: number;
+        verified?: boolean;
     }
 ): MatchResult[] {
     let filteredCVs = [...cvs];
@@ -256,7 +257,13 @@ export function filterAndMatchCVs(
             if (filters.experienceMin !== undefined && years < filters.experienceMin) return false;
             if (filters.experienceMax !== undefined && years > filters.experienceMax) return false;
             return true;
+            if (filters.experienceMax !== undefined && years > filters.experienceMax) return false;
+            return true;
         });
+    }
+
+    if (filters.verified) {
+        filteredCVs = filteredCVs.filter(cv => cv.personalInfo.verified === true);
     }
 
     // Calculate match scores

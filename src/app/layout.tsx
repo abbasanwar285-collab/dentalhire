@@ -19,18 +19,18 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  title: "DentalHire - Find Your Perfect Dental Career Match",
-  description: "Connect with top dental clinics and professionals. DentalHire is the premier job platform for dental assistants, hygienists, and sales representatives.",
+  title: "Hire Me - Gateway to Better Jobs",
+  description: "Connect with top dental clinics and professionals. Hire Me is the premier job platform for dental assistants, hygienists, and sales representatives.",
   keywords: "dental jobs, dental assistant jobs, dental hygienist, dental careers, dentist hiring",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "DentalHire",
+    title: "Hire Me",
   },
   openGraph: {
-    title: "DentalHire - Dental Industry Job Platform",
-    description: "Find your perfect dental career match or hire top dental professionals",
+    title: "Hire Me - Gateway to Better Jobs",
+    description: "Find your perfect career match or hire top professionals",
     type: "website",
     locale: "en_US",
   },

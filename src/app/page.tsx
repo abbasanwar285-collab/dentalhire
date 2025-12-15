@@ -111,12 +111,18 @@ export default function HomePage() {
 
       {/* Brand Header */}
       <div className="absolute top-8 left-0 right-0 text-center z-10">
-        <div className="inline-flex items-center gap-2 mb-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-blue-500/20">
-            DH
+        <div className="inline-flex items-center gap-3 mb-2">
+          <div className="relative w-16 h-16 transition-transform hover:scale-105">
+            <Image
+              src="/logo.png"
+              alt="Hire Me Logo"
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
-          <span className="text-xl font-bold text-gray-900 dark:text-white">
-            Dental<span className="text-blue-600 ml-0.5">Hire</span>
+          <span className="text-2xl font-bold text-gray-900 dark:text-white">
+            Hire Me
           </span>
         </div>
       </div>

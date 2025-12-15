@@ -100,7 +100,7 @@ const translations: Record<string, Record<string, string>> = {
         'home.testimonials.subtitle': 'See what our users have to say about DentalHire',
 
         'home.final.title': 'Ready to Find Your Perfect Match?',
-        'home.final.subtitle': 'Join thousands of dental professionals who found their dream careers through DentalHire.',
+        'home.final.subtitle': 'Join thousands of dental professionals who found their dream careers through Hire Me.',
         'home.final.btn.create': 'Create Free Account',
         'home.final.btn.post': 'Post a Job',
 
@@ -155,7 +155,7 @@ const translations: Record<string, Record<string, string>> = {
         'about.title': 'About',
         'about.subtitle': 'Connecting talented dental professionals with leading clinics across the region',
         'about.mission': 'Our Mission',
-        'about.mission.p1': 'DentalHire is dedicated to revolutionizing the way dental professionals find their dream jobs and how clinics discover exceptional talent.',
+        'about.mission.p1': 'Hire Me is dedicated to revolutionizing the way dental professionals find their dream jobs and how clinics discover exceptional talent.',
         'about.mission.p2': 'We believe in creating meaningful connections that benefit both job seekers and employers, fostering growth and excellence in the dental industry.',
         'about.whyus': 'Why Choose Us?',
         'about.whyus.1': 'Specialized platform for dental professionals',
@@ -170,7 +170,7 @@ const translations: Record<string, Record<string, string>> = {
         'about.trust': 'Trust',
         'about.trust.desc': 'Verified profiles and transparent processes',
         'about.cta': 'Ready to Get Started?',
-        'about.cta.desc': 'Join thousands of dental professionals and clinics already using DentalHire',
+        'about.cta.desc': 'Join thousands of dental professionals and clinics already using Hire Me',
         'about.cta.btn': 'Create Your Account',
 
         // Contact Page
@@ -216,7 +216,7 @@ const translations: Record<string, Record<string, string>> = {
         'footer.contactus': 'Contact Us',
         'footer.privacypolicy': 'Privacy Policy',
         'footer.termsofservice': 'Terms of Service',
-        'footer.copyright': 'DentalHire. All rights reserved.',
+        'footer.copyright': 'Hire Me. All rights reserved.',
 
         // Jobs Page
         'jobs.title': 'Find Your Dream Dental Job',
@@ -533,10 +533,10 @@ const translations: Record<string, Record<string, string>> = {
 
         'home.testimonials.title.prefix': 'موثوق من قبل',
         'home.testimonials.title.highlight': 'المحترفين',
-        'home.testimonials.subtitle': 'شاهد ما يقوله مستخدمونا عن DentalHire',
+        'home.testimonials.subtitle': 'شاهد ما يقوله مستخدمونا عن Hire Me',
 
         'home.final.title': 'مستعد للعثور على وظيفتك المثالية؟',
-        'home.final.subtitle': 'انضم لآلاف المحترفين الذين وجدوا وظائف أحلامهم عبر DentalHire.',
+        'home.final.subtitle': 'انضم لآلاف المحترفين الذين وجدوا وظائف أحلامهم عبر Hire Me.',
         'home.final.btn.create': 'أنشئ حساب مجاني',
         'home.final.btn.post': 'أعلن عن وظيفة',
 
@@ -591,7 +591,7 @@ const translations: Record<string, Record<string, string>> = {
         'about.title': 'عن',
         'about.subtitle': 'نربط محترفي الأسنان الموهوبين بالعيادات الرائدة في المنطقة',
         'about.mission': 'مهمتنا',
-        'about.mission.p1': 'DentalHire مكرسة لتغيير الطريقة التي يجد بها محترفو الأسنان وظائف أحلامهم وكيف تكتشف العيادات المواهب الاستثنائية.',
+        'about.mission.p1': 'Hire Me مكرسة لتغيير الطريقة التي يجد بها محترفو الأسنان وظائف أحلامهم وكيف تكتشف العيادات المواهب الاستثنائية.',
         'about.mission.p2': 'نؤمن بإنشاء اتصالات ذات معنى تفيد كل من الباحثين عن عمل وأصحاب العمل، مما يعزز النمو والتميز في مجال طب الأسنان.',
         'about.whyus': 'لماذا تختارنا؟',
         'about.whyus.1': 'منصة متخصصة لمحترفي الأسنان',
@@ -606,7 +606,7 @@ const translations: Record<string, Record<string, string>> = {
         'about.trust': 'الثقة',
         'about.trust.desc': 'ملفات موثقة وعمليات شفافة',
         'about.cta': 'مستعد للبدء؟',
-        'about.cta.desc': 'انضم لآلاف محترفي الأسنان والعيادات الذين يستخدمون DentalHire',
+        'about.cta.desc': 'انضم لآلاف محترفي الأسنان والعيادات الذين يستخدمون Hire Me',
         'about.cta.btn': 'أنشئ حسابك',
 
         // Contact Page
@@ -652,7 +652,7 @@ const translations: Record<string, Record<string, string>> = {
         'footer.contactus': 'اتصل بنا',
         'footer.privacypolicy': 'سياسة الخصوصية',
         'footer.termsofservice': 'شروط الخدمة',
-        'footer.copyright': 'DentalHire. جميع الحقوق محفوظة.',
+        'footer.copyright': 'Hire Me. جميع الحقوق محفوظة.',
 
         // Jobs Page
         'jobs.title': 'اعثر على وظيفة أسنان أحلامك',

@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import { cn } from '@/lib/utils';
@@ -110,12 +111,18 @@ export default function Navbar() {
             <div className="container-custom">
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shadow-lg group-hover:shadow-xl transition-shadow">
-                            DH
+                    <Link href="/" className="flex items-center gap-3 group">
+                        <div className="relative w-12 h-12 transition-transform duration-300 group-hover:scale-105">
+                            <Image
+                                src="/logo.png"
+                                alt="Hire Me Logo"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
-                        <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:block">
-                            Dental<span className="text-blue-600">Hire</span>
+                        <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:block group-hover:text-blue-600 transition-colors">
+                            Hire Me
                         </span>
                     </Link>
 

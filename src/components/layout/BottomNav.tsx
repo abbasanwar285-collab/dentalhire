@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Home, Briefcase, LayoutDashboard, Menu, User, LogIn } from 'lucide-react';
+import { Home, Briefcase, LayoutDashboard, Menu, User, LogIn, ClipboardList } from 'lucide-react';
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -66,10 +66,12 @@ export default function BottomNav() {
             isActive: pathname.includes('/dashboard') || pathname === '/login',
         },
         {
-            label: language === 'ar' ? 'حسابي' : 'Profile', // Simplified Menu/Profile
-            href: isAuthenticated ? '/profile' : '/register',
-            icon: User,
-            isActive: pathname === '/profile' || pathname === '/register',
+            label: language === 'ar' ? 'طلباتي' : 'My Applications',
+            href: isAuthenticated
+                ? (user?.role === 'clinic' ? '/clinic/applications' : '/job-seeker/applications')
+                : '/login',
+            icon: ClipboardList,
+            isActive: pathname.includes('/applications'),
         },
     ];
 

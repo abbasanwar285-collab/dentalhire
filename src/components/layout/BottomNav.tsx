@@ -1,3 +1,5 @@
+'use client';
+
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Home, Briefcase, LayoutDashboard, LogIn, ClipboardList, UserPlus, User } from 'lucide-react';

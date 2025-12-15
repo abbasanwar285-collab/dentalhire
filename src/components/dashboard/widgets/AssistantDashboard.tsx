@@ -9,42 +9,72 @@ export default function AssistantDashboard() {
     const { language } = useLanguage();
     const { user } = useAuthStore();
 
-    const [statsData, setStatsData] = useState({
-        nearby_jobs: 0,
-        avg_salary: 0,
-        profile_views: 0
-    });
-    const [loading, setLoading] = useState(true);
+    const [nearbyJobs, setNearbyJobs] = useState<{ id: string; title: string; clinic: string; dist: string; salary: string }[]>([]);
 
     useEffect(() => {
-        const fetchStats = async () => {
+        const fetchStatsAndJobs = async () => {
             if (!user) return;
             const supabase = getSupabaseClient();
             try {
-                // Call the new RPC
-                const { data, error } = await supabase
+                // 1. Fetch Stats
+                const { data: stats, error: statsError } = await supabase
                     .rpc('get_dashboard_stats', {
                         p_user_id: user.id,
-                        p_role: 'job_seeker' // Force job_seeker logic for assistants
+                        p_role: 'job_seeker'
                     });
 
-                if (error) throw error;
-                if (data) {
+                if (stats && !statsError) {
                     setStatsData({
-                        nearby_jobs: data.nearby_jobs || 0,
-                        avg_salary: data.avg_salary || 0,
-                        profile_views: data.profile_views || 0
+                        nearby_jobs: stats.nearby_jobs || 0,
+                        avg_salary: stats.avg_salary || 0,
+                        profile_views: stats.profile_views || 0
                     });
                 }
+
+                // 2. Fetch Nearby Jobs List
+                // Get user city first
+                const { data: userData } = await supabase
+                    .from('cvs')
+                    .select('city')
+                    .eq('user_id', user.id)
+                    .single();
+
+                const userCity = userData?.city || '';
+
+                if (userCity) {
+                    const { data: jobs } = await supabase
+                        .from('jobs')
+                        .select('id, title, salary_min, salary_max, location, clinics(name)')
+                        .eq('status', 'active')
+                        .ilike('location', `%${userCity}%`)
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+
+                    if (jobs) {
+                        const mappedJobs = jobs.map((job: any) => ({
+                            id: job.id,
+                            title: job.title,
+                            clinic: job.clinics?.name || 'Unknown Clinic',
+                            dist: userCity, // Since we matched city, it's local
+                            salary: `${job.salary_min}-${job.salary_max}`
+                        }));
+                        setNearbyJobs(mappedJobs);
+                    }
+                }
+
             } catch (err) {
-                console.error('Failed to fetch dashboard stats:', err);
+                console.error('Failed to fetch dashboard data:', err);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchStats();
+        fetchStatsAndJobs();
     }, [user]);
+
+    // ... stats definition ...
+
+    // ... return ...
 
     const stats = [
         {
@@ -73,7 +103,7 @@ export default function AssistantDashboard() {
         },
     ];
 
-    const nearbyJobs: { title: string; clinic: string; dist: string; salary: string }[] = [];
+
 
     const skillsChecklist = [
         { skill: language === 'ar' ? 'التعقيم ومكافحة العدوى' : 'Sterilization & Infection Control', status: true },

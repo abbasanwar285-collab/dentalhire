@@ -276,7 +276,15 @@ export default function ClinicSearchPage() {
                     const govAr = (iraqLocations as any)[govKey].ar;
                     const districts = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.en.toLowerCase()) || [];
                     const districtsAr = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.ar) || [];
+
                     possibleMatches = [locFilter, govAr, ...districts, ...districtsAr];
+
+                    // Add stripped Arabic versions (e.g. remove "قضاء ", "ناحية ", "مركز ")
+                    if (govAr.startsWith('محافظة ')) possibleMatches.push(govAr.replace('محافظة ', ''));
+                    districtsAr.forEach((d: string) => {
+                        const stripped = d.replace(/^(قضاء|ناحية|مركز)\s+/, '');
+                        if (stripped !== d) possibleMatches.push(stripped);
+                    });
                 }
             } else {
                 // Check if it matches a district significantly
@@ -285,6 +293,10 @@ export default function ClinicSearchPage() {
                     if (foundDist) {
                         parentGovernorate = govName.toLowerCase();
                         possibleMatches.push(foundDist.ar);
+                        // Strip prefix
+                        const stripped = foundDist.ar.replace(/^(قضاء|ناحية|مركز)\s+/, '');
+                        if (stripped !== foundDist.ar) possibleMatches.push(stripped);
+
                         // Also add the governorate name to prevent cross-governorate matches
                         possibleMatches.push(govName.toLowerCase());
                         possibleMatches.push((gov as any).ar);
@@ -297,16 +309,19 @@ export default function ClinicSearchPage() {
                 const cityLower = m.cv.personalInfo.city?.toLowerCase() || '';
                 const preferredLower = m.cv.location.preferred.map((l: string) => l.toLowerCase());
 
-                // Helper function for more precise matching
+                // Helper function for more precise matching (Fixed for Arabic)
                 const matchesLocation = (text: string, pattern: string): boolean => {
                     if (!text || !pattern) return false;
 
                     // Exact match
                     if (text === pattern) return true;
 
-                    // Word boundary match (e.g., "Maysan" matches "Maysan City" but not "Al-Maysan Street")
-                    const wordBoundaryRegex = new RegExp(`\\b${pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i');
-                    if (wordBoundaryRegex.test(text)) {
+                    // Regex check with custom boundaries (works for Arabic unlike \b)
+                    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    // Matches start OR separator + pattern + end OR separator
+                    const regex = new RegExp(`(^|[\\s.,;:\\-،])(${escapedPattern})($|[\\s.,;:\\-،])`, 'i');
+
+                    if (regex.test(text)) {
                         // If searching for a governorate, ensure it's not a district of another governorate
                         if (isGovernorate && parentGovernorate) {
                             // Check if the text contains markers of being in a different governorate
@@ -317,6 +332,7 @@ export default function ClinicSearchPage() {
 
                             // If text contains another governorate name, it's not a match
                             const containsOtherGov = otherGovernorates.some(otherGov =>
+                                // Simple includes check for exclusion is usually safer/enough
                                 text.includes(String(otherGov).toLowerCase())
                             );
 
@@ -566,7 +582,7 @@ export default function ClinicSearchPage() {
                                                         const val = e.target.value;
                                                         setSelectedGov(val);
                                                         setSelectedDistrict('');
-                                                        // setArea(''); // Keep area ? No reset for logical flow
+                                                        setArea('');
                                                         updateLocationFilter(val, '', '');
                                                     }}
                                                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
@@ -591,7 +607,8 @@ export default function ClinicSearchPage() {
                                                         onChange={(e) => {
                                                             const val = e.target.value;
                                                             setSelectedDistrict(val);
-                                                            updateLocationFilter(selectedGov, val, area);
+                                                            setArea('');
+                                                            updateLocationFilter(selectedGov, val, '');
                                                         }}
                                                         className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
                                                         style={{ backgroundImage: 'none' }}

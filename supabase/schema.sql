@@ -218,7 +218,7 @@ CREATE POLICY "Clinics can manage own jobs" ON jobs
 
 -- Clinics policies
 CREATE POLICY "Users can update their own clinic details" ON clinics
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
 
 CREATE POLICY "Public profiles are viewable by everyone" ON clinics
     FOR SELECT USING (true);

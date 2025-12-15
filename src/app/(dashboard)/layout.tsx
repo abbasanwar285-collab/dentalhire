@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Navbar, Sidebar } from '@/components/layout';
 import { useAuthStore } from '@/store';
-import { PageLoader } from '@/components/shared';
+import { PageLoader, NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import EmployerOnboardingModal from '@/components/onboarding/EmployerOnboardingModal';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -167,7 +167,9 @@ export default function DashboardLayout({
                     </span>
                 </div>
                 {/* Placeholder for future actions (e.g. notifications) */}
-                <div className="w-10"></div>
+                <div className="flex items-center">
+                    <NotificationBell />
+                </div>
             </div>
 
             <main className="md:ps-64 pt-20 md:pt-8 min-h-screen transition-all duration-300">

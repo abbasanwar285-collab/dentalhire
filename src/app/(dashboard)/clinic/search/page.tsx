@@ -24,7 +24,8 @@ import {
     User,
     Stethoscope,
     Heart,
-    CheckCircle
+    CheckCircle,
+    Award
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -529,6 +530,12 @@ export default function ClinicSearchPage() {
                                             </div>
                                             <p className="text-xs text-gray-500">
                                                 {m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}
+                                                {m.cv.certifications && m.cv.certifications.length > 0 && (
+                                                    <span className="block text-[10px] text-gray-500 mt-0.5 line-clamp-1">
+                                                        <Award size={10} className="inline-block mr-1 align-text-top" />
+                                                        {m.cv.certifications.map(c => c.name).join(language === 'ar' ? '، ' : ', ')}
+                                                    </span>
+                                                )}
                                                 {m.cv.experience && m.cv.experience.length > 0 && (
                                                     <span className="block text-[10px] text-gray-400 mt-0.5 line-clamp-2">
                                                         {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
@@ -843,6 +850,12 @@ export default function ClinicSearchPage() {
                                             <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                                                 {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
                                             </p>
+                                            {match.cv?.certifications && match.cv.certifications.length > 0 && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-1" title={match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}>
+                                                    <Award size={12} className="inline-block mr-1 text-gray-400" />
+                                                    {match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}
+                                                </p>
+                                            )}
                                             {match.cv?.experience && match.cv.experience.length > 0 && (
                                                 <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
                                                     {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
@@ -904,6 +917,12 @@ export default function ClinicSearchPage() {
                                                     </div>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400">
                                                         {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
+                                                        {match.cv.certifications && match.cv.certifications.length > 0 && (
+                                                            <span className="block mt-1 text-xs text-gray-500 line-clamp-1" title={match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}>
+                                                                <Award size={12} className="inline-block mr-1 text-gray-400" />
+                                                                {match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}
+                                                            </span>
+                                                        )}
                                                         {match.cv.experience && match.cv.experience.length > 0 && (
                                                             <span className="block mt-1 text-xs text-gray-500 line-clamp-1" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
                                                                 {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}

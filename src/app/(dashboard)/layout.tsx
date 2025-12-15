@@ -170,8 +170,8 @@ export default function DashboardLayout({
                     >
                         <Menu size={24} />
                     </button>
-                    <span className="font-bold text-lg text-gray-900 dark:text-white">
-                        Dental<span className="text-blue-600">Hire</span>
+                    <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+                        Hire Me
                     </span>
                 </div>
                 {/* Actions */}
@@ -191,7 +191,7 @@ export default function DashboardLayout({
                 </div>
             </div>
 
-            <main className="md:ps-64 pt-20 md:pt-8 min-h-screen transition-all duration-300">
+            <main className="md:ps-64 pt-20 md:pt-28 min-h-screen transition-all duration-300">
                 <div className="px-4 md:px-6 pb-20 md:pb-6">
                     {children}
                 </div>

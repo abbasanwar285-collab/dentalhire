@@ -112,16 +112,7 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-3 group">
-                        <div className="relative w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl shadow-sm p-1 transition-transform duration-300 group-hover:scale-105 flex items-center justify-center overflow-hidden border border-gray-100 dark:border-gray-700">
-                            <Image
-                                src="/logo.png"
-                                alt="Hire Me Logo"
-                                fill
-                                className="object-contain p-0.5"
-                                priority
-                            />
-                        </div>
-                        <span className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 hidden sm:block">
+                        <span className="text-xl md:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
                             Hire Me
                         </span>
                     </Link>

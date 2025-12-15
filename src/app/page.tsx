@@ -112,16 +112,16 @@ export default function HomePage() {
       {/* Brand Header */}
       <div className="absolute top-8 left-0 right-0 text-center z-10">
         <div className="inline-flex items-center gap-3 mb-2">
-          <div className="relative w-16 h-16 transition-transform hover:scale-105">
+          <div className="relative w-16 h-16 bg-white rounded-2xl shadow-lg shadow-blue-500/10 p-2 flex items-center justify-center transition-transform hover:scale-105">
             <Image
               src="/logo.png"
               alt="Hire Me Logo"
               fill
-              className="object-contain"
+              className="object-contain p-1"
               priority
             />
           </div>
-          <span className="text-2xl font-bold text-gray-900 dark:text-white">
+          <span className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
             Hire Me
           </span>
         </div>

@@ -1,6 +1,6 @@
 {
-    "name": "DentalHire",
-    "short_name": "DentalHire",
+    "name": "Hire Me",
+    "short_name": "Hire Me",
     "description": "Connect dental professionals with clinics and opportunities",
     "start_url": "/",
     "display": "standalone",

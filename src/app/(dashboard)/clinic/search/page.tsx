@@ -247,6 +247,17 @@ export default function ClinicSearchPage() {
     // Default clinic location (Baghdad)
     const clinicLocation = { lat: 33.3128, lng: 44.3615 };
 
+    // Derive available skills from actual candidates
+    const availableSkills = useMemo(() => {
+        const skillsSet = new Set<string>();
+        results.forEach(m => {
+            m.cv.skills?.forEach(s => {
+                if (s && s.trim()) skillsSet.add(s.trim());
+            });
+        });
+        return Array.from(skillsSet).sort();
+    }, [results]);
+
     // Filter and sort results
     const filteredResults = useMemo(() => {
         let currentResults = [...results];
@@ -744,25 +755,29 @@ export default function ClinicSearchPage() {
                                             {t.skills}
                                         </label>
                                         <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                                            {(language === 'ar' ? dentalSkillsAr : dentalSkills).slice(0, 15).map(skill => (
-                                                <button
-                                                    key={skill}
-                                                    onClick={() => {
-                                                        const current = filters.skills || [];
-                                                        if (current.includes(skill)) {
-                                                            setFilter('skills', current.filter(s => s !== skill));
-                                                        } else {
-                                                            setFilter('skills', [...current, skill]);
-                                                        }
-                                                    }}
-                                                    className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
-                                                        ? 'bg-blue-500 text-white shadow-md'
-                                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                        }`}
-                                                >
-                                                    {skill}
-                                                </button>
-                                            ))}
+                                            {availableSkills.length > 0 ? (
+                                                availableSkills.map(skill => (
+                                                    <button
+                                                        key={skill}
+                                                        onClick={() => {
+                                                            const current = filters.skills || [];
+                                                            if (current.includes(skill)) {
+                                                                setFilter('skills', current.filter(s => s !== skill));
+                                                            } else {
+                                                                setFilter('skills', [...current, skill]);
+                                                            }
+                                                        }}
+                                                        className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
+                                                            ? 'bg-blue-500 text-white shadow-md'
+                                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                            }`}
+                                                    >
+                                                        {skill}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <p className="text-xs text-gray-500 p-1">{t.noCandidatesFound}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>

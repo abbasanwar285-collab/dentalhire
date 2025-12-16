@@ -703,10 +703,10 @@ export default function ClinicSearchPage() {
 
                                     <hr className="border-gray-100 dark:border-gray-700" />
 
-                                    {/* Salary Range - Simplified Dropdown */}
+                                    {/* Salary Range - Iraqi Dinar */}
                                     <div>
                                         <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
-                                            {t.salaryRange}
+                                            {t.salaryRange} <span className="text-xs font-normal text-gray-500">({language === 'ar' ? 'د.ع' : 'IQD'})</span>
                                         </label>
                                         <select
                                             value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
@@ -719,15 +719,14 @@ export default function ClinicSearchPage() {
                                             style={{ backgroundImage: 'none' }}
                                         >
                                             <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
-                                            <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
-                                            <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
-                                            <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>
-                                            <option value="2000-3000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$2,000 - $3,000</option>
-                                            <option value="3000-5000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$3,000 - $5,000</option>
-                                            <option value="5000-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من $5,000' : 'Above $5,000'}</option>
+                                            <option value="0-500000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من 500 ألف د.ع' : 'Under 500,000 IQD'}</option>
+                                            <option value="500000-1000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '500 ألف - 1 مليون د.ع' : '500K - 1M IQD'}</option>
+                                            <option value="1000000-2000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '1 مليون - 2 مليون د.ع' : '1M - 2M IQD'}</option>
+                                            <option value="2000000-4000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '2 مليون - 4 مليون د.ع' : '2M - 4M IQD'}</option>
+                                            <option value="4000000-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من 4 مليون د.ع' : 'Above 4M IQD'}</option>
                                         </select>
                                         <div className="mt-2 text-xs text-center text-gray-400">
-                                            {t.min}: ${filters.salaryMin || 0} - {t.max}: ${filters.salaryMax || 10000}
+                                            {t.min}: {(filters.salaryMin || 0).toLocaleString()} - {t.max}: {(filters.salaryMax || 5000000).toLocaleString()}
                                         </div>
                                     </div>
 

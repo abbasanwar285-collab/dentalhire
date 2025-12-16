@@ -59,27 +59,18 @@ export default function UpdatePasswordPage() {
         resolver: zodResolver(updatePasswordSchema),
     });
 
-    // Debug capturing
-    const [debugLogs, setDebugLogs] = useState<string[]>([]);
-    const addLog = (msg: string) => setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
-
     const onSubmit = async (data: UpdatePasswordInput) => {
         setIsLoading(true);
         setError(null);
-        addLog('Starting password update...');
 
         try {
             const supabase = getSupabaseClient();
-            addLog('Supabase client got.');
 
             // 1. Verify we have a session first
-            addLog('Checking session again...');
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                addLog('Session MISSING in submit');
                 throw new Error(language === 'ar' ? 'انتهت صلاحية الجلسة. يرجى طلب رابط جديد.' : 'Session expired. Please request a new link.');
             }
-            addLog('Session OK. Calling updateUser...');
 
             // 2. Attempt update with timeout race
             const updatePromise = supabase.auth.updateUser({
@@ -93,12 +84,8 @@ export default function UpdatePasswordPage() {
 
             const { error: updateError } = await Promise.race([updatePromise, timeoutPromise]) as any;
 
-            if (updateError) {
-                addLog(`Update failed: ${updateError.message}`);
-                throw updateError;
-            }
+            if (updateError) throw updateError;
 
-            addLog('Update SUCCESS! Redirecting...');
             setIsSuccess(true);
 
             // Redirect to login after 3 seconds
@@ -107,7 +94,6 @@ export default function UpdatePasswordPage() {
             }, 3000);
 
         } catch (err: any) {
-            addLog(`CATCH Error: ${err.message}`);
             console.error('Update password error:', err);
             let msg = err.message || 'Unknown error';
             if (msg === 'Request timed out') {
@@ -116,7 +102,6 @@ export default function UpdatePasswordPage() {
             alert(msg); // Force visible alert on mobile
             setError(msg);
         } finally {
-            addLog('Finally block reached. Loading false.');
             setIsLoading(false);
         }
     };
@@ -135,17 +120,9 @@ export default function UpdatePasswordPage() {
             </div>
 
             {/* Session Verification Display */}
-            <div className="text-center mb-6 p-2 bg-blue-50/50 rounded-lg text-sm text-blue-800 space-y-1">
-                <div>
-                    {language === 'ar' ? 'جاري التحديث للحساب: ' : 'Updating for: '}
-                    <span className="font-bold font-mono">{userEmail || (language === 'ar' ? 'جار التحقق...' : 'Checking session...')}</span>
-                </div>
-                {/* Server Debug Info */}
-                {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug_email') && (
-                    <div className="text-xs text-gray-500 border-t border-blue-200 mt-1 pt-1">
-                        Server Saw: {decodeURIComponent(new URLSearchParams(window.location.search).get('debug_email')!)}
-                    </div>
-                )}
+            <div className="text-center mb-6 p-2 bg-blue-50/50 rounded-lg text-sm text-blue-800">
+                {language === 'ar' ? 'جاري التحديث للحساب: ' : 'Updating for: '}
+                <span className="font-bold font-mono">{userEmail || (language === 'ar' ? 'جار التحقق...' : 'Checking session...')}</span>
             </div>
 
             {isSuccess ? (
@@ -164,7 +141,7 @@ export default function UpdatePasswordPage() {
                 </div>
             ) : (
                 <>
-                    {(error || (error === null && debugLogs.length > 0 && debugLogs[debugLogs.length - 1].includes('Error'))) && (
+                    {error && (
                         <div className="mb-6 p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 animate-in slide-in-from-top-2">
                             <AlertCircle size={20} className="shrink-0" />
                             <p className="text-sm font-medium">{error}</p>
@@ -218,22 +195,6 @@ export default function UpdatePasswordPage() {
                     </form>
                 </>
             )}
-
-            {/* Debug Console */}
-            <div className="mt-8 p-4 bg-black/90 rounded-lg text-left text-xs font-mono text-green-400 overflow-x-auto max-h-40 overflow-y-auto">
-                <div className="mb-2 text-gray-500 border-b border-gray-700 pb-1">Debug Console</div>
-                {debugLogs.length === 0 ? (
-                    <div className="text-gray-600 italic">No logs yet...</div>
-                ) : (
-                    debugLogs.map((log, i) => (
-                        <div key={i}>{log}</div>
-                    ))
-                )}
-            </div>
-
-            <div className="mt-4 text-center text-xs text-gray-300 dark:text-gray-700">
-                v2.1 - Debug Console Active
-            </div>
         </div>
     );
 }

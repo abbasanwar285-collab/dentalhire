@@ -30,15 +30,26 @@ export default function UpdatePasswordPage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [userEmail, setUserEmail] = useState<string | null>(null);
 
-    // Initial check for session on mount
-    useState(() => {
+    // Robust session listening
+    useEffect(() => {
         const supabase = getSupabaseClient();
+
+        // 1. Check immediately
         supabase.auth.getSession().then(({ data: { session } }) => {
             if (session?.user) {
                 setUserEmail(session.user.email || 'No Email Found');
             }
         });
-    });
+
+        // 2. Listen for changes (delayed init)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                setUserEmail(session.user.email || 'No Email Found');
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
 
     const {
         register,

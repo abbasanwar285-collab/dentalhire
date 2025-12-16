@@ -207,8 +207,17 @@ function RegisterContent() {
         },
     };
 
-    const t = translations[language as keyof typeof translations];
+    // Safety check for translations
+    const currentTranslations = translations[language as keyof typeof translations];
+
+    // Fallback to English if current language translations are missing
+    const t = currentTranslations || translations['en'];
     const isRTL = language === 'ar';
+
+    // Show loading state if language is somehow undefined (should be caught by context, but extra safety)
+    if (!language || !t) {
+        return <div className="min-h-[50vh] flex items-center justify-center">Loading...</div>;
+    }
 
     const mainRoles = [
         {

@@ -12,7 +12,9 @@ import {
   Users,
   Megaphone,
   FileText,
-  ArrowRight
+
+  ArrowRight,
+  FlaskConical
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -21,7 +23,7 @@ export default function HomePage() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
-  const [step, setStep] = useState<'initial' | 'role_selection'>('initial');
+  const [step, setStep] = useState<'initial' | 'role_selection' | 'employer_role_selection'>('initial');
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -50,7 +52,12 @@ export default function HomePage() {
 
     // Redirect logic
     if (role === 'clinic') {
-      router.push('/register?role=clinic');
+      if (!subRole) {
+        setStep('employer_role_selection');
+        return;
+      }
+      // Redirect with specific type
+      router.push(`/register?role=clinic&userType=${subRole}`);
     } else {
       const typeMap: Record<string, string> = {
         dentist: 'dentist',
@@ -99,6 +106,36 @@ export default function HomePage() {
       titleEn: 'Public Figure / Brand Face',
       icon: <Megaphone className="w-6 h-6" />,
       color: 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'
+    }
+  ];
+
+  const employerRoles = [
+    {
+      id: 'clinic',
+      titleAr: 'عيادة أسنان',
+      titleEn: 'Dental Clinic',
+      icon: <Stethoscope className="w-10 h-10" />,
+      color: 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+      descAr: 'ترخيص العيادة مطلوب',
+      descEn: 'Clinic License Required'
+    },
+    {
+      id: 'company',
+      titleAr: 'شركة',
+      titleEn: 'Company',
+      icon: <Building2 className="w-10 h-10" />,
+      color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+      descAr: 'سجل تجاري مطلوب',
+      descEn: 'Commercial CR Required'
+    },
+    {
+      id: 'lab',
+      titleAr: 'مختبر',
+      titleEn: 'Laboratory',
+      icon: <FlaskConical className="w-10 h-10" />,
+      color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+      descAr: 'ترخيص مختبر مطلوب',
+      descEn: 'Lab License Required'
     }
   ];
 
@@ -171,6 +208,47 @@ export default function HomePage() {
                 </p>
 
                 <div className="absolute inset-0 rounded-3xl ring-4 ring-teal-500/0 group-hover:ring-teal-500/10 transition-all duration-500" />
+              </button>
+            </div>
+          </div>
+
+        ) : step === 'employer_role_selection' ? (
+          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-2xl animate-fade-in border border-gray-100 dark:border-gray-700">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                {language === 'ar' ? 'من أنت؟' : 'Who are you?'}
+              </h2>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                {language === 'ar' ? 'اختر نوع المنشأة' : 'Choose your facility type'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {employerRoles.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => handleRoleSelect('clinic', role.id)}
+                  className="flex flex-col items-center text-center p-8 rounded-2xl border-2 border-transparent bg-gray-50 dark:bg-gray-700/30 hover:bg-white dark:hover:bg-gray-700 hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1"
+                >
+                  <div className={cn("w-20 h-20 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", role.color)}>
+                    {role.icon}
+                  </div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+                    {language === 'ar' ? role.titleAr : role.titleEn}
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {language === 'ar' ? role.descAr : role.descEn}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-12 pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
+              <button
+                onClick={() => setStep('initial')}
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-white font-medium transition-colors px-6 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50"
+              >
+                {language === 'ar' ? 'العودة للخلف' : 'Go Back'}
               </button>
             </div>
           </div>

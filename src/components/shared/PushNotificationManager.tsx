@@ -8,8 +8,8 @@ import { Button } from '@/components/shared';
 export default function PushNotificationManager() {
     const { user } = useAuthStore();
     const { enablePushNotifications } = useNotificationStore();
-    const [permission, setPermission] = useState<NotificationPermission>('default');
-    const [showPrompt, setShowPrompt] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
         if (typeof window !== 'undefined' && 'Notification' in window) {
@@ -25,11 +25,18 @@ export default function PushNotificationManager() {
 
     const handleEnable = async () => {
         if (!user) return;
+        setIsLoading(true);
+        setErrorMsg('');
+
         const success = await enablePushNotifications(user.id);
+
         if (success) {
             setPermission('granted');
             setShowPrompt(false);
+        } else {
+            setErrorMsg('فشل التفعيل. يرجى التأكد من سماحيات المتصفح.');
         }
+        setIsLoading(false);
     };
 
     if (!showPrompt || permission === 'granted' || permission === 'denied') return null;
@@ -47,9 +54,12 @@ export default function PushNotificationManager() {
                     </p>
                 </div>
             </div>
+            {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
             <div className="flex gap-2 justify-end">
                 <Button variant="outline" size="sm" onClick={() => setShowPrompt(false)}>لاحقاً</Button>
-                <Button size="sm" onClick={handleEnable}>تفعيل</Button>
+                <Button size="sm" onClick={handleEnable} disabled={isLoading}>
+                    {isLoading ? 'جاري التفعيل...' : 'تفعيل'}
+                </Button>
             </div>
         </div>
     );

@@ -26,17 +26,36 @@ interface CVDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     cv: any;
+    isApproved?: boolean;
 }
 
 export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     isOpen,
     onClose,
-    cv
+    cv,
+    isApproved = false
 }) => {
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState<'overview' | 'experience' | 'skills'>('overview');
 
     if (!cv) return null;
+
+    // ... variants ...
+
+    // Helper to mask contact info
+    const getContactInfo = (value: string | undefined, type: 'email' | 'phone') => {
+        if (isApproved) return value || (language === 'ar' ? 'غير متوفر' : 'N/A');
+        if (!value) return (language === 'ar' ? 'غير متوفر' : 'N/A');
+        return type === 'email' ? `${value.substring(0, 3)}***@***.***` : `${value.substring(0, 4)}****`;
+    };
+
+    // ... render ...
+
+    // In render:
+    // Email (Line 195)
+    // Phone (Line 204)
+    // Contact Button (Line 164)
+
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -159,15 +178,21 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                         </motion.div>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     <div className="flex gap-3 pb-2">
-                                        <Button
-                                            onClick={() => window.open(`mailto:${cv.personalInfo?.email || cv.email}`, '_blank')}
-                                            className="bg-white/90 hover:bg-white text-blue-700 border-none shadow-lg backdrop-blur-sm"
-                                        >
-                                            <Mail size={18} className="mr-2" />
-                                            {language === 'ar' ? 'تواصل' : 'Contact'}
-                                        </Button>
+                                        {isApproved ? (
+                                            <Button
+                                                onClick={() => window.open(`mailto:${cv.personalInfo?.email || cv.email}`, '_blank')}
+                                                className="bg-white/90 hover:bg-white text-blue-700 border-none shadow-lg backdrop-blur-sm"
+                                            >
+                                                <Mail size={18} className="mr-2" />
+                                                {language === 'ar' ? 'تواصل' : 'Contact'}
+                                            </Button>
+                                        ) : (
+                                            <div className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl text-white text-sm border border-white/20 flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                                                {language === 'ar' ? 'يجب طلب السيرة الذاتية للتواصل' : 'Request CV to Contact'}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -192,7 +217,9 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-xs text-gray-400">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</p>
-                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate" title={cv.personalInfo?.email || cv.email}>{cv.personalInfo?.email || cv.email}</p>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate" title={isApproved ? (cv.personalInfo?.email || cv.email) : ''}>
+                                                        {isApproved ? (cv.personalInfo?.email || cv.email) : (cv.personalInfo?.email || cv.email)?.replace(/(.{3})(.*)(@.*)/, "$1***$3")}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -201,7 +228,9 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-gray-400">{language === 'ar' ? 'الهاتف' : 'Phone'}</p>
-                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200" dir="ltr">{cv.personalInfo?.phone || cv.phone}</p>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200" dir="ltr">
+                                                        {isApproved ? (cv.personalInfo?.phone || cv.phone) : (cv.personalInfo?.phone || cv.phone)?.substring(0, 4) + '****'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">

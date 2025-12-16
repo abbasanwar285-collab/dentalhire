@@ -8,7 +8,7 @@ import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { useSearchStore, useAuthStore, useJobStore } from '@/store';
 import { dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { iraqLocations } from '@/data/iraq_locations';
-import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal } from '@/components/shared';
+import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, useToast } from '@/components/shared';
 import {
     Search,
     Grid3X3,
@@ -25,7 +25,8 @@ import {
     Stethoscope,
     Heart,
     CheckCircle,
-    Award
+    Award,
+    FileText
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -56,13 +57,12 @@ export default function ClinicSearchPage() {
     // Auth & Job Store for Favorites
     const { user } = useAuthStore();
     const { favorites, toggleFavorite, loadFavorites } = useJobStore();
+    const { addToast } = useToast();
 
     // Load favorites on mount
     useEffect(() => {
-        if (user?.id) {
-            loadFavorites(user.id);
-        }
-    }, [user?.id, loadFavorites]);
+        if (user) loadFavorites(user.id);
+    }, [user, loadFavorites]);
 
     const handleToggleFavorite = async (e: React.MouseEvent, cvId: string) => {
         e.stopPropagation(); // Prevent card click
@@ -75,6 +75,61 @@ export default function ClinicSearchPage() {
     const [selectedGov, setSelectedGov] = useState<string>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
     const [area, setArea] = useState<string>('');
+    const [cvRequests, setCvRequests] = useState<Record<string, string>>({}); // candidateId -> status
+    const [requestingIds, setRequestingIds] = useState<Set<string>>(new Set());
+
+    // Fetch CV Requests
+    useEffect(() => {
+        const fetchRequests = async () => {
+            if (!user) return;
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('cv_access_requests')
+                .select('job_seeker_id, status')
+                .eq('employer_id', user.id);
+
+            if (data) {
+                const requestsMap: Record<string, string> = {};
+                data.forEach((r: any) => {
+                    requestsMap[r.job_seeker_id] = r.status;
+                });
+                setCvRequests(requestsMap);
+            }
+        };
+
+        fetchRequests();
+    }, [user]);
+
+    const handleRequestCV = async (e: React.MouseEvent, cvId: string, candidateId: string) => {
+        e.stopPropagation();
+        if (!user) return;
+
+        setRequestingIds(prev => new Set(prev).add(candidateId));
+
+        try {
+            const supabase = getSupabaseClient();
+            // @ts-ignore
+            const { error } = await supabase.rpc('request_cv_access', {
+                p_employer_id: user.id,
+                p_job_seeker_id: candidateId
+            });
+
+            if (error) throw error;
+
+            setCvRequests(prev => ({ ...prev, [candidateId]: 'pending' }));
+            addToast(language === 'ar' ? 'تم إرسال الطلب بنجاح' : 'Request sent successfully', 'success');
+        } catch (error) {
+            console.error(error);
+            addToast(language === 'ar' ? 'حدث خطأ في طلب السيرة الذاتية' : 'Error requesting CV', 'error');
+        } finally {
+            setRequestingIds(prev => {
+                const next = new Set(prev);
+                next.delete(candidateId);
+                return next;
+            });
+        }
+    };
+
 
     // Fetch initial data
     useEffect(() => {
@@ -887,6 +942,51 @@ export default function ClinicSearchPage() {
                                                     </span>
                                                 )}
                                             </div>
+
+                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="flex-1 text-xs"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedCV(match.cv.id);
+                                                    }}
+                                                >
+                                                    {t.viewProfile}
+                                                </Button>
+                                                {cvRequests[match.cv.userId] === 'approved' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Logic to open full CV directly or pass approved flag
+                                                            setSelectedCV(match.cv.id);
+                                                        }}
+                                                    >
+                                                        <FileText size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'عرض السيرة' : 'View CV'}
+                                                    </Button>
+                                                ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        disabled
+                                                        className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                    >
+                                                        {language === 'ar' ? 'تم الطلب' : 'Request Sent'}
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                        loading={requestingIds.has(match.cv.userId)}
+                                                        onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                    >
+                                                        {language === 'ar' ? 'طلب CV' : 'Request CV'}
+                                                    </Button>
+                                                )}
+                                            </div>
                                         </Card>
                                     ))}
                                 </div>
@@ -948,6 +1048,51 @@ export default function ClinicSearchPage() {
                                                 </div>
                                             </div>
 
+                                            {/* Mobile Actions for List View */}
+                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex gap-2 md:hidden">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="flex-1 text-xs"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedCV(match.cv.id);
+                                                    }}
+                                                >
+                                                    {t.viewProfile}
+                                                </Button>
+                                                {cvRequests[match.cv.userId] === 'approved' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedCV(match.cv.id);
+                                                        }}
+                                                    >
+                                                        <FileText size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'عرض' : 'View'}
+                                                    </Button>
+                                                ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        disabled
+                                                        className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                    >
+                                                        {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                        loading={requestingIds.has(match.cv.userId)}
+                                                        onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                    >
+                                                        {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                    </Button>
+                                                )}
+                                            </div>
+
                                             <div className="flex items-center gap-4 hidden md:flex">
                                                 <div className="text-right">
                                                     <p className="font-medium text-gray-900 dark:text-white">
@@ -957,20 +1102,53 @@ export default function ClinicSearchPage() {
                                                         {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
                                                     </p>
                                                 </div>
-                                                <div className="flex flex-col items-end gap-2">
-                                                    <MatchScore score={match.score} size="sm" />
-                                                    <button
-                                                        onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                        className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                            }`}
-                                                    >
-                                                        <Heart
-                                                            size={18}
-                                                            fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                        />
-                                                    </button>
+                                                <div className="flex flex-col items-end gap-3 min-w-[120px]">
+                                                    <div className="flex items-center gap-2">
+                                                        <MatchScore score={match.score} size="sm" />
+                                                        <button
+                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                                }`}
+                                                        >
+                                                            <Heart
+                                                                size={18}
+                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                                            />
+                                                        </button>
+                                                    </div>
+
+                                                    {cvRequests[match.cv.userId] === 'approved' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setSelectedCV(match.cv.id);
+                                                            }}
+                                                        >
+                                                            <FileText size={14} className="mr-1" />
+                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                        </Button>
+                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            disabled
+                                                            className="w-full text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                        >
+                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                            loading={requestingIds.has(match.cv.userId)}
+                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                        >
+                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </Card>
@@ -997,6 +1175,7 @@ export default function ClinicSearchPage() {
                     isOpen={!!selectedCandidate}
                     onClose={() => setSelectedCV(null)}
                     cv={selectedCandidate.cv}
+                    isApproved={selectedCandidate.cv.userId ? cvRequests[selectedCandidate.cv.userId] === 'approved' : false}
                 />
             )}
         </div>

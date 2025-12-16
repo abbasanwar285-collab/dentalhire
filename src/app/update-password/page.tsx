@@ -71,12 +71,12 @@ export default function UpdatePasswordPage() {
                 router.push('/login');
             }, 3000);
 
-        } catch (err: any) {
             console.error('Update password error:', err);
             let msg = err.message || 'Unknown error';
             if (msg === 'Request timed out') {
                 msg = language === 'ar' ? 'استغرق الطلب وقتاً طويلاً. تحقق من الاتصال.' : 'Request timed out. Check connection.';
             }
+            alert(msg); // Force visible alert on mobile
             setError(msg);
         } finally {
             setIsLoading(false);
@@ -166,6 +166,11 @@ export default function UpdatePasswordPage() {
                     </form>
                 </>
             )}
+
+            {/* Debug Version Indicator */}
+            <div className="mt-8 text-center text-xs text-gray-300 dark:text-gray-700">
+                v2.0 - Debug Mode
+            </div>
         </div>
     );
 }

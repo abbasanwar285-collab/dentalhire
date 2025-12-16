@@ -203,3 +203,32 @@ export const mockReviews: Review[] = [];
 export function getMockReviewsForTarget(targetId: string): Review[] {
     return [];
 }
+
+// Salary Ranges by Role (Iraq Context)
+export const SALARY_RANGES_BY_ROLE: Record<string, { min: number; max: number; label: string; labelAr: string }[]> = {
+    dentist: [
+        { min: 500000, max: 1000000, label: 'Entry Level', labelAr: 'مستوى مبتدئ' },
+        { min: 1000000, max: 2500000, label: 'Mid Level', labelAr: 'مستوى متوسط' },
+        { min: 2500000, max: 5000000, label: 'Senior / Specialist', labelAr: 'خبير / أخصائي' }
+    ],
+    dental_assistant: [
+        { min: 300000, max: 500000, label: 'Junior', labelAr: 'مبتدئ' },
+        { min: 500000, max: 800000, label: 'Senior', labelAr: 'خبير' }
+    ],
+    dental_technician: [
+        { min: 600000, max: 1200000, label: 'Technician', labelAr: 'فني' },
+        { min: 1200000, max: 2500000, label: 'Lab Manager', labelAr: 'مدير مختبر' }
+    ],
+    media: [
+        { min: 400000, max: 800000, label: 'Specialist', labelAr: 'أخصائي' },
+        { min: 800000, max: 1500000, label: 'Manager', labelAr: 'مدير' }
+    ],
+    sales_rep: [
+        { min: 500000, max: 1000000, label: 'Representative', labelAr: 'مندوب' },
+        { min: 1000000, max: 2000000, label: 'Senior / Supervisor', labelAr: 'مشرف' }
+    ],
+    secretary: [
+        { min: 350000, max: 550000, label: 'Receptionist', labelAr: 'موظف استقبال' },
+        { min: 550000, max: 850000, label: 'Office Manager', labelAr: 'مدير مكتب' }
+    ]
+};

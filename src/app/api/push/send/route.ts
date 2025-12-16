@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { createClient } from '@supabase/supabase-js';
 
-// Configure web-push
-webpush.setVapidDetails(
-    process.env.NEXT_PUBLIC_VAPID_SUBJECT || 'mailto:admin@dentalhire.com',
-    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-    process.env.VAPID_PRIVATE_KEY!
-);
-
 export async function POST(request: Request) {
+    // Configure web-push inside handler and trim keys to avoid build time errors
+    webpush.setVapidDetails(
+        (process.env.NEXT_PUBLIC_VAPID_SUBJECT || 'mailto:admin@dentalhire.com').trim(),
+        process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!.trim(),
+        process.env.VAPID_PRIVATE_KEY!.trim()
+    );
+
     try {
         const { userId, title, message, url } = await request.json();
 

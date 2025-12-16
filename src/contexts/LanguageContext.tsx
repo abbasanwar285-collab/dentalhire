@@ -262,6 +262,7 @@ const translations: Record<string, Record<string, string>> = {
         'dashboard.recommended.subtitle': 'Jobs that match your profile',
         'dashboard.hoursago': 'hours ago',
         'dashboard.dayago': 'day ago',
+        'dashboard.saved': 'Saved Jobs',
 
         // Sidebar
         'sidebar.dashboard': 'Dashboard',
@@ -698,6 +699,7 @@ const translations: Record<string, Record<string, string>> = {
         'dashboard.recommended.subtitle': 'وظائف تتطابق مع ملفك',
         'dashboard.hoursago': 'ساعات مضت',
         'dashboard.dayago': 'يوم مضى',
+        'dashboard.saved': 'وظائف محفوظة',
 
         // Sidebar
         'sidebar.dashboard': 'لوحة التحكم',

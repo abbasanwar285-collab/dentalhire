@@ -33,7 +33,8 @@ export default function JobSeekerDashboard() {
     const [loading, setLoading] = useState(true);
 
     // Derive saved job objects from the jobs store
-    const savedJobItems = jobs.filter(job => savedJobs.includes(job.id));
+    const safeJobs = Array.isArray(jobs) ? jobs : [];
+    const savedJobItems = safeJobs.filter(job => savedJobs.includes(job.id));
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -167,7 +168,7 @@ export default function JobSeekerDashboard() {
                                                                 app.status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
                                                                     'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                                                         }`}>
-                                                        {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                                                        {app.status ? (app.status.charAt(0).toUpperCase() + app.status.slice(1)) : 'Unknown'}
                                                     </span>
                                                     <span className="text-xs text-gray-400">
                                                         {new Date(app.created_at).toLocaleDateString()}

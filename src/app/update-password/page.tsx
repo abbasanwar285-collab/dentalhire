@@ -108,6 +108,12 @@ export default function UpdatePasswordPage() {
                 </p>
             </div>
 
+            {/* Session Verification Display */}
+            <div className="text-center mb-6 p-2 bg-blue-50/50 rounded-lg text-sm text-blue-800">
+                {language === 'ar' ? 'جاري التحديث للحساب: ' : 'Updating for: '}
+                <span className="font-bold font-mono">{userEmail || (language === 'ar' ? 'جار التحقق...' : 'Checking session...')}</span>
+            </div>
+
             {isSuccess ? (
                 <div className="text-center p-6 bg-green-50 dark:bg-green-900/10 rounded-2xl border border-green-100 dark:border-green-900/30 animate-in fade-in zoom-in-95 duration-300">
                     <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">

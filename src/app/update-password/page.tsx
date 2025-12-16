@@ -28,6 +28,17 @@ export default function UpdatePasswordPage() {
     const [error, setError] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [userEmail, setUserEmail] = useState<string | null>(null);
+
+    // Initial check for session on mount
+    useState(() => {
+        const supabase = getSupabaseClient();
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session?.user) {
+                setUserEmail(session.user.email || 'No Email Found');
+            }
+        });
+    });
 
     const {
         register,

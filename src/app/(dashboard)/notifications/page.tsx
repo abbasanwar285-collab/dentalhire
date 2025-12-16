@@ -1,28 +1,71 @@
-'use client';
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store/useNotificationStore';
-import { Bell, Check, Clock, Briefcase, MessageSquare, Star, Info } from 'lucide-react';
+import { Bell, Check, Clock, Briefcase, MessageSquare, Star, Info, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { PageLoader } from '@/components/shared';
+import { PageLoader, Button } from '@/components/shared';
+import { getSupabaseClient } from '@/lib/supabase/client';
+import { useToast } from '@/components/shared/useToast';
 
 export default function NotificationsPage() {
     const { user } = useAuthStore();
     const {
         notifications,
-        isLoading,
         fetchNotifications,
         markAsRead,
         markAllAsRead
     } = useNotificationStore();
+    const isLoading = useNotificationStore(state => state.isLoading);
     const { language } = useLanguage();
+    const { addToast } = useToast();
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     useEffect(() => {
         if (user) {
             fetchNotifications(user.id);
         }
     }, [user, fetchNotifications]);
+
+    const handleRespondToCV = async (e: React.MouseEvent, notificationId: string, requestId: string, status: 'approved' | 'rejected') => {
+        e.stopPropagation();
+        if (!user || processingId) return;
+
+        setProcessingId(notificationId);
+        try {
+            const supabase = getSupabaseClient();
+            // @ts-ignore
+            const { error } = await supabase.rpc('respond_to_cv_access', {
+                p_request_id: requestId,
+                p_job_seeker_id: user.id,
+                p_status: status
+            });
+
+            if (error) throw error;
+
+            addToast(
+                language === 'ar'
+                    ? (status === 'approved' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب')
+                    : (status === 'approved' ? 'Request approved' : 'Request rejected'),
+                status === 'approved' ? 'success' : 'info'
+            );
+
+            // Mark notification as read
+            markAsRead(notificationId);
+
+            // Re-fetch notifications to update state if needed or just rely on local update
+            // Ideally backend marks req as processed. 
+            // We can also trigger a re-fetch of CV access status if this page displayed it, but here we just show notifications.
+
+        } catch (error) {
+            console.error('Error responding to CV request:', error);
+            addToast(
+                language === 'ar' ? 'حدث خطأ أثناء معالجة الطلب' : 'Error processing request',
+                'error'
+            );
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -82,6 +125,8 @@ export default function NotificationsPage() {
                 {notifications.length > 0 ? (
                     notifications.map((notification) => {
                         const Icon = getIcon(notification.type);
+                        const isCVRequest = notification.data?.action === 'cv_request';
+
                         return (
                             <div
                                 key={notification.id}
@@ -108,6 +153,32 @@ export default function NotificationsPage() {
                                                         month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'
                                                     })}
                                                 </p>
+
+                                                {/* Action Buttons for CV Requests */}
+                                                {isCVRequest && !notification.read && (
+                                                    <div className="flex items-center gap-2 mt-3 animate-in fade-in slide-in-from-top-1">
+                                                        <Button
+                                                            size="sm"
+                                                            className="h-8 bg-green-600 hover:bg-green-700 text-white gap-1"
+                                                            onClick={(e) => handleRespondToCV(e, notification.id, notification.data.requestId, 'approved')}
+                                                            loading={processingId === notification.id}
+                                                            disabled={!!processingId}
+                                                        >
+                                                            <Check size={14} />
+                                                            {language === 'ar' ? 'موافقة' : 'Approve'}
+                                                        </Button>
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 gap-1"
+                                                            onClick={(e) => handleRespondToCV(e, notification.id, notification.data.requestId, 'rejected')}
+                                                            disabled={!!processingId}
+                                                        >
+                                                            <X size={14} />
+                                                            {language === 'ar' ? 'رفض' : 'Decline'}
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
                                             {!notification.read && (
                                                 <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></div>

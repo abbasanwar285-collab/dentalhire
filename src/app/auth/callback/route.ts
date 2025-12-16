@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get('code')
     // if "next" is in param, use it as the redirect URL
     const next = searchParams.get('next') ?? '/'
+    const type = searchParams.get('type')
 
     if (code) {
         const cookieStore = request.cookies
@@ -27,11 +28,16 @@ export async function GET(request: NextRequest) {
             }
         )
         const { error } = await supabase.auth.exchangeCodeForSession(code)
+
         if (!error) {
+            // If it's a password recovery flow, force redirect to update-password
+            if (type === 'recovery') {
+                return NextResponse.redirect(`${origin}/update-password`)
+            }
             return NextResponse.redirect(`${origin}${next}`)
         }
     }
 
     // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+    return NextResponse.redirect(`${origin}/login?error=auth_code_error`)
 }

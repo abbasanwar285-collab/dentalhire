@@ -116,7 +116,7 @@ export default function LoginPage() {
     return (
         <div className="animate-fade-in" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Mobile Logo */}
-            <div className="lg:hidden text-center mb-8">
+            <div className="lg:hidden text-center mb-6">
                 <Link href="/" className="inline-flex items-center gap-2">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
                         DH
@@ -127,7 +127,7 @@ export default function LoginPage() {
                 </Link>
             </div>
 
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {t('auth.welcome')}
                 </h1>

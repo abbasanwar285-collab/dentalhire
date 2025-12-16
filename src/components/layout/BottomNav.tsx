@@ -15,6 +15,11 @@ export default function BottomNav() {
     const [isVisible, setIsVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
+    // Hide on specific routes
+    if (pathname === '/login' || pathname === '/register') {
+        return null;
+    }
+
     // Robust auth check
     const isAuthenticated = !!user;
 

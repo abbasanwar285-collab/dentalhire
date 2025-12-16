@@ -271,7 +271,8 @@ function RegisterContent() {
                 <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
                 {/* Main Content Area */}
-                <div className="bg-transparent pt-12 pb-24 min-h-screen">
+                {/* Main Content Area */}
+                <div className="bg-transparent pt-4 pb-8 w-full">
                     <div className="p-4 md:p-8 relative z-10">
                         {/* Error Message */}
                         {error && (
@@ -404,7 +405,7 @@ function RegisterContent() {
 
                         {/* Step 3: Account Details */}
                         {step === 3 && (
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
                                 <div className="flex items-center justify-between mb-6">
                                     <button
                                         type="button"

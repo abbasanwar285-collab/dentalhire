@@ -18,9 +18,11 @@ export default function AuthLayout({
     return (
         <div className="h-screen flex flex-col overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Top Side - Form */}
-            <div className="flex-1 flex items-center justify-center p-6 bg-white dark:bg-gray-900 relative z-10">
-                <div className="w-full max-w-4xl">
-                    {children}
+            <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900 relative z-10">
+                <div className="min-h-full flex items-center justify-center p-6">
+                    <div className="w-full max-w-4xl">
+                        {children}
+                    </div>
                 </div>
             </div>
 

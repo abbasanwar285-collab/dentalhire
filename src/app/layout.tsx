@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ToastProvider, SmartNotificationToast } from "@/components/shared";
 import { BottomNav } from "@/components/layout";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
+import PushNotificationManager from "@/components/shared/PushNotificationManager";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -68,6 +69,7 @@ export default function RootLayout({
                 </ToastProvider>
                 <BottomNav />
                 <PWAInstallPrompt />
+                <PushNotificationManager />
                 <SmartNotificationToast />
               </ThemeProvider>
             </div>

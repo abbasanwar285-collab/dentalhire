@@ -34,6 +34,7 @@ interface NotificationState {
     markAllAsRead: (userId: string) => Promise<void>;
     addNotification: (notification: Notification) => void;
     subscribeToNotifications: (userId: string) => () => void;
+    enablePushNotifications: (userId: string) => Promise<boolean>;
 }
 
 export const useNotificationStore = create<NotificationState>((set, get) => ({
@@ -186,5 +187,56 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
         return () => {
             supabase.removeChannel(channel);
         };
+    },
+
+    enablePushNotifications: async (userId: string) => {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            console.log('Push notifications not supported');
+            return false;
+        }
+
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') return false;
+
+            const registration = await navigator.serviceWorker.ready;
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
+            });
+
+            // Save subscription to DB
+            const supabase = getSupabaseClient();
+            // @ts-ignore - Table not yet in types
+            const { error } = await supabase.from('push_subscriptions').upsert({
+                user_id: userId,
+                endpoint: subscription.endpoint,
+                auth_key: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('auth') as ArrayBuffer) as any)),
+                p256dh_key: btoa(String.fromCharCode.apply(null, new Uint8Array(subscription.getKey('p256dh') as ArrayBuffer) as any))
+            } as any, { onConflict: 'endpoint' });
+
+            if (error) console.error('Error saving subscription:', error);
+
+            return true;
+        } catch (error) {
+            console.error('Error enabling push:', error);
+            return false;
+        }
     }
 }));
+
+// Helper function to convert VAPID key
+function urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}

@@ -3,9 +3,8 @@ import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store/useNotificationStore';
 import { Bell, Check, Clock, Briefcase, MessageSquare, Star, Info, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { PageLoader, Button } from '@/components/shared';
-import { getSupabaseClient } from '@/lib/supabase/client';
-import { useToast } from '@/components/shared/useToast';
+import { PageLoader, Button, useToast } from '@/components/shared';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function NotificationsPage() {
     const { user } = useAuthStore();

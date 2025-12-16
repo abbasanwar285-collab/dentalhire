@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
     const { searchParams, origin } = new URL(request.url)
@@ -8,18 +9,25 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type')
 
     if (code) {
+        const cookieStore = await cookies()
         const supabase = createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
             {
                 cookies: {
                     getAll() {
-                        return request.cookies.getAll()
+                        return cookieStore.getAll()
                     },
                     setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            request.cookies.set(name, value)
-                        )
+                        try {
+                            cookiesToSet.forEach(({ name, value, options }) =>
+                                cookieStore.set(name, value, options)
+                            )
+                        } catch {
+                            // The `setAll` method was called from a Server Component.
+                            // This can be ignored if you have middleware refreshing
+                            // user sessions.
+                        }
                     },
                 },
             }
@@ -28,13 +36,12 @@ export async function GET(request: NextRequest) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
             const isLocal = process.env.NODE_ENV === 'development'
 
-            // Determine the base URL: prefer env var, then forwarded host, then hardcoded production
+            // Force production URL in production environment
             let baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
 
-            if (!isLocal && process.env.NEXT_PUBLIC_SITE_URL) {
+            if (!isLocal && process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.startsWith('http')) {
                 baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
             }
 

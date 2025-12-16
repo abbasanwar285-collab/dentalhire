@@ -145,10 +145,19 @@ export const useAuthStore = create<AuthState>()(
                 set({ isLoading: true, error: null });
                 try {
                     const supabase = getSupabaseClient();
+
+                    const getRedirectUrl = () => {
+                        if (typeof window === 'undefined') return undefined;
+                        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                        return isLocal
+                            ? `${window.location.origin}/auth/callback`
+                            : 'https://dentalhire.vercel.app/auth/callback';
+                    };
+
                     const { error } = await supabase.auth.signInWithOAuth({
                         provider,
                         options: {
-                            redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+                            redirectTo: getRedirectUrl(),
                         },
                     });
 

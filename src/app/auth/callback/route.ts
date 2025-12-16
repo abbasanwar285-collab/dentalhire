@@ -41,12 +41,29 @@ export async function GET(request: NextRequest) {
             // Force production URL in production environment
             const baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
 
-            const { data: { user } } = await supabase.auth.getUser();
-            const emailParam = user?.email ? `&debug_email=${encodeURIComponent(user.email)}` : '';
-
             // Force password recovery flow
             if (type === 'recovery') {
-                return NextResponse.redirect(`${baseUrl}/update-password?${emailParam}`)
+                return NextResponse.redirect(`${baseUrl}/update-password`)
+            }
+
+            // Attempt to get user role for direct redirect
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                const { data: profile } = await supabase
+                    .from('users')
+                    .select('role')
+                    .eq('auth_id', user.id)
+                    .single();
+
+                if (profile?.role) {
+                    if (profile.role === 'clinic') {
+                        return NextResponse.redirect(`${baseUrl}/clinic/dashboard`);
+                    } else if (profile.role === 'job_seeker') {
+                        return NextResponse.redirect(`${baseUrl}/job-seeker/dashboard`);
+                    } else if (profile.role === 'admin') {
+                        return NextResponse.redirect(`${baseUrl}/admin/dashboard`);
+                    }
+                }
             }
 
             return NextResponse.redirect(`${baseUrl}${next}`)

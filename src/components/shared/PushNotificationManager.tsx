@@ -8,6 +8,8 @@ import { Button } from '@/components/shared';
 export default function PushNotificationManager() {
     const { user } = useAuthStore();
     const { enablePushNotifications } = useNotificationStore();
+    const [permission, setPermission] = useState<NotificationPermission>('default');
+    const [showPrompt, setShowPrompt] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 

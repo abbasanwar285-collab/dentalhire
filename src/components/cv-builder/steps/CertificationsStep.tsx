@@ -4,12 +4,13 @@
 // DentalHire - Certifications Step
 // ============================================
 
-import { useState } from 'react';
-import { useCVStore } from '@/store';
+import { useState, useMemo } from 'react';
+import { useCVStore, useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button, Input } from '@/components/shared';
 import { Certification } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { CERTIFICATIONS_BY_ROLE, CERTIFICATIONS_BY_ROLE_AR } from '@/data/mockData';
 import { Plus, Trash2, Edit2, X, Award, Building2, Calendar } from 'lucide-react';
 
 export default function CertificationsStep() {
@@ -55,14 +56,16 @@ export default function CertificationsStep() {
         setIsEditing(true);
     };
 
-    const suggestedCertifications = [
-        { name: language === 'ar' ? 'مساعد طب أسنان مسجل (RDA)' : 'Registered Dental Assistant (RDA)', issuer: language === 'ar' ? 'مجلس طب الأسنان' : 'State Dental Board' },
-        { name: language === 'ar' ? 'مساعد طب أسنان معتمد (CDA)' : 'Certified Dental Assistant (CDA)', issuer: 'DANB' },
-        { name: language === 'ar' ? 'شهادة الإنعاش القلبي (CPR/BLS)' : 'CPR/BLS Certification', issuer: language === 'ar' ? 'جمعية القلب الأمريكية' : 'American Heart Association' },
-        { name: language === 'ar' ? 'ترخيص الأشعة السينية للأسنان' : 'Dental Radiology License', issuer: language === 'ar' ? 'مجلس طب الأسنان' : 'State Dental Board' },
-        { name: language === 'ar' ? 'تدريب السلامة المهنية (OSHA)' : 'OSHA Compliance Training', issuer: 'OSHA' },
-        { name: language === 'ar' ? 'شهادة أكسيد النيتروز' : 'Nitrous Oxide Certification', issuer: language === 'ar' ? 'مجلس طب الأسنان' : 'State Dental Board' },
-    ];
+    const { user } = useAuthStore();
+    const userType = user?.userType || 'dental_assistant';
+
+    const suggestedCertifications = useMemo(() => {
+        const roleKey = userType;
+        if (language === 'ar') {
+            return CERTIFICATIONS_BY_ROLE_AR[roleKey] || CERTIFICATIONS_BY_ROLE_AR['dental_assistant'];
+        }
+        return CERTIFICATIONS_BY_ROLE[roleKey] || CERTIFICATIONS_BY_ROLE['dental_assistant'];
+    }, [userType, language]);
 
     const formatDisplayDate = (date: string) => {
         return formatDate(date);

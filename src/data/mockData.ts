@@ -87,6 +87,81 @@ export const dentalSkillsAr = [...SKILLS_BY_ROLE_AR.dentist, ...SKILLS_BY_ROLE_A
 export const salesSkills = SKILLS_BY_ROLE.sales_rep;
 export const salesSkillsAr = SKILLS_BY_ROLE_AR.sales_rep;
 
+// Role-based certifications mapping (Iraq Context)
+export const CERTIFICATIONS_BY_ROLE: Record<string, { name: string, issuer: string }[]> = {
+    dentist: [
+        { name: 'Bachelor of Dental Surgery (B.D.S)', issuer: 'University of Baghdad / Mustansiriyah' },
+        { name: 'Iraqi Dental Association Membership', issuer: 'Iraqi Dental Association' },
+        { name: 'Specialized Board Certification', issuer: 'Iraqi Board for Medical Specializations' },
+        { name: 'Masters in Conservative Dentistry', issuer: 'University of Baghdad' },
+        { name: 'Diploma in Oral Implantology', issuer: 'Ministry of Higher Education' }
+    ],
+    dental_assistant: [
+        { name: 'Diploma in Dental Assistance', issuer: 'Medical Technical Institute' },
+        { name: 'Health Profession Practice License', issuer: 'Ministry of Health - Iraq' },
+        { name: 'Infection Control Certificate', issuer: 'Ministry of Health' },
+        { name: 'Basic Life Support (BLS)', issuer: 'Iraqi Red Crescent Society' }
+    ],
+    dental_technician: [
+        { name: 'Diploma in Dental Technology', issuer: 'Institute of Medical Technology' },
+        { name: 'Bachelor in Dental Technology', issuer: 'College of Health & Medical Technology' },
+        { name: 'Certified Dental Technician', issuer: 'Ministry of Health' },
+        { name: 'CAD/CAM Certification', issuer: 'Private Training Centers' }
+    ],
+    media: [
+        { name: 'Digital Marketing Specialist', issuer: 'Google / Meta' },
+        { name: 'Photography & Editing Course', issuer: 'Local Arts Institute' },
+        { name: 'Social Media Management', issuer: 'Online Certification' }
+    ],
+    sales_rep: [
+        { name: 'Medical Sales Representative', issuer: 'Training Academy' },
+        { name: 'Bachelor of Pharmacy / Science', issuer: 'Iraqi University' },
+        { name: 'Sales Skills Certification', issuer: 'Business Institute' }
+    ],
+    secretary: [
+        { name: 'Administration & Management', issuer: 'Training Center' },
+        { name: 'Language Proficiency (English/Arabic)', issuer: 'Language Institute' },
+        { name: 'Computer Skills (ICDL)', issuer: 'ICDL Iraq' }
+    ]
+};
+
+export const CERTIFICATIONS_BY_ROLE_AR: Record<string, { name: string, issuer: string }[]> = {
+    dentist: [
+        { name: 'بكالوريوس طب وجراحة الفم والأسنان', issuer: 'جامعة بغداد / المستنصرية' },
+        { name: 'عضوية نقابة أطباء الأسنان', issuer: 'نقابة أطباء الأسنان العراقية' },
+        { name: 'شهادة البورد العراقي', issuer: 'المجلس العراقي للاختصاصات الطبية' },
+        { name: 'ماجستير علاج تحفظي', issuer: 'جامعة بغداد' },
+        { name: 'دبلوم زراعة الأسنان', issuer: 'وزارة التعليم العالي' }
+    ],
+    dental_assistant: [
+        { name: 'دبلوم وقاية أسنان / مساعد', issuer: 'المعهد الطبي التقني' },
+        { name: 'إجازة ممارسة المهنة الصحية', issuer: 'وزارة الصحة العراقية' },
+        { name: 'شهادة مكافحة العدوى', issuer: 'وزارة الصحة' },
+        { name: 'الإسعافات الأولية (BLS)', issuer: 'جمعية الهلال الأحمر العراقي' }
+    ],
+    dental_technician: [
+        { name: 'دبلوم صناعة أسنان', issuer: 'المعهد التقني الطبي' },
+        { name: 'بكالوريوس تقنيات صناعة الأسنان', issuer: 'كلية التقنيات الصحية والطبية' },
+        { name: 'هوية تقني أسنان مرخص', issuer: 'وزارة الصحة' },
+        { name: 'شهادة أنظمة CAD/CAM', issuer: 'مراكز تدريب خاصة' }
+    ],
+    media: [
+        { name: 'أخصائي تسويق رقمي', issuer: 'Google / Meta' },
+        { name: 'دورة تصوير ومونتاج', issuer: 'معاهد فنية محلية' },
+        { name: 'إدارة التواصل الاجتماعي', issuer: 'شهادات عبر الإنترنت' }
+    ],
+    sales_rep: [
+        { name: 'مندوب مبيعات طبي', issuer: 'أكاديمية التدريب' },
+        { name: 'بكالوريوس صيدلة / علوم', issuer: 'الجامعات العراقية' },
+        { name: 'شهادة مهارات البيع', issuer: 'معهد إدارة الأعمال' }
+    ],
+    secretary: [
+        { name: 'الإدارة والسكرتارية', issuer: 'مراكز التدريب المهني' },
+        { name: 'كفاءة اللغة (إنجليزي/عربي)', issuer: 'معهد اللغات' },
+        { name: 'مهارات الحاسوب (ICDL)', issuer: 'المركز الوطني' }
+    ]
+};
+
 // Empty Data Structures for Production
 export const mockCVs: CV[] = [];
 export const mockClinics: Clinic[] = [];

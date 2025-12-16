@@ -53,6 +53,14 @@ export async function GET(request: NextRequest) {
         }
     }
 
-    // Auth Code Error Redirect
+    // If no code but we have error params from Supabase (e.g. otp_expired)
+    const errorParam = searchParams.get('error')
+    const errorDesc = searchParams.get('error_description')
+
+    if (errorParam) {
+        return NextResponse.redirect(`${origin}/login?error=${errorParam}&details=${encodeURIComponent(errorDesc ?? '')}`)
+    }
+
+    // Auth Code Error Redirect (Generic)
     return NextResponse.redirect(`${origin}/login?error=no_code_provided`)
 }

@@ -41,9 +41,12 @@ export async function GET(request: NextRequest) {
             // Force production URL in production environment
             const baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
 
+            const { data: { user } } = await supabase.auth.getUser();
+            const emailParam = user?.email ? `&debug_email=${encodeURIComponent(user.email)}` : '';
+
             // Force password recovery flow
             if (type === 'recovery') {
-                return NextResponse.redirect(`${baseUrl}/update-password`)
+                return NextResponse.redirect(`${baseUrl}/update-password?${emailParam}`)
             }
 
             return NextResponse.redirect(`${baseUrl}${next}`)

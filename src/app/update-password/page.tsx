@@ -120,9 +120,17 @@ export default function UpdatePasswordPage() {
             </div>
 
             {/* Session Verification Display */}
-            <div className="text-center mb-6 p-2 bg-blue-50/50 rounded-lg text-sm text-blue-800">
-                {language === 'ar' ? 'جاري التحديث للحساب: ' : 'Updating for: '}
-                <span className="font-bold font-mono">{userEmail || (language === 'ar' ? 'جار التحقق...' : 'Checking session...')}</span>
+            <div className="text-center mb-6 p-2 bg-blue-50/50 rounded-lg text-sm text-blue-800 space-y-1">
+                <div>
+                    {language === 'ar' ? 'جاري التحديث للحساب: ' : 'Updating for: '}
+                    <span className="font-bold font-mono">{userEmail || (language === 'ar' ? 'جار التحقق...' : 'Checking session...')}</span>
+                </div>
+                {/* Server Debug Info */}
+                {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('debug_email') && (
+                    <div className="text-xs text-gray-500 border-t border-blue-200 mt-1 pt-1">
+                        Server Saw: {decodeURIComponent(new URLSearchParams(window.location.search).get('debug_email')!)}
+                    </div>
+                )}
             </div>
 
             {isSuccess ? (

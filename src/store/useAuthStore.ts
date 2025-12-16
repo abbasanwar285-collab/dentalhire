@@ -205,32 +205,35 @@ export const useAuthStore = create<AuthState>()(
                         // Wait briefly for trigger to complete (100ms)
                         await new Promise(resolve => setTimeout(resolve, 100));
 
-                        // Fetch the created profile
+                        // 1. Fetch the placeholder profile created by the trigger
                         const { data: profileData, error: profileError } = await supabase
                             .from('users')
                             .select('*')
                             .eq('auth_id', authData.user.id)
                             .single();
 
-                        // Fallback: If trigger failed but auth succeeded, try manual insert
-                        if (!profileData || profileError) {
-                            console.warn('Trigger execution delayed or failed, attempting manual profile creation');
-                            const { error: manualInsertError } = await supabase
-                                .from('users')
-                                .insert({
-                                    auth_id: authData.user.id,
-                                    email: data.email,
-                                    role: data.role,
-                                    user_type: data.userType,
-                                    first_name: data.firstName,
-                                    last_name: data.lastName,
-                                    verified: false
-                                });
+                        if (profileError || !profileData) {
+                            console.error('Failed to fetch created profile:', profileError);
+                            set({ error: 'auth.registration_failed_profile', isLoading: false });
+                            return false;
+                        }
 
-                            if (manualInsertError) {
-                                console.error('Manual profile creation failed:', manualInsertError);
-                                // Don't block flow, but user data might be incomplete
-                            }
+                        // 2. IMMEDIATE UPDATE: Fill in the missing details
+                        const { error: updateError } = await (supabase
+                            .from('users') as any) // Type assertion if needed
+                            .update({
+                                first_name: data.firstName,
+                                last_name: data.lastName,
+                                role: data.role,
+                                user_type: data.userType,
+                                phone: data.phone,
+                                verified: false // Explicitly set verified false
+                            })
+                            .eq('id', profileData.id);
+
+                        if (updateError) {
+                            console.error('Failed to update profile details:', updateError);
+                            // We continue, but warn. The user exists but has empty name.
                         }
 
                         const user: User = {
@@ -241,16 +244,10 @@ export const useAuthStore = create<AuthState>()(
                             profile: {
                                 firstName: data.firstName,
                                 lastName: data.lastName,
+                                phone: data.phone,
                                 verified: false,
-                                // Use fetched data if available
-                                ...(profileData ? {
-                                    firstName: profileData.first_name,
-                                    lastName: profileData.last_name,
-                                    city: profileData.city,
-                                    phone: profileData.phone,
-                                    avatar: profileData.avatar,
-                                    verified: profileData.verified
-                                } : {})
+                                avatar: undefined,
+                                city: undefined
                             },
                             createdAt: new Date(),
                             updatedAt: new Date(),

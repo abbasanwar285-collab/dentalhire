@@ -16,9 +16,7 @@ export default function BottomNav() {
     const [lastScrollY, setLastScrollY] = useState(0);
 
     // Hide on specific routes
-    if (pathname === '/login' || pathname === '/register') {
-        return null;
-    }
+
 
     // Robust auth check
     const isAuthenticated = !!user;
@@ -37,6 +35,11 @@ export default function BottomNav() {
         window.addEventListener('scroll', handleScroll, { passive: true });
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY]);
+
+    // Hide on specific routes
+    if (pathname === '/login' || pathname === '/register') {
+        return null;
+    }
 
     const getDashboardLink = () => {
         if (!user) return '/login';

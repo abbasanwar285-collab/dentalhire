@@ -71,6 +71,7 @@ export default function UpdatePasswordPage() {
                 router.push('/login');
             }, 3000);
 
+        } catch (err: any) {
             console.error('Update password error:', err);
             let msg = err.message || 'Unknown error';
             if (msg === 'Request timed out') {

@@ -39,11 +39,7 @@ export async function GET(request: NextRequest) {
             const isLocal = process.env.NODE_ENV === 'development'
 
             // Force production URL in production environment
-            let baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
-
-            if (!isLocal && process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.startsWith('http')) {
-                baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
-            }
+            const baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
 
             // Force password recovery flow
             if (type === 'recovery') {

@@ -47,9 +47,12 @@ export async function GET(request: NextRequest) {
             }
 
             return NextResponse.redirect(`${baseUrl}${next}`)
+        } else {
+            console.error('Auth callback error:', error)
+            return NextResponse.redirect(`${origin}/login?error=exchange_failed&details=${encodeURIComponent(error.message)}`)
         }
     }
 
     // Auth Code Error Redirect
-    return NextResponse.redirect(`${origin}/login?error=auth_code_error`)
+    return NextResponse.redirect(`${origin}/login?error=no_code_provided`)
 }

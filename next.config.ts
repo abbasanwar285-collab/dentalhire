@@ -14,9 +14,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
+
   experimental: {
     // Force webpack for compatibility with PWA plugin
     turbopack: false,

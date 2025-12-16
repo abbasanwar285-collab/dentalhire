@@ -59,18 +59,27 @@ export default function UpdatePasswordPage() {
         resolver: zodResolver(updatePasswordSchema),
     });
 
+    // Debug capturing
+    const [debugLogs, setDebugLogs] = useState<string[]>([]);
+    const addLog = (msg: string) => setDebugLogs(prev => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
+
     const onSubmit = async (data: UpdatePasswordInput) => {
         setIsLoading(true);
         setError(null);
+        addLog('Starting password update...');
 
         try {
             const supabase = getSupabaseClient();
+            addLog('Supabase client got.');
 
             // 1. Verify we have a session first
+            addLog('Checking session again...');
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
+                addLog('Session MISSING in submit');
                 throw new Error(language === 'ar' ? 'انتهت صلاحية الجلسة. يرجى طلب رابط جديد.' : 'Session expired. Please request a new link.');
             }
+            addLog('Session OK. Calling updateUser...');
 
             // 2. Attempt update with timeout race
             const updatePromise = supabase.auth.updateUser({
@@ -82,10 +91,14 @@ export default function UpdatePasswordPage() {
                 setTimeout(() => reject(new Error('Request timed out')), 10000)
             );
 
-            const { error } = await Promise.race([updatePromise, timeoutPromise]) as any;
+            const { error: updateError } = await Promise.race([updatePromise, timeoutPromise]) as any;
 
-            if (error) throw error;
+            if (updateError) {
+                addLog(`Update failed: ${updateError.message}`);
+                throw updateError;
+            }
 
+            addLog('Update SUCCESS! Redirecting...');
             setIsSuccess(true);
 
             // Redirect to login after 3 seconds
@@ -94,6 +107,7 @@ export default function UpdatePasswordPage() {
             }, 3000);
 
         } catch (err: any) {
+            addLog(`CATCH Error: ${err.message}`);
             console.error('Update password error:', err);
             let msg = err.message || 'Unknown error';
             if (msg === 'Request timed out') {
@@ -102,6 +116,7 @@ export default function UpdatePasswordPage() {
             alert(msg); // Force visible alert on mobile
             setError(msg);
         } finally {
+            addLog('Finally block reached. Loading false.');
             setIsLoading(false);
         }
     };
@@ -149,7 +164,7 @@ export default function UpdatePasswordPage() {
                 </div>
             ) : (
                 <>
-                    {error && (
+                    {(error || (error === null && debugLogs.length > 0 && debugLogs[debugLogs.length - 1].includes('Error'))) && (
                         <div className="mb-6 p-4 bg-red-50/50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 rounded-2xl flex items-center gap-3 text-red-600 dark:text-red-400 animate-in slide-in-from-top-2">
                             <AlertCircle size={20} className="shrink-0" />
                             <p className="text-sm font-medium">{error}</p>
@@ -204,9 +219,20 @@ export default function UpdatePasswordPage() {
                 </>
             )}
 
-            {/* Debug Version Indicator */}
-            <div className="mt-8 text-center text-xs text-gray-300 dark:text-gray-700">
-                v2.0 - Debug Mode
+            {/* Debug Console */}
+            <div className="mt-8 p-4 bg-black/90 rounded-lg text-left text-xs font-mono text-green-400 overflow-x-auto max-h-40 overflow-y-auto">
+                <div className="mb-2 text-gray-500 border-b border-gray-700 pb-1">Debug Console</div>
+                {debugLogs.length === 0 ? (
+                    <div className="text-gray-600 italic">No logs yet...</div>
+                ) : (
+                    debugLogs.map((log, i) => (
+                        <div key={i}>{log}</div>
+                    ))
+                )}
+            </div>
+
+            <div className="mt-4 text-center text-xs text-gray-300 dark:text-gray-700">
+                v2.1 - Debug Console Active
             </div>
         </div>
     );

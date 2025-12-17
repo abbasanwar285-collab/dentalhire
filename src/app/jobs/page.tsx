@@ -80,18 +80,32 @@ function JobsContent() {
         };
     }, [subscribeToJobs]);
 
+    // Redirect employers to their own jobs page
+    useEffect(() => {
+        if (user && ['clinic', 'company', 'lab'].includes(user.role)) {
+            const employerJobsPath = user.userType === 'company'
+                ? '/company/jobs'
+                : user.userType === 'lab'
+                    ? '/lab/jobs'
+                    : '/clinic/jobs';
+            router.replace(employerJobsPath);
+        }
+    }, [user, router]);
+
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
-            if (user) {
+            // Only load jobs for non-employers
+            if (user && !['clinic', 'company', 'lab'].includes(user.role)) {
                 loadCV(user.id);
                 searchJobsSmart(user.id, searchQuery);
-            } else {
+            } else if (!user) {
                 loadJobs();
             }
         }, 500); // Debounce search
 
         return () => clearTimeout(debounceTimer);
     }, [user, searchQuery, loadJobs, loadCV, searchJobsSmart]);
+
 
     // Removed aggressive ID clearing useEffect to allow proper deep linking and history management
     // The previous hack at lines 92-106 was interfering with legitimate navigation.

@@ -3,15 +3,17 @@
 import { useAuthStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Button, useToast } from '@/components/shared';
-import { Lock, Building2, CreditCard, Shield } from 'lucide-react';
+import { Lock, Building2, CreditCard, Shield, CheckCircle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function ClinicSettingsPage() {
     const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
     const { addToast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,6 +21,23 @@ export default function ClinicSettingsPage() {
     // Local state for fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+
+    // Debounced values
+    const debouncedFirstName = useDebounce(firstName, 1000);
+    const debouncedLastName = useDebounce(lastName, 1000);
+
+    // Auto-save effect
+    useEffect(() => {
+        if (!user?.profile) return;
+
+        const hasChanges =
+            debouncedFirstName !== (user.profile.firstName || '') ||
+            debouncedLastName !== (user.profile.lastName || '');
+
+        if (hasChanges) {
+            handleSave(true);
+        }
+    }, [debouncedFirstName, debouncedLastName]);
 
     // Initialize state from user data
     useEffect(() => {
@@ -62,9 +81,14 @@ export default function ClinicSettingsPage() {
         }
     };
 
-    const handleSave = async () => {
+    const handleSave = async (isAutoSave = false) => {
         if (!user) return;
-        setIsSaving(true);
+
+        if (isAutoSave) {
+            setSaveStatus('saving');
+        } else {
+            setIsSaving(true);
+        }
 
         try {
             await updateProfile({
@@ -72,12 +96,21 @@ export default function ClinicSettingsPage() {
                 lastName
             });
 
-            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨', 'success');
+            if (isAutoSave) {
+                setSaveStatus('saved');
+                setTimeout(() => setSaveStatus('idle'), 2000);
+            } else {
+                addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨', 'success');
+            }
         } catch (error) {
             console.error('Save error:', error);
-            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            if (!isAutoSave) {
+                addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            }
         } finally {
-            setIsSaving(false);
+            if (!isAutoSave) {
+                setIsSaving(false);
+            }
         }
     };
 
@@ -179,10 +212,22 @@ export default function ClinicSettingsPage() {
                                 />
                             </div>
                         </div>
-                        <div className="pt-2">
-                            <Button onClick={handleSave} disabled={isSaving}>
+                        <div className="pt-2 flex items-center gap-3">
+                            <Button onClick={() => handleSave(false)} disabled={isSaving}>
                                 {isSaving ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : text.save}
                             </Button>
+
+                            {saveStatus === 'saving' && (
+                                <span className="text-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                                    {language === 'ar' ? 'جاري الحفظ تلقائياً...' : 'Auto-saving...'}
+                                </span>
+                            )}
+                            {saveStatus === 'saved' && (
+                                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle size={14} />
+                                    {language === 'ar' ? 'تم الحفظ' : 'Saved'}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -3,10 +3,11 @@
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button, useToast } from '@/components/shared';
-import { Bell, Lock, User, Shield, MapPin, Save } from 'lucide-react';
+import { Bell, Lock, User, Shield, MapPin, Save, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { iraqLocations } from '@/data/iraq_locations';
 import { getSupabaseClient } from '@/lib/supabase';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function SettingsPage() {
     const { user, updateProfile } = useAuthStore();
@@ -28,7 +29,29 @@ export default function SettingsPage() {
 
     // Loading States
     const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+    // Debounced values for auto-save
+    const debouncedFirstName = useDebounce(firstName, 1000);
+    const debouncedLastName = useDebounce(lastName, 1000);
+    const debouncedCity = useDebounce(city, 1000);
+
+    // Effect for Auto-Save
+    useEffect(() => {
+        // Skip initial render or empty values if needed (though empty might be valid updates)
+        if (!user) return;
+
+        // Check if values actually changed from user profile
+        const hasChanges =
+            debouncedFirstName !== user.profile.firstName ||
+            debouncedLastName !== user.profile.lastName ||
+            debouncedCity !== user.profile.city;
+
+        if (hasChanges) {
+            handleSaveProfile(true);
+        }
+    }, [debouncedFirstName, debouncedLastName, debouncedCity]);
 
     // Initialize state from user data
     useEffect(() => {
@@ -51,9 +74,14 @@ export default function SettingsPage() {
         loadSettings();
     }, []);
 
-    const handleSaveProfile = async () => {
+    const handleSaveProfile = async (isAutoSave = false) => {
         if (!user) return;
-        setIsSavingProfile(true);
+
+        if (isAutoSave) {
+            setSaveStatus('saving');
+        } else {
+            setIsSavingProfile(true);
+        }
 
         try {
             // 1. Update User Profile (Store + DB)
@@ -80,12 +108,22 @@ export default function SettingsPage() {
                     .eq('id', cvData.id);
             }
 
-            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully', 'success');
+            if (isAutoSave) {
+                setSaveStatus('saved');
+                // Reset status after 2 seconds
+                setTimeout(() => setSaveStatus('idle'), 2000);
+            } else {
+                addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully', 'success');
+            }
         } catch (error) {
             console.error('Error saving profile:', error);
-            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            if (!isAutoSave) {
+                addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            }
         } finally {
-            setIsSavingProfile(false);
+            if (!isAutoSave) {
+                setIsSavingProfile(false);
+            }
         }
     };
 
@@ -231,9 +269,9 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        <div className="pt-2">
+                        <div className="pt-2 flex items-center gap-3">
                             <Button
-                                onClick={handleSaveProfile}
+                                onClick={() => handleSaveProfile(false)}
                                 disabled={isSavingProfile}
                                 leftIcon={isSavingProfile ? undefined : <Save size={18} />}
                             >
@@ -241,6 +279,18 @@ export default function SettingsPage() {
                                     ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...')
                                     : (language === 'ar' ? 'حفظ التغييرات' : 'Save Changes')}
                             </Button>
+
+                            {saveStatus === 'saving' && (
+                                <span className="text-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                                    {language === 'ar' ? 'جاري الحفظ تلقائياً...' : 'Auto-saving...'}
+                                </span>
+                            )}
+                            {saveStatus === 'saved' && (
+                                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle size={14} />
+                                    {language === 'ar' ? 'تم الحفظ' : 'Saved'}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

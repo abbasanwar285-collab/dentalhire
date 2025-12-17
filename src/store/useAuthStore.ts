@@ -318,8 +318,7 @@ export const useAuthStore = create<AuthState>()(
                     const { data: { session } } = await supabase.auth.getSession();
                     if (!session?.access_token) {
                         console.error('No active session for profile update');
-                        set({ error: 'No active session' });
-                        return;
+                        throw new Error('No active session');
                     }
 
                     // Call API route instead of direct DB/RPC (to bypass RLS)
@@ -343,35 +342,32 @@ export const useAuthStore = create<AuthState>()(
 
                     if (!result.success) {
                         console.error('Profile update failed:', result.error);
-                        set({ error: result.error || 'Update failed' });
-                        return;
+                        throw new Error(result.error || 'Update failed');
                     }
 
                     const updatedData = result.data;
 
                     // Update store with the ACTUAL returned data from DB
                     if (updatedData) {
-                        set({
-                            user: {
-                                ...user,
+                        set((state) => ({
+                            user: state.user ? {
+                                ...state.user,
                                 profile: {
+                                    ...state.user.profile,
                                     firstName: updatedData.first_name,
                                     lastName: updatedData.last_name,
                                     phone: updatedData.phone,
-                                    avatar: updatedData.avatar || user.profile.avatar,
+                                    avatar: updatedData.avatar || state.user.profile.avatar,
                                     city: updatedData.city,
-                                    verified: user.profile.verified
                                 },
                                 updatedAt: new Date(updatedData.updated_at),
-                            },
-                        });
+                            } : null,
+                        }));
                         console.log('Store updated with new profile data');
                     }
                 } catch (error) {
                     console.error('Exception updating profile:', error);
-                    set({
-                        error: 'An error occurred updating profile',
-                    });
+                    throw error; // Re-throw so the component can handle it
                 }
             },
 

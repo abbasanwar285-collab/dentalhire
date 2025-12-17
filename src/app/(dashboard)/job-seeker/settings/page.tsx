@@ -117,7 +117,9 @@ export default function SettingsPage() {
             }
         } catch (error) {
             console.error('Error saving profile:', error);
-            if (!isAutoSave) {
+            if (isAutoSave) {
+                setSaveStatus('idle');
+            } else {
                 addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
             }
         } finally {

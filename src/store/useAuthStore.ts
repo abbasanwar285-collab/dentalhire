@@ -316,6 +316,14 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const supabase = getSupabaseClient();
 
+                    // Get current auth user to ensure we have the correct Auth ID
+                    const { data: { user: authUser } } = await supabase.auth.getUser();
+
+                    if (!authUser) {
+                        set({ error: 'No active session' });
+                        return;
+                    }
+
                     // Build update object with only defined fields
                     const updateData: Record<string, any> = {};
                     if (updates.firstName !== undefined) updateData.first_name = updates.firstName;
@@ -323,39 +331,50 @@ export const useAuthStore = create<AuthState>()(
                     if (updates.phone !== undefined) updateData.phone = updates.phone;
                     if (updates.avatar !== undefined) updateData.avatar = updates.avatar;
                     if (updates.city !== undefined) updateData.city = updates.city;
+                    updateData.updated_at = new Date().toISOString(); // Explicitly update timestamp
 
                     // If no fields to update, exit early
-                    if (Object.keys(updateData).length === 0) {
-                        // set({ isLoading: false });
+                    if (Object.keys(updateData).length === 1) { // Only updated_at
                         return;
                     }
 
+                    // Update using auth_id for reliability and return the updated record
                     const result = await (supabase
                         .from('users') as any)
                         .update(updateData)
-                        .eq('id', user.id);
+                        .eq('auth_id', authUser.id) // Use auth_id instead of table id
+                        .select() // Return updated data
+                        .single();
 
-                    const { error } = result;
+                    const { data: updatedRecord, error } = result;
 
                     if (error) {
                         console.error('Error updating profile:', error);
-                        set({ error: error.message }); // isLoading: false removed
+                        set({ error: error.message });
                         return;
                     }
 
-                    set({
-                        user: {
-                            ...user,
-                            profile: { ...user.profile, ...updates },
-                            updatedAt: new Date(),
-                        },
-                        // isLoading: false,
-                    });
+                    // Update store with the ACTUAL returned data from DB to ensure sync
+                    if (updatedRecord) {
+                        set({
+                            user: {
+                                ...user,
+                                profile: {
+                                    firstName: updatedRecord.first_name,
+                                    lastName: updatedRecord.last_name,
+                                    phone: updatedRecord.phone,
+                                    avatar: updatedRecord.avatar,
+                                    city: updatedRecord.city,
+                                    verified: user.profile.verified // Keep existing
+                                },
+                                updatedAt: new Date(updatedRecord.updated_at),
+                            },
+                        });
+                    }
                 } catch (error) {
                     console.error('Exception updating profile:', error);
                     set({
                         error: 'An error occurred updating profile',
-                        // isLoading: false,
                     });
                 }
             },

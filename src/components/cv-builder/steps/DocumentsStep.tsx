@@ -9,11 +9,13 @@ import { useCVStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateId } from '@/lib/utils';
 import { FileText, Upload, Trash2, File, CheckCircle, AlertCircle } from 'lucide-react';
+import { getSupabaseClient } from '@/lib/supabase';
 
 export default function DocumentsStep() {
     const { documents, addDocument, removeDocument } = useCVStore();
     const { language, t } = useLanguage();
     const [uploading, setUploading] = useState(false);
+    const [uploadError, setUploadError] = useState<string | null>(null);
 
     const documentTypes = [
         { type: 'identification', label: language === 'ar' ? 'هوية تعريفية' : 'Identification', icon: <File size={20} />, accept: '.pdf,.jpg,.png' },
@@ -27,20 +29,53 @@ export default function DocumentsStep() {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // In production, this would upload to cloud storage
-        // For demo, we simulate the upload
         setUploading(true);
+        setUploadError(null);
 
-        setTimeout(() => {
+        try {
+            // Get current user
+            const supabase = getSupabaseClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                throw new Error(language === 'ar' ? 'يجب تسجيل الدخول لرفع الملفات' : 'You must be logged in to upload files');
+            }
+
+            // Generate unique filename
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${user.id}/${type}_${Date.now()}.${fileExt}`;
+
+            // Upload to Supabase Storage
+            const { data, error } = await supabase.storage
+                .from('documents')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                throw error;
+            }
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('documents')
+                .getPublicUrl(fileName);
+
+            // Add document to store
             addDocument({
                 id: generateId(),
                 name: file.name,
                 type: type,
-                url: URL.createObjectURL(file), // In production: cloud storage URL
+                url: urlData.publicUrl,
                 uploadedAt: new Date(),
             });
+
+        } catch (error: any) {
+            console.error('Upload error:', error);
+            setUploadError(error.message || (language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file'));
+        } finally {
             setUploading(false);
-        }, 1000);
+        }
     };
 
     return (
@@ -153,17 +188,51 @@ export default function DocumentsStep() {
                     type="file"
                     multiple
                     accept=".pdf,.doc,.docx,.jpg,.png"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                         const files = Array.from(e.target.files || []);
-                        files.forEach(file => {
-                            addDocument({
-                                id: generateId(),
-                                name: file.name,
-                                type: 'other',
-                                url: URL.createObjectURL(file),
-                                uploadedAt: new Date(),
-                            });
-                        });
+                        if (files.length === 0) return;
+
+                        setUploading(true);
+                        setUploadError(null);
+
+                        try {
+                            const supabase = getSupabaseClient();
+                            const { data: { user } } = await supabase.auth.getUser();
+                            if (!user) {
+                                throw new Error(language === 'ar' ? 'يجب تسجيل الدخول لرفع الملفات' : 'You must be logged in to upload files');
+                            }
+
+                            for (const file of files) {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `${user.id}/portfolio_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+
+                                const { error } = await supabase.storage
+                                    .from('documents')
+                                    .upload(fileName, file, {
+                                        cacheControl: '3600',
+                                        upsert: false
+                                    });
+
+                                if (error) throw error;
+
+                                const { data: urlData } = supabase.storage
+                                    .from('documents')
+                                    .getPublicUrl(fileName);
+
+                                addDocument({
+                                    id: generateId(),
+                                    name: file.name,
+                                    type: 'portfolio',
+                                    url: urlData.publicUrl,
+                                    uploadedAt: new Date(),
+                                });
+                            }
+                        } catch (error: any) {
+                            console.error('Upload error:', error);
+                            setUploadError(error.message || (language === 'ar' ? 'فشل رفع الملفات' : 'Failed to upload files'));
+                        } finally {
+                            setUploading(false);
+                        }
                     }}
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                     title={language === 'ar' ? 'رفع ملفات' : 'Upload files'}
@@ -175,6 +244,15 @@ export default function DocumentsStep() {
                     <div className="w-4 h-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
                     <p className="text-sm text-blue-700 dark:text-blue-400">
                         {language === 'ar' ? 'جاري رفع المستند...' : 'Uploading document...'}
+                    </p>
+                </div>
+            )}
+
+            {uploadError && (
+                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center gap-3 border border-red-200 dark:border-red-800">
+                    <AlertCircle size={20} className="text-red-500" />
+                    <p className="text-sm text-red-700 dark:text-red-400">
+                        {uploadError}
                     </p>
                 </div>
             )}

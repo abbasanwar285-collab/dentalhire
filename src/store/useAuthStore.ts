@@ -311,7 +311,7 @@ export const useAuthStore = create<AuthState>()(
                 const { user } = get();
                 if (!user) return;
 
-                set({ isLoading: true });
+                // set({ isLoading: true }); // Removed to prevent global loader during auto-save
 
                 try {
                     const supabase = getSupabaseClient();
@@ -326,7 +326,7 @@ export const useAuthStore = create<AuthState>()(
 
                     // If no fields to update, exit early
                     if (Object.keys(updateData).length === 0) {
-                        set({ isLoading: false });
+                        // set({ isLoading: false });
                         return;
                     }
 
@@ -339,7 +339,7 @@ export const useAuthStore = create<AuthState>()(
 
                     if (error) {
                         console.error('Error updating profile:', error);
-                        set({ error: error.message, isLoading: false });
+                        set({ error: error.message }); // isLoading: false removed
                         return;
                     }
 
@@ -349,13 +349,13 @@ export const useAuthStore = create<AuthState>()(
                             profile: { ...user.profile, ...updates },
                             updatedAt: new Date(),
                         },
-                        isLoading: false,
+                        // isLoading: false,
                     });
                 } catch (error) {
                     console.error('Exception updating profile:', error);
                     set({
                         error: 'An error occurred updating profile',
-                        isLoading: false,
+                        // isLoading: false,
                     });
                 }
             },

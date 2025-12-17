@@ -1,0 +1,102 @@
+-- ============================================
+-- MASTER RLS FIX - PART 1B: CLINICS, JOBS, APPLICATIONS
+-- DentalHire Security Policies
+-- Run this SECOND in Supabase SQL Editor
+-- ============================================
+
+-- ==================== CLINICS ====================
+ALTER TABLE clinics ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can view clinics" ON clinics;
+DROP POLICY IF EXISTS "Users can view own clinic" ON clinics;
+DROP POLICY IF EXISTS "Users can create clinic" ON clinics;
+DROP POLICY IF EXISTS "Users can update own clinic" ON clinics;
+DROP POLICY IF EXISTS "Users can delete own clinic" ON clinics;
+DROP POLICY IF EXISTS "Users can insert own clinic" ON clinics;
+
+-- Anyone can view clinics (needed for job listings)
+CREATE POLICY "Anyone can view clinics" ON clinics
+    FOR SELECT USING (true);
+
+-- Users can create their own clinic
+CREATE POLICY "Users can create clinic" ON clinics
+    FOR INSERT WITH CHECK (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+-- Users can update their own clinic
+CREATE POLICY "Users can update own clinic" ON clinics
+    FOR UPDATE USING (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+-- Users can delete their own clinic
+CREATE POLICY "Users can delete own clinic" ON clinics
+    FOR DELETE USING (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+-- ==================== JOBS ====================
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can view active jobs" ON jobs;
+DROP POLICY IF EXISTS "Clinics can view own jobs" ON jobs;
+DROP POLICY IF EXISTS "Clinics can insert own jobs" ON jobs;
+DROP POLICY IF EXISTS "Clinics can update own jobs" ON jobs;
+DROP POLICY IF EXISTS "Clinics can delete own jobs" ON jobs;
+DROP POLICY IF EXISTS "Clinics can manage own jobs" ON jobs;
+
+-- Anyone can view active jobs
+CREATE POLICY "Anyone can view active jobs" ON jobs
+    FOR SELECT USING (status = 'active');
+
+-- Clinics can view all their own jobs
+CREATE POLICY "Clinics can view own jobs" ON jobs
+    FOR SELECT USING (
+        clinic_id IN (SELECT c.id FROM clinics c JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- Clinics can insert jobs
+CREATE POLICY "Clinics can insert own jobs" ON jobs
+    FOR INSERT WITH CHECK (
+        clinic_id IN (SELECT c.id FROM clinics c JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- Clinics can update their jobs
+CREATE POLICY "Clinics can update own jobs" ON jobs
+    FOR UPDATE USING (
+        clinic_id IN (SELECT c.id FROM clinics c JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- Clinics can delete their jobs
+CREATE POLICY "Clinics can delete own jobs" ON jobs
+    FOR DELETE USING (
+        clinic_id IN (SELECT c.id FROM clinics c JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- ==================== JOB_APPLICATIONS ====================
+ALTER TABLE job_applications ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own applications" ON job_applications;
+DROP POLICY IF EXISTS "Users can insert applications" ON job_applications;
+DROP POLICY IF EXISTS "Users can update own applications" ON job_applications;
+DROP POLICY IF EXISTS "Clinics can view applications" ON job_applications;
+DROP POLICY IF EXISTS "Clinics can update applications" ON job_applications;
+
+-- Users can view their own applications
+CREATE POLICY "Users can view own applications" ON job_applications
+    FOR SELECT USING (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+-- Users can create applications
+CREATE POLICY "Users can insert applications" ON job_applications
+    FOR INSERT WITH CHECK (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+-- Clinics can view applications for their jobs
+CREATE POLICY "Clinics can view applications" ON job_applications
+    FOR SELECT USING (
+        job_id IN (SELECT j.id FROM jobs j JOIN clinics c ON j.clinic_id = c.id JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- Clinics can update applications for their jobs
+CREATE POLICY "Clinics can update applications" ON job_applications
+    FOR UPDATE USING (
+        job_id IN (SELECT j.id FROM jobs j JOIN clinics c ON j.clinic_id = c.id JOIN users u ON c.user_id = u.id WHERE u.auth_id = auth.uid())
+    );
+
+-- ==================== VERIFICATION ====================
+SELECT 'Part 1B Complete - Clinics, Jobs & Applications Fixed' AS status;
+SELECT tablename, policyname, cmd FROM pg_policies WHERE tablename IN ('clinics', 'jobs', 'job_applications') ORDER BY tablename;

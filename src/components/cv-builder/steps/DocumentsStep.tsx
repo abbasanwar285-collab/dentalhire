@@ -40,9 +40,13 @@ export default function DocumentsStep() {
                 throw new Error(language === 'ar' ? 'يجب تسجيل الدخول لرفع الملفات' : 'You must be logged in to upload files');
             }
 
+            console.log('[DocumentUpload] User ID:', user.id);
+            console.log('[DocumentUpload] File:', file.name, 'Type:', type, 'Size:', file.size);
+
             // Generate unique filename
             const fileExt = file.name.split('.').pop();
             const fileName = `${user.id}/${type}_${Date.now()}.${fileExt}`;
+            console.log('[DocumentUpload] Target path:', fileName);
 
             // Upload to Supabase Storage
             const { data, error } = await supabase.storage
@@ -53,13 +57,33 @@ export default function DocumentsStep() {
                 });
 
             if (error) {
+                console.error('[DocumentUpload] Upload error:', error);
                 throw error;
             }
+
+            console.log('[DocumentUpload] Upload success:', data);
 
             // Get public URL
             const { data: urlData } = supabase.storage
                 .from('documents')
                 .getPublicUrl(fileName);
+
+            console.log('[DocumentUpload] Public URL:', urlData.publicUrl);
+
+            // Verify URL is not blob
+            if (urlData.publicUrl.startsWith('blob:')) {
+                throw new Error('Upload failed - got blob URL instead of storage URL');
+            }
+
+            // Remove existing document of same type if it exists (for single-instance types)
+            // Portfolio and Other allow multiples, others should be replaced
+            if (['identification', 'resume', 'certification'].includes(type)) {
+                const existingDoc = documents.find(d => d.type === type);
+                if (existingDoc) {
+                    removeDocument(existingDoc.id);
+                    console.log('[DocumentUpload] Removed existing document:', existingDoc.id);
+                }
+            }
 
             // Add document to store
             addDocument({
@@ -70,9 +94,14 @@ export default function DocumentsStep() {
                 uploadedAt: new Date(),
             });
 
+            // Show success with URL for debugging
+            console.log('[DocumentUpload] Document added successfully with URL:', urlData.publicUrl);
+
         } catch (error: any) {
-            console.error('Upload error:', error);
-            setUploadError(error.message || (language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file'));
+            console.error('[DocumentUpload] Error:', error);
+            const errorMsg = error.message || (language === 'ar' ? 'فشل رفع الملف' : 'Failed to upload file');
+            setUploadError(errorMsg);
+            alert('Upload Error: ' + errorMsg); // Alert for immediate feedback
         } finally {
             setUploading(false);
         }

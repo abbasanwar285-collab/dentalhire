@@ -16,7 +16,8 @@ import {
     Clock,
     Share2,
     CheckCircle,
-    CheckCircle2
+    CheckCircle2,
+    FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,13 +28,15 @@ interface CVDetailsModalProps {
     onClose: () => void;
     cv: any;
     isApproved?: boolean;
+    viewMode?: 'profile' | 'cv';
 }
 
 export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     isOpen,
     onClose,
     cv,
-    isApproved = false
+    isApproved = false,
+    viewMode = 'profile'
 }) => {
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState<'overview' | 'experience' | 'skills'>('overview');
@@ -57,6 +60,260 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     // Contact Button (Line 164)
 
 
+    const formatCurrency = (amount: number, currency: string) => {
+        return new Intl.NumberFormat(language === 'ar' ? 'ar-IQ' : 'en-US', {
+            style: 'currency',
+            currency: currency || 'IQD',
+            maximumFractionDigits: 0
+        }).format(amount);
+    };
+
+    // --- Professional CV View ---
+    if (viewMode === 'cv') {
+        return (
+            <AnimatePresence>
+                {isOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm"
+                            onClick={onClose}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl flex flex-col custom-scrollbar"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Close Button */}
+                            <button
+                                onClick={onClose}
+                                className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors z-10 print:hidden"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            {/* Header Section */}
+                            <div className="bg-gray-50 p-8 border-b border-gray-200">
+                                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                                    {/* Photo */}
+                                    <div className="w-32 h-32 rounded-xl bg-gray-200 overflow-hidden shadow-md shrink-0 border-4 border-white">
+                                        {cv.personalInfo?.photo || cv.photo ? (
+                                            <img
+                                                src={cv.personalInfo?.photo || cv.photo}
+                                                alt={cv.personalInfo?.fullName}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                <User size={48} />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Main Info */}
+                                    <div className="flex-1 space-y-3">
+                                        <div>
+                                            <h1 className="text-3xl font-bold text-gray-900">
+                                                {cv.personalInfo?.fullName || cv.full_name}
+                                            </h1>
+                                            <p className="text-xl text-blue-600 font-medium mt-1">
+                                                {cv.experience?.[0]?.title || (language === 'ar' ? 'باحث عن عمل' : 'Job Seeker')}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                            {/* Location */}
+                                            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                                <MapPin size={16} className="text-gray-400" />
+                                                <span>{cv.personalInfo?.city || cv.city}</span>
+                                            </div>
+
+                                            {/* Experience */}
+                                            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                                <Briefcase size={16} className="text-gray-400" />
+                                                <span>
+                                                    {cv.experience ?
+                                                        (language === 'ar' ? `${cv.experience.length} خبرات سابقة` : `${cv.experience.length} Previous Roles`)
+                                                        : (language === 'ar' ? 'حديث التخرج' : 'Fresh Graduate')}
+                                                </span>
+                                            </div>
+
+                                            {/* Verified Badge */}
+                                            {(cv.personalInfo?.verified || cv.verified) && (
+                                                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 text-blue-700">
+                                                    <CheckCircle size={16} />
+                                                    <span>{language === 'ar' ? 'تم التحقق' : 'Verified'}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-8 space-y-8">
+                                {/* Bio */}
+                                {(cv.personalInfo?.bio || cv.bio) && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
+                                            <User size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'نبذة عني' : 'About Me'}
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed text-base">
+                                            {cv.personalInfo?.bio || cv.bio}
+                                        </p>
+                                    </section>
+                                )}
+
+                                {/* Contact Grid (Only if Approved) */}
+                                {isApproved && (
+                                    <section className="bg-blue-50/50 rounded-xl p-6 border border-blue-100">
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                            <Phone size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'معلومات التواصل' : 'Contact Information'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الهاتف' : 'Phone'}</p>
+                                                <p className="font-medium text-gray-900" dir="ltr">{cv.personalInfo?.phone || cv.phone}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</p>
+                                                <p className="font-medium text-gray-900">{cv.personalInfo?.email || cv.email}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الراتب المتوقع' : 'Expected Salary'}</p>
+                                                <p className="font-medium text-gray-900 text-green-600">
+                                                    {cv.salary?.expected ? formatCurrency(cv.salary.expected, cv.salary.currency) : (language === 'ar' ? 'قابل للتفاوض' : 'Negotiable')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Experience */}
+                                {cv.experience && cv.experience.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Briefcase size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'الخبرة العملية' : 'Work Experience'}
+                                        </h3>
+                                        <div className="space-y-6">
+                                            {cv.experience.map((exp: any, idx: number) => (
+                                                <div key={idx} className="relative ps-6 border-s-2 border-gray-100">
+                                                    <div className="absolute -start-[7px] top-1.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-white" />
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                                                        <h4 className="text-lg font-bold text-gray-900">{exp.title}</h4>
+                                                        <span className="text-sm text-gray-500 font-mono">
+                                                            {exp.startDate} - {exp.current ? (language === 'ar' ? 'الحاضر' : 'Present') : exp.endDate}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-blue-600 font-medium mb-2">{exp.company} • {exp.location}</p>
+                                                    {exp.description && (
+                                                        <p className="text-gray-600 text-sm">{exp.description}</p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Skills */}
+                                {cv.skills && cv.skills.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Award size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'المهارات' : 'Skills'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {cv.skills.map((skill: string, idx: number) => (
+                                                <span key={idx} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium border border-gray-200">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Education */}
+                                {cv.certifications && cv.certifications.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <GraduationCap size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'التعليم والشهادات' : 'Education'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {cv.certifications.map((cert: any, idx: number) => (
+                                                <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                                    <h4 className="font-bold text-gray-900">{cert.title || cert.name}</h4>
+                                                    <p className="text-sm text-gray-600 mt-1">{cert.issuer || cert.institution}</p>
+                                                    <p className="text-xs text-blue-600 font-bold mt-2">{cert.date || cert.year}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Work Samples / Documents */}
+                                {cv.documents && cv.documents.length > 0 && isApproved && (
+                                    <section className="print:break-inside-avoid">
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Share2 size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'المرفقات ونماذج الأعمال' : 'Portfolio & Documents'}
+                                        </h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                            {/* Render Images First */}
+                                            {cv.documents.filter((d: any) => d.type?.startsWith('image') || d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map((doc: any, idx: number) => (
+                                                <div key={idx} className="group relative aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(doc.url, '_blank')}>
+                                                    <img src={doc.url} alt={doc.name || 'Work Sample'} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+                                                        {language === 'ar' ? 'عرض الصورة' : 'View Image'}
+                                                    </div>
+                                                </div>
+                                            ))}
+
+                                            {/* Render PDFs/Docs */}
+                                            {cv.documents.filter((d: any) => !d.type?.startsWith('image') && !d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map((doc: any, idx: number) => (
+                                                <a
+                                                    key={idx}
+                                                    href={doc.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-xl transition-colors group text-center gap-3"
+                                                >
+                                                    <div className="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center text-blue-600 transition-colors">
+                                                        <FileText size={24} />
+                                                    </div>
+                                                    <span className="text-sm font-medium text-blue-900 line-clamp-2">
+                                                        {doc.name || (language === 'ar' ? 'تحميل ملف' : 'Download File')}
+                                                    </span>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between items-center rounded-b-xl print:hidden">
+                                <Button variant="outline" onClick={onClose}>
+                                    {language === 'ar' ? 'إغلاق' : 'Close'}
+                                </Button>
+                                <Button onClick={() => window.print()}>
+                                    {language === 'ar' ? 'طباعة / حفظ PDF' : 'Print / Save PDF'}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        );
+    }
+
+    // --- Standard View Implementation ---
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1 }
@@ -68,7 +325,7 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
             opacity: 1,
             scale: 1,
             y: 0,
-            transition: { type: "spring", duration: 0.6, bounce: 0.3 }
+            transition: { type: "spring" as const, duration: 0.6, bounce: 0.3 }
         },
         exit: { opacity: 0, scale: 0.9, y: 50 }
     };
@@ -76,14 +333,6 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     const itemVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
-    };
-
-    const formatCurrency = (amount: number, currency: string) => {
-        return new Intl.NumberFormat(language === 'ar' ? 'ar-IQ' : 'en-US', {
-            style: 'currency',
-            currency: currency || 'IQD',
-            maximumFractionDigits: 0
-        }).format(amount);
     };
 
     return (

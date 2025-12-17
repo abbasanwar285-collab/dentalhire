@@ -9,7 +9,8 @@ export type NotificationType =
     | 'application_status'
     | 'status_change'
     | 'new_application'
-    | 'system';
+    | 'system'
+    | 'cv_request';
 
 export interface Notification {
     id: string;

@@ -72,7 +72,7 @@ BEGIN
         'طلب عرض السيرة الذاتية', -- CV Access Request
         COALESCE(v_employer_name, 'صاحب عمل') || ' يرغب في الاطلاع على سيرتك الذاتية الكاملة.', -- [Employer] wants to view your full CV
         'system', -- using 'system' as generic type
-        jsonb_build_object('requestId', v_request_id, 'action', 'cv_request', 'employerId', p_employer_id),
+        jsonb_build_object('requestId', v_request_id, 'action', 'cv_request', 'employerId', p_employer_id, 'clinicName', v_employer_name),
         false
     );
 

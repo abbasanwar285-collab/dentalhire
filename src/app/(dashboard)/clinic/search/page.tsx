@@ -50,6 +50,7 @@ export default function ClinicSearchPage() {
         }
     }, []);
     const [selectedCV, setSelectedCV] = useState<string | null>(null);
+    const [cvViewMode, setCvViewMode] = useState<'profile' | 'cv'>('profile');
     const [mapView, setMapView] = useState(false);
     const { language } = useLanguage();
     const [isLoading, setIsLoading] = useState(true);
@@ -1173,9 +1174,13 @@ export default function ClinicSearchPage() {
             {selectedCandidate && (
                 <CVDetailsModal
                     isOpen={!!selectedCandidate}
-                    onClose={() => setSelectedCV(null)}
+                    onClose={() => {
+                        setSelectedCV(null);
+                        setCvViewMode('profile');
+                    }}
                     cv={selectedCandidate.cv}
                     isApproved={selectedCandidate.cv.userId ? cvRequests[selectedCandidate.cv.userId] === 'approved' : false}
+                    viewMode={cvViewMode}
                 />
             )}
         </div>

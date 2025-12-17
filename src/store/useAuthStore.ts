@@ -316,20 +316,29 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const supabase = getSupabaseClient();
 
+                    // Build update object with only defined fields
+                    const updateData: Record<string, any> = {};
+                    if (updates.firstName !== undefined) updateData.first_name = updates.firstName;
+                    if (updates.lastName !== undefined) updateData.last_name = updates.lastName;
+                    if (updates.phone !== undefined) updateData.phone = updates.phone;
+                    if (updates.avatar !== undefined) updateData.avatar = updates.avatar;
+                    if (updates.city !== undefined) updateData.city = updates.city;
+
+                    // If no fields to update, exit early
+                    if (Object.keys(updateData).length === 0) {
+                        set({ isLoading: false });
+                        return;
+                    }
+
                     const result = await (supabase
                         .from('users') as any)
-                        .update({
-                            first_name: updates.firstName,
-                            last_name: updates.lastName,
-                            phone: updates.phone,
-                            avatar: updates.avatar,
-                            city: updates.city,
-                        })
+                        .update(updateData)
                         .eq('id', user.id);
 
                     const { error } = result;
 
                     if (error) {
+                        console.error('Error updating profile:', error);
                         set({ error: error.message, isLoading: false });
                         return;
                     }
@@ -343,6 +352,7 @@ export const useAuthStore = create<AuthState>()(
                         isLoading: false,
                     });
                 } catch (error) {
+                    console.error('Exception updating profile:', error);
                     set({
                         error: 'An error occurred updating profile',
                         isLoading: false,
@@ -363,6 +373,13 @@ export const useAuthStore = create<AuthState>()(
                             .select('*')
                             .eq('auth_id', session.user.id)
                             .single() as { data: any; error: any };
+
+                        // Handle database error
+                        if (error) {
+                            console.error('Error fetching user data in checkSession:', error);
+                            set({ isLoading: false, isAuthenticated: false, user: null });
+                            return;
+                        }
 
                         if (userData) {
                             const user: User = {
@@ -388,12 +405,19 @@ export const useAuthStore = create<AuthState>()(
                                 isLoading: false,
                             });
                             return;
+                        } else {
+                            // User data not found in database
+                            console.warn('User data not found for session user:', session.user.id);
+                            set({ isLoading: false, isAuthenticated: false, user: null });
+                            return;
                         }
                     }
 
-                    set({ isLoading: false });
+                    // No session exists
+                    set({ isLoading: false, isAuthenticated: false, user: null });
                 } catch (error) {
-                    set({ isLoading: false });
+                    console.error('Exception in checkSession:', error);
+                    set({ isLoading: false, isAuthenticated: false, user: null });
                 }
             },
 

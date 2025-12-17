@@ -23,7 +23,10 @@ import {
     Download,
     Mail,
     FileText,
-    ExternalLink
+    ExternalLink,
+    Users,
+    Building2,
+    Shield
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -182,7 +185,11 @@ function AdminUsersContent() {
             (user.last_name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
             (user.email || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-        const matchesRole = selectedRole === 'all' || user.role === selectedRole;
+        let matchesRole = false;
+        if (selectedRole === 'all') matchesRole = true;
+        else if (selectedRole === 'employer') matchesRole = ['clinic', 'company', 'lab'].includes(user.role);
+        else matchesRole = user.role === selectedRole;
+
         const matchesVerified = selectedVerified === 'all'
             ? true
             : selectedVerified === 'verified' ? user.verified
@@ -240,25 +247,43 @@ function AdminUsersContent() {
                             leftIcon={<Search size={18} />}
                         />
                     </div>
-                    <div className="flex gap-3">
-                        <select
-                            value={selectedRole}
-                            onChange={(e) => setSelectedRole(e.target.value)}
-                            aria-label="Filter by role"
-                            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                        >
-                            <option value="all">{t('admin.users.filter.role')}</option>
-                            <option value="job_seeker">{t('admin.users.filter.jobseeker')}</option>
-                            <option value="clinic">{t('admin.users.filter.clinic')}</option>
-                            <option value="admin">{t('admin.users.filter.admin')}</option>
-                        </select>
+                </div>
+
+                {/* Tabs for User Types */}
+                <div className="px-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+                    <div className="flex overflow-x-auto gap-2 no-scrollbar">
+                        {[
+                            { id: 'all', label: t('admin.users.filter.all') || 'All Users', icon: <Users size={18} /> },
+                            { id: 'job_seeker', label: t('admin.users.filter.jobseeker'), icon: <UserCheck size={18} /> },
+                            { id: 'employer', label: t('admin.users.filter.clinic') || 'Employers', icon: <Building2 size={18} /> }, // Using 'employer' to group clinic/company/lab
+                            { id: 'admin', label: t('admin.users.filter.admin'), icon: <Shield size={18} /> },
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setSelectedRole(tab.id)}
+                                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border text-sm font-medium transition-all whitespace-nowrap ${selectedRole === tab.id
+                                    ? 'bg-blue-50 border-blue-200 text-blue-600 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-400'
+                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700'
+                                    }`}
+                            >
+                                {tab.icon}
+                                <span>{tab.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Secondary Filters (Verification) */}
+                <div className="px-4 py-3 flex justify-end mobile:justify-between border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50">
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500 hidden sm:inline">{t('admin.users.filter.status')}:</span>
                         <select
                             value={selectedVerified}
                             onChange={(e) => setSelectedVerified(e.target.value)}
                             aria-label="Filter by verification"
-                            className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                            className="px-3 py-1.5 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:ring-1 focus:ring-blue-500"
                         >
-                            <option value="all">{t('admin.users.filter.status')}</option>
+                            <option value="all">{t('admin.users.filter.all_statuses') || 'All Statuses'}</option>
                             <option value="verified">{t('admin.users.filter.verified')}</option>
                             <option value="unverified">{t('admin.users.filter.unverified')}</option>
                         </select>

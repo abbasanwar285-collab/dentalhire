@@ -340,41 +340,47 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                     </section>
                                 )}
 
-                                {/* Work Samples / Documents */}
-                                {cv.documents && cv.documents.length > 0 && isApproved && (
+                                {/* Work Samples / Documents - Only show portfolio and resume, hide private docs */}
+                                {cv.documents && cv.documents.filter((d: any) => d.type === 'portfolio' || d.type === 'resume').length > 0 && isApproved && (
                                     <section className="print:break-inside-avoid">
                                         <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
                                             <Share2 size={20} className="text-blue-600" />
-                                            {language === 'ar' ? 'المرفقات ونماذج الأعمال' : 'Portfolio & Documents'}
+                                            {language === 'ar' ? 'نماذج الأعمال والسيرة الذاتية' : 'Portfolio & Resume'}
                                         </h3>
                                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                            {/* Render Images First */}
-                                            {cv.documents.filter((d: any) => d.type?.startsWith('image') || d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map((doc: any, idx: number) => (
-                                                <div key={idx} className="group relative aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(doc.url, '_blank')}>
-                                                    <img src={doc.url} alt={doc.name || 'Work Sample'} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
-                                                        {language === 'ar' ? 'عرض الصورة' : 'View Image'}
+                                            {/* Render Images (only from portfolio type) */}
+                                            {cv.documents
+                                                .filter((d: any) => (d.type === 'portfolio' || d.type === 'resume') && (d.type?.startsWith('image') || d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)))
+                                                .map((doc: any, idx: number) => (
+                                                    <div key={idx} className="group relative aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(doc.url, '_blank')}>
+                                                        <img src={doc.url} alt={doc.name || 'Work Sample'} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+                                                            {language === 'ar' ? 'عرض الصورة' : 'View Image'}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))}
+                                                ))}
 
-                                            {/* Render PDFs/Docs */}
-                                            {cv.documents.filter((d: any) => !d.type?.startsWith('image') && !d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)).map((doc: any, idx: number) => (
-                                                <a
-                                                    key={idx}
-                                                    href={doc.url}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-xl transition-colors group text-center gap-3"
-                                                >
-                                                    <div className="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center text-blue-600 transition-colors">
-                                                        <FileText size={24} />
-                                                    </div>
-                                                    <span className="text-sm font-medium text-blue-900 line-clamp-2">
-                                                        {doc.name || (language === 'ar' ? 'تحميل ملف' : 'Download File')}
-                                                    </span>
-                                                </a>
-                                            ))}
+                                            {/* Render PDFs/Docs (only portfolio and resume) */}
+                                            {cv.documents
+                                                .filter((d: any) => (d.type === 'portfolio' || d.type === 'resume') && !d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                                .map((doc: any, idx: number) => (
+                                                    <a
+                                                        key={idx}
+                                                        href={doc.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-xl transition-colors group text-center gap-3"
+                                                    >
+                                                        <div className="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center text-blue-600 transition-colors">
+                                                            <FileText size={24} />
+                                                        </div>
+                                                        <span className="text-sm font-medium text-blue-900 line-clamp-2">
+                                                            {doc.type === 'resume'
+                                                                ? (language === 'ar' ? 'السيرة الذاتية' : 'Resume/CV')
+                                                                : (doc.name || (language === 'ar' ? 'نموذج عمل' : 'Work Sample'))}
+                                                        </span>
+                                                    </a>
+                                                ))}
                                         </div>
                                     </section>
                                 )}

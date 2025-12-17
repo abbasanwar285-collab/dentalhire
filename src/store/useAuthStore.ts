@@ -314,30 +314,40 @@ export const useAuthStore = create<AuthState>()(
                 try {
                     const supabase = getSupabaseClient();
 
-                    // Use RPC function to bypass RLS issues
-                    const { data: result, error: rpcError } = await (supabase.rpc as any)('update_my_profile', {
-                        p_first_name: updates.firstName ?? null,
-                        p_last_name: updates.lastName ?? null,
-                        p_city: updates.city ?? null,
-                        p_phone: updates.phone ?? null,
+                    // Get the current session token
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session?.access_token) {
+                        console.error('No active session for profile update');
+                        set({ error: 'No active session' });
+                        return;
+                    }
+
+                    // Call API route instead of direct DB/RPC (to bypass RLS)
+                    const response = await fetch('/api/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session.access_token}`
+                        },
+                        body: JSON.stringify({
+                            firstName: updates.firstName,
+                            lastName: updates.lastName,
+                            city: updates.city,
+                            phone: updates.phone,
+                            avatar: updates.avatar
+                        })
                     });
 
-                    if (rpcError) {
-                        console.error('RPC Error updating profile:', rpcError);
-                        set({ error: rpcError.message });
+                    const result = await response.json();
+                    console.log('Profile update API response:', result);
+
+                    if (!result.success) {
+                        console.error('Profile update failed:', result.error);
+                        set({ error: result.error || 'Update failed' });
                         return;
                     }
 
-                    // Handle RPC response
-                    const typedResult = result as { success: boolean; error?: string; data?: any };
-
-                    if (!typedResult?.success) {
-                        console.error('Profile update failed:', typedResult?.error);
-                        set({ error: typedResult?.error || 'Update failed' });
-                        return;
-                    }
-
-                    const updatedData = typedResult.data;
+                    const updatedData = result.data;
 
                     // Update store with the ACTUAL returned data from DB
                     if (updatedData) {
@@ -355,6 +365,7 @@ export const useAuthStore = create<AuthState>()(
                                 updatedAt: new Date(updatedData.updated_at),
                             },
                         });
+                        console.log('Store updated with new profile data');
                     }
                 } catch (error) {
                     console.error('Exception updating profile:', error);
@@ -363,6 +374,7 @@ export const useAuthStore = create<AuthState>()(
                     });
                 }
             },
+
 
 
             checkSession: async () => {

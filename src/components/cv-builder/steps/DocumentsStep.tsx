@@ -5,14 +5,15 @@
 // ============================================
 
 import { useState } from 'react';
-import { useCVStore } from '@/store';
+import { useCVStore, useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateId } from '@/lib/utils';
 import { FileText, Upload, Trash2, File, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase';
 
 export default function DocumentsStep() {
-    const { documents, addDocument, removeDocument } = useCVStore();
+    const { documents, addDocument, removeDocument, saveCV } = useCVStore();
+    const { user } = useAuthStore();
     const { language, t } = useLanguage();
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
@@ -94,6 +95,11 @@ export default function DocumentsStep() {
                 uploadedAt: new Date(),
             });
 
+            // Save immediately
+            if (user?.id) {
+                await saveCV(user.id);
+            }
+
             // Show success with URL for debugging
             console.log('[DocumentUpload] Document added successfully with URL:', urlData.publicUrl);
 
@@ -166,7 +172,12 @@ export default function DocumentsStep() {
                                     <FileText size={16} />
                                 </a>
                                 <button
-                                    onClick={() => removeDocument(doc.id)}
+                                    onClick={async () => {
+                                        removeDocument(doc.id);
+                                        if (user?.id) {
+                                            await saveCV(user.id);
+                                        }
+                                    }}
                                     className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                     aria-label={`${language === 'ar' ? 'حذف' : 'Remove'} ${doc.name}`}
                                 >
@@ -273,6 +284,10 @@ export default function DocumentsStep() {
                                     url: urlData.publicUrl,
                                     uploadedAt: new Date(),
                                 });
+                            }
+
+                            if (user?.id) {
+                                await saveCV(user.id);
                             }
                         } catch (error: any) {
                             console.error('Upload error:', error);

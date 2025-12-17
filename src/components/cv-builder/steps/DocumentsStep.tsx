@@ -277,6 +277,10 @@ export default function DocumentsStep() {
                                     .from('documents')
                                     .getPublicUrl(fileName);
 
+                                if (urlData.publicUrl.startsWith('blob:')) {
+                                    throw new Error('Upload failed - got blob URL instead of storage URL');
+                                }
+
                                 addDocument({
                                     id: generateId(),
                                     name: file.name,

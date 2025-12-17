@@ -299,7 +299,7 @@ export const useCVStore = create<CVState>()(
                                 startDate: data.availability_start_date,
                                 schedule: data.availability_schedule || defaultSchedule,
                             },
-                            documents: data.documents as Document[] || [],
+                            documents: (data.documents as Document[] || []).filter(d => !d.url?.startsWith('blob:')),
                         });
                     }
                 } catch (error) {

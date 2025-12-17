@@ -27,6 +27,7 @@ export default function DashboardLayout({
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [checkingProfile, setCheckingProfile] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const { unreadCount, fetchNotifications } = useNotificationStore();
 
     // Check if employer needs to complete profile
@@ -97,6 +98,7 @@ export default function DashboardLayout({
     useEffect(() => {
         // Redirect to login if not authenticated
         if (!isLoading && !isAuthenticated) {
+            setIsRedirecting(true);
             router.push('/login');
             return;
         }
@@ -119,6 +121,7 @@ export default function DashboardLayout({
                     dental_technician: 'technician',
                 };
                 const target = map[user.userType] || 'job-seeker';
+                setIsRedirecting(true);
                 router.push(`/${target}/dashboard`);
                 return;
             }
@@ -129,6 +132,7 @@ export default function DashboardLayout({
             if (['clinic', 'company', 'lab'].includes(user.role) && jobSeekerRoutes.includes(segment)) {
                 if (path.includes('/dashboard')) {
                     // Redirect to their employer dashboard
+                    setIsRedirecting(true);
                     if (user.userType === 'company') router.push('/company/dashboard');
                     else if (user.userType === 'lab') router.push('/lab/dashboard');
                     else router.push('/clinic/dashboard');
@@ -139,16 +143,23 @@ export default function DashboardLayout({
             // 3. Prevent Employers from accessing other Employer routes
             if (user.role === 'clinic') {
                 if (user.userType === 'company' && (segment === 'clinic' || segment === 'lab')) {
+                    setIsRedirecting(true);
                     router.push('/company/dashboard');
+                    return;
                 } else if (user.userType === 'lab' && (segment === 'clinic' || segment === 'company')) {
+                    setIsRedirecting(true);
                     router.push('/lab/dashboard');
+                    return;
                 } else if (user.userType === 'clinic' && (segment === 'company' || segment === 'lab')) {
+                    setIsRedirecting(true);
                     router.push('/clinic/dashboard');
+                    return;
                 }
             }
 
             // 4. Force Admin to Admin Dashboard & Prevent Others from Admin
             if (user.role === 'admin' && segment !== 'admin') {
+                setIsRedirecting(true);
                 router.push('/admin/dashboard');
                 return;
             }
@@ -160,6 +171,7 @@ export default function DashboardLayout({
                     lab: 'lab'
                 };
                 // Handle job seeker sub-types redirection
+                setIsRedirecting(true);
                 if (user.role === 'job_seeker') {
                     // Start of Job Seeker Map logic duplication (can be cleaned up but keeping robust)
                     const jsMap: Record<string, string> = {
@@ -193,7 +205,8 @@ export default function DashboardLayout({
         setCheckingProfile(false);
     };
 
-    if (isLoading || checkingProfile) {
+    // Show loader during loading, profile check, or active redirect
+    if (isLoading || checkingProfile || isRedirecting) {
         return <PageLoader />;
     }
 

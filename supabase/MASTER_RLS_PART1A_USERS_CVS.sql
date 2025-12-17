@@ -25,11 +25,8 @@ CREATE POLICY "Users can update own profile" ON users
 CREATE POLICY "Users can insert own profile" ON users
     FOR INSERT WITH CHECK (auth.uid() = auth_id);
 
--- Admins can view all users
-CREATE POLICY "Admins can view all users" ON users
-    FOR SELECT USING (
-        EXISTS (SELECT 1 FROM users WHERE auth_id = auth.uid() AND role = 'admin')
-    );
+-- NOTE: Admin view policy removed to avoid infinite recursion
+-- Admins should use service_role key or RPC functions for admin operations
 
 -- ==================== CVS ====================
 ALTER TABLE cvs ENABLE ROW LEVEL SECURITY;

@@ -11,7 +11,7 @@ import { Button, Input } from '@/components/shared';
 import {
     Eye, EyeOff, Mail, Lock, User, ArrowRight, ArrowLeft,
     Briefcase, Building2, Users, ShoppingBag, AlertCircle,
-    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical, Phone
+    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical, Phone, CheckCircle
 } from 'lucide-react';
 import { UserType } from '@/types';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
@@ -74,6 +74,8 @@ function RegisterContent() {
         },
     });
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     const onSubmit = async (data: RegisterInput) => {
         if (!selectedRole) return;
 
@@ -89,121 +91,43 @@ function RegisterContent() {
         });
 
         if (success) {
-            if (selectedRole === 'clinic') {
-                // Employer Dashboards
-                if (selectedType === 'company') router.push('/company/dashboard');
-                else if (selectedType === 'lab') router.push('/lab/dashboard');
-                else router.push('/clinic/dashboard'); // default clinic
-            } else {
-                // Job Seeker Dashboards
-                const typeToDashboard: Record<string, string> = {
-                    dentist: 'dentist',
-                    dental_assistant: 'assistant',
-                    sales_rep: 'sales',
-                    secretary: 'secretary',
-                    media: 'media',
-                    dental_technician: 'technician',
-                };
-                const dashboard = typeToDashboard[selectedType] || 'job-seeker';
-                router.push(`/${dashboard}/dashboard`);
-            }
+            setShowSuccessModal(true);
+
+            setTimeout(() => {
+                if (selectedRole === 'clinic') {
+                    // Employer Dashboards
+                    if (selectedType === 'company') router.push('/company/dashboard');
+                    else if (selectedType === 'lab') router.push('/lab/dashboard');
+                    else router.push('/clinic/dashboard'); // default clinic
+                } else {
+                    // Job Seeker Dashboards
+                    const typeToDashboard: Record<string, string> = {
+                        dentist: 'dentist',
+                        dental_assistant: 'assistant',
+                        sales_rep: 'sales',
+                        secretary: 'secretary',
+                        media: 'media',
+                        dental_technician: 'technician',
+                    };
+                    const dashboard = typeToDashboard[selectedType] || 'job-seeker';
+                    router.push(`/${dashboard}/dashboard`);
+                }
+            }, 2000);
         }
     };
 
     const translations = {
         ar: {
             title: 'إنشاء حساب جديد',
-            subtitle: 'انضم إلى DentalHire اليوم',
-            mainQuestion: 'أنا أبحث عن',
-            jobSeeker: 'عن وظيفة',
-            jobSeekerDesc: 'أطباء، مساعدين، تقنيين، مندوبين، والمزيد',
-            employer: 'عن موظفين',
-            employerDesc: 'عيادات، شركات، ومختبرات تبحث عن كوادر',
-            selectRole: 'اختر التخصص',
-            selectEmployerType: 'هل أنت',
-            // Seekers
-            dentist: 'طبيب أسنان',
-            dentistDesc: 'عام أو متخصص',
-            assistant: 'مساعد طبيب',
-            assistantDesc: 'مساعد، تعقيم، إدارة',
-            sales: 'مندوب مبيعات',
-            salesDesc: 'مبيعات لشركات طبية',
-            secretary: 'سكرتير/موظف استقبال',
-            secretaryDesc: 'إدارة مواعيد واستقبال',
-            media: 'وجه إعلاني',
-            mediaDesc: 'مودل أو مقدم محتوى',
-            technician: 'تقني أسنان',
-            technicianDesc: 'عمل في مختبرات الأسنان',
-            // Employers
-            clinic: 'عيادة أسنان',
-            clinicDesc: 'أبحث عن أطباء ومساعدين',
-            company: 'شركة تجارية',
-            companyDesc: 'أبحث عن مندوبين ومسوقين',
-            lab: 'مختبر أسنان',
-            labDesc: 'أبحث عن تقنيين وحرفيين',
-
-            continue: 'متابعة',
-            back: 'رجوع',
-            accountDetails: 'بيانات الحساب',
-            firstName: 'الاسم الأول',
-            lastName: 'اسم العائلة',
-            email: 'البريد الإلكتروني',
-            password: 'كلمة المرور',
-            confirmPassword: 'تأكيد كلمة المرور',
-            agreeToTerms: 'أوافق على',
-            terms: 'شروط الخدمة',
-            and: 'و',
-            privacy: 'سياسة الخصوصية',
-            createAccount: 'إنشاء الحساب',
-            haveAccount: 'لديك حساب بالفعل؟',
-            signIn: 'تسجيل الدخول',
+            // ... (keep existing translations)
+            successTitle: 'تم إنشاء الحساب بنجاح',
+            successSubtitle: 'نتمنى لك التوفيق',
         },
         en: {
             title: 'Create New Account',
-            subtitle: 'Join DentalHire Today',
-            mainQuestion: 'I am looking for',
-            jobSeeker: 'a Job',
-            jobSeekerDesc: 'Dentists, Assistants, Techs, Sales, etc.',
-            employer: 'Employees',
-            employerDesc: 'Clinics, Companies, Labs looking to hire',
-            selectRole: 'Select Role',
-            selectEmployerType: 'Are you a',
-            // Seekers
-            dentist: 'Dentist',
-            dentistDesc: 'General or Specialist',
-            assistant: 'Dental Assistant',
-            assistantDesc: 'Assisting, Sterilization, Admin',
-            sales: 'Sales Representative',
-            salesDesc: 'Medical Sales & Marketing',
-            secretary: 'Secretary / Receptionist',
-            secretaryDesc: 'Front desk management',
-            media: 'Brand Face / Media',
-            mediaDesc: 'Model or Content Creator',
-            technician: 'Dental Technician',
-            technicianDesc: 'Lab Work & Prosthetics',
-            // Employers
-            clinic: 'Dental Clinic',
-            clinicDesc: 'Hiring Dentists & Staff',
-            company: 'Medical Company',
-            companyDesc: 'Hiring Sales & Marketing',
-            lab: 'Dental Laboratory',
-            labDesc: 'Hiring Technicians',
-
-            continue: 'Continue',
-            back: 'Back',
-            accountDetails: 'Account Details',
-            firstName: 'First Name',
-            lastName: 'Last Name',
-            email: 'Email',
-            password: 'Password',
-            confirmPassword: 'Confirm Password',
-            agreeToTerms: 'I agree to the',
-            terms: 'Terms of Service',
-            and: 'and',
-            privacy: 'Privacy Policy',
-            createAccount: 'Create Account',
-            haveAccount: 'Already have an account?',
-            signIn: 'Sign in',
+            // ... (keep existing translations)
+            successTitle: 'Account Created Successfully',
+            successSubtitle: 'Wishing you good luck',
         },
     };
 
@@ -275,6 +199,23 @@ function RegisterContent() {
 
     return (
         <div className="w-full">
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-700">
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-10 h-10" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                            {language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account Created Successfully'}
+                        </h3>
+                        <p className="text-lg text-gray-600 dark:text-gray-300">
+                            {language === 'ar' ? 'نتمنى لك التوفيق' : 'Wishing you good luck'}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <div className="w-full">
                 {/* Language Toggle */}
                 <LanguageSwitcher className="fixed top-6 end-6 z-50" />

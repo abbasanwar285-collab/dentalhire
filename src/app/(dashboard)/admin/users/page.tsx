@@ -83,7 +83,7 @@ function AdminUsersContent() {
             const supabase = getSupabaseClient();
             const { data, error } = await supabase
                 .from('users')
-                .select('*')
+                .select('id, email, first_name, last_name, role, user_type, verified, created_at, phone, avatar')
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -293,8 +293,8 @@ function AdminUsersContent() {
 
             {/* Users Table */}
             <Card>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
+                <div className="overflow-x-auto w-full">
+                    <table className="w-full min-w-[800px]">
                         <thead>
                             <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
                                 <th className="p-4">

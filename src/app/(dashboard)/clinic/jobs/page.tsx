@@ -172,11 +172,51 @@ export default function ClinicJobsPage() {
         requirements: '',
         salary: { min: 0, max: 0 },
         location: '',
+        locationProvince: '',
+        locationDistrict: '',
+        locationNeighborhood: '',
         employmentType: 'full_time' as EmploymentType,
         gender: 'any' as 'male' | 'female' | 'any',
         workingHours: { start: '09:00', end: '17:00' },
         skills: '',
     });
+
+    const smartSkills = {
+        'dentist': {
+            ar: ['علاج جذور', 'حشوات تجميلية', 'قلع جراحي', 'تقويم أسنان', 'زراعة أسنان', 'تيجان وجسور'],
+            en: ['Root Canal', 'Cosmetic Fillings', 'Surgical Extraction', 'Orthodontics', 'Implants', 'Crowns & Bridges']
+        },
+        'assistant': {
+            ar: ['تعقيم', 'مساعدة كرسي (4-handed)', 'إدارة مخزون', 'أشعة سينية', 'تحضير المواد', 'استقبال المرضى'],
+            en: ['Sterilization', '4-Handed Dentistry', 'Inventory Management', 'X-Ray', 'Material Prep', 'Patient Reception']
+        },
+        'secretary': {
+            ar: ['إدارة مواعيد', 'إكسل و وورد', 'رد على الهاتف', 'حسابات بسيطة', 'لباقة في الكلام', 'تنظيم ملفات'],
+            en: ['Scheduling', 'Excel & Word', 'Phone Etiquette', 'Basic Accounting', 'Communication', 'Filing']
+        },
+        'technician': {
+            ar: ['تشميع', 'صب قوالب', 'سيراميك', 'أكريلك', 'تصميم CAD/CAM'],
+            en: ['Waxing', 'Casting', 'Ceramics', 'Acrylic', 'CAD/CAM Design']
+        },
+        'sales': {
+            ar: ['تسويق ميداني', 'إغلاق صفقات', 'بناء علاقات', 'قيادة سيارة', 'تفاوض'],
+            en: ['Field Marketing', 'Closing Deals', 'Relationship Building', 'Driving', 'Negotiation']
+        }
+    };
+
+    const getSmartSkills = (title: string) => {
+        const lowerTitle = title.toLowerCase();
+        let matchedRole = '';
+
+        if (lowerTitle.includes('dentist') || lowerTitle.includes('طبيب')) matchedRole = 'dentist';
+        else if (lowerTitle.includes('assistant') || lowerTitle.includes('مساعد')) matchedRole = 'assistant';
+        else if (lowerTitle.includes('secretary') || lowerTitle.includes('سكرتير') || lowerTitle.includes('استقبال')) matchedRole = 'secretary';
+        else if (lowerTitle.includes('technician') || lowerTitle.includes('تقني')) matchedRole = 'technician';
+        else if (lowerTitle.includes('sales') || lowerTitle.includes('مندوب') || lowerTitle.includes('مبيعات')) matchedRole = 'sales';
+
+        if (!matchedRole) return [];
+        return language === 'ar' ? smartSkills[matchedRole as keyof typeof smartSkills].ar : smartSkills[matchedRole as keyof typeof smartSkills].en;
+    };
 
     const resetForm = () => {
         setForm({
@@ -185,6 +225,9 @@ export default function ClinicJobsPage() {
             requirements: '',
             salary: { min: 0, max: 0 },
             location: '',
+            locationProvince: '',
+            locationDistrict: '',
+            locationNeighborhood: '',
             employmentType: 'full_time',
             gender: 'any',
             workingHours: { start: '09:00', end: '17:00' },
@@ -196,7 +239,7 @@ export default function ClinicJobsPage() {
     };
 
     const handleGenerateDescription = async () => {
-        if (!form.title || !form.location) {
+        if (!form.title || !form.locationProvince) {
             alert(t.enterTitleLocation);
             return;
         }
@@ -204,7 +247,8 @@ export default function ClinicJobsPage() {
         setIsGenerating(true);
         try {
             const skills = form.skills.split(',').map(s => s.trim()).filter(Boolean);
-            const description = await generateJobDescription(form.title, skills, form.location);
+            const fullLocation = `${form.locationProvince} - ${form.locationDistrict} ${form.locationNeighborhood ? '- ' + form.locationNeighborhood : ''}`;
+            const description = await generateJobDescription(form.title, skills, fullLocation);
             setForm(prev => ({ ...prev, description }));
         } catch (error) {
             console.error('Failed to generate description', error);
@@ -222,6 +266,11 @@ export default function ClinicJobsPage() {
             return;
         }
 
+        // Construct full location string
+        let fullLocation = form.locationProvince;
+        if (form.locationDistrict) fullLocation += ` - ${form.locationDistrict}`;
+        if (form.locationNeighborhood) fullLocation += ` - ${form.locationNeighborhood}`;
+
         const jobData = {
             clinicId: clinicId,
             clinicName: clinicName || 'Unknown Clinic',
@@ -229,7 +278,7 @@ export default function ClinicJobsPage() {
             description: form.description,
             requirements: form.requirements.split(',').map((r) => r.trim()).filter(Boolean),
             salary: { ...form.salary, currency: 'USD' },
-            location: form.location,
+            location: fullLocation,
             employmentType: form.employmentType,
             gender: form.gender,
             workingHours: form.workingHours,
@@ -252,12 +301,18 @@ export default function ClinicJobsPage() {
     };
 
     const handleEdit = (job: Job) => {
+        // Try to parse existing location string back to parts (heuristic)
+        const parts = job.location.split(' - ');
+
         setForm({
             title: job.title,
             description: job.description,
             requirements: job.requirements.join(', '),
             salary: { min: job.salary.min, max: job.salary.max },
             location: job.location,
+            locationProvince: parts[0] || '',
+            locationDistrict: parts[1] || '',
+            locationNeighborhood: parts[2] || '',
             employmentType: job.employmentType,
             gender: job.gender || 'any',
             workingHours: job.workingHours || { start: '09:00', end: '17:00' },
@@ -403,7 +458,7 @@ export default function ClinicJobsPage() {
                                 onChange={(e) => setForm({ ...form, requirements: e.target.value })}
                             />
 
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <Input
                                     label={t.minSalary}
                                     type="number"
@@ -424,24 +479,82 @@ export default function ClinicJobsPage() {
                                 />
                             </div>
 
-                            <div className="space-y-1.5">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {t.location}
-                                </label>
-                                <select
-                                    value={form.location}
-                                    onChange={(e) => setForm({ ...form, location: e.target.value })}
-                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                                    required
-                                    aria-label={t.location}
-                                >
-                                    <option value="" disabled>{t.locationPlaceholder}</option>
-                                    {Object.keys(iraqLocations).map((loc) => (
-                                        <option key={loc} value={loc}>
-                                            {language === 'ar' ? (iraqLocations as any)[loc].ar : loc}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        {language === 'ar' ? 'المحافظة *' : 'Province *'}
+                                    </label>
+                                    <select
+                                        value={form.locationProvince}
+                                        onChange={(e) => {
+                                            setForm({
+                                                ...form,
+                                                locationProvince: e.target.value,
+                                                locationDistrict: '',
+                                                locationNeighborhood: ''
+                                            });
+                                        }}
+                                        className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                        required
+                                    >
+                                        <option value="" disabled>{language === 'ar' ? 'اختر المحافظة' : 'Select Province'}</option>
+                                        {Object.keys(iraqLocations).map((loc) => (
+                                            <option key={loc} value={loc}>
+                                                {language === 'ar' ? (iraqLocations as any)[loc].ar : loc}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {form.locationProvince && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                                {language === 'ar' ? 'القضاء *' : 'District *'}
+                                            </label>
+                                            <select
+                                                value={form.locationDistrict}
+                                                onChange={(e) => {
+                                                    setForm({
+                                                        ...form,
+                                                        locationDistrict: e.target.value,
+                                                        locationNeighborhood: ''
+                                                    });
+                                                }}
+                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                                required
+                                            >
+                                                <option value="" disabled>{language === 'ar' ? 'اختر القضاء' : 'Select District'}</option>
+                                                {form.locationProvince && iraqLocations[form.locationProvince]?.districts.map((district) => (
+                                                    <option key={district.en} value={district.en}>
+                                                        {language === 'ar' ? district.ar : district.en}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                                {language === 'ar' ? 'الحي / المنطقة' : 'Neighborhood'}
+                                            </label>
+                                            <select
+                                                value={form.locationNeighborhood}
+                                                onChange={(e) => setForm({ ...form, locationNeighborhood: e.target.value })}
+                                                className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                            >
+                                                <option value="">{language === 'ar' ? 'اختر الحي (اختياري)' : 'Select Neighborhood (Optional)'}</option>
+                                                {form.locationProvince && form.locationDistrict &&
+                                                    iraqLocations[form.locationProvince]?.districts
+                                                        .find(d => d.en === form.locationDistrict)?.neighborhoods?.map((neigh) => (
+                                                            <option key={neigh.en} value={neigh.en}>
+                                                                {language === 'ar' ? neigh.ar : neigh.en}
+                                                            </option>
+                                                        ))
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <div>
@@ -502,12 +615,47 @@ export default function ClinicJobsPage() {
                                 </div>
                             </div>
 
-                            <Input
-                                label={t.requiredSkills}
-                                placeholder={t.skillsPlaceholder}
-                                value={form.skills}
-                                onChange={(e) => setForm({ ...form, skills: e.target.value })}
-                            />
+                            <div>
+                                <Input
+                                    label={t.requiredSkills}
+                                    placeholder={t.skillsPlaceholder}
+                                    value={form.skills}
+                                    onChange={(e) => setForm({ ...form, skills: e.target.value })}
+                                />
+                                {/* Smart Skills Suggestions */}
+                                {getSmartSkills(form.title).length > 0 && (
+                                    <div className="mt-2 animate-in fade-in slide-in-from-top-2">
+                                        <p className="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                                            <span className="text-amber-500">✨</span>
+                                            {language === 'ar' ? 'مهارات مقترحة:' : 'Suggested Skills:'}
+                                        </p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {getSmartSkills(form.title).map((skill) => {
+                                                const currentSkills = form.skills.toLowerCase().split(',').map(s => s.trim());
+                                                const isSelected = currentSkills.includes(skill.toLowerCase());
+
+                                                if (isSelected) return null;
+
+                                                return (
+                                                    <button
+                                                        key={skill}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            const newSkills = form.skills
+                                                                ? `${form.skills}, ${skill}`
+                                                                : skill;
+                                                            setForm({ ...form, skills: newSkills });
+                                                        }}
+                                                        className="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors border border-blue-100 dark:border-blue-800"
+                                                    >
+                                                        + {skill}
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="flex gap-3 pt-4">
                                 <Button type="button" variant="secondary" onClick={resetForm} className="flex-1">

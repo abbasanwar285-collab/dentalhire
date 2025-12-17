@@ -130,6 +130,38 @@ export default function DashboardLayout({
                     router.push('/clinic/dashboard');
                 }
             }
+
+            // 4. Force Admin to Admin Dashboard & Prevent Others from Admin
+            if (user.role === 'admin' && segment !== 'admin') {
+                router.push('/admin/dashboard');
+                return;
+            }
+            if (user.role !== 'admin' && segment === 'admin') {
+                const map: Record<string, string> = {
+                    job_seeker: 'job-seeker',
+                    clinic: 'clinic',
+                    company: 'company',
+                    lab: 'lab'
+                };
+                // Handle job seeker sub-types redirection
+                if (user.role === 'job_seeker') {
+                    // Start of Job Seeker Map logic duplication (can be cleaned up but keeping robust)
+                    const jsMap: Record<string, string> = {
+                        dentist: 'dentist',
+                        dental_assistant: 'assistant',
+                        sales_rep: 'sales',
+                        secretary: 'secretary',
+                        media: 'media',
+                        dental_technician: 'technician',
+                    };
+                    const target = jsMap[user.userType] || 'job-seeker';
+                    router.push(`/${target}/dashboard`);
+                } else {
+                    const target = map[user.role] || 'login';
+                    router.push(`/${target}/dashboard`);
+                }
+                return;
+            }
         }
 
         // Fetch notifications for badge

@@ -46,12 +46,28 @@ export default function DashboardLayout({
 
             try {
                 const supabase = getSupabaseClient();
-                const { data: clinicData, error } = await supabase
+
+                // Add timeout to prevent hanging indefinitely
+                const timeoutPromise = new Promise<null>((resolve) =>
+                    setTimeout(() => resolve(null), 5000)
+                );
+
+                const queryPromise = supabase
                     .from('clinics')
                     .select('name, city')
                     .eq('user_id', user.id)
                     .maybeSingle();
 
+                const result = await Promise.race([queryPromise, timeoutPromise]);
+
+                // If timeout occurred, just continue without showing onboarding
+                if (result === null) {
+                    console.warn('Employer profile check timed out, continuing without onboarding');
+                    setCheckingProfile(false);
+                    return;
+                }
+
+                const { data: clinicData, error } = result;
                 const typedData = clinicData as { name: string; city: string } | null;
 
                 // If no clinic record or missing name/city, show onboarding

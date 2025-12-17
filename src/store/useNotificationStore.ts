@@ -191,6 +191,13 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     },
 
     enablePushNotifications: async (userId: string) => {
+        // Early validation for VAPID key
+        const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+        if (!vapidKey) {
+            console.error('VAPID public key not configured');
+            return false;
+        }
+
         if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
             console.log('Push notifications not supported');
             return false;
@@ -200,10 +207,17 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
             const permission = await Notification.requestPermission();
             if (permission !== 'granted') return false;
 
-            const registration = await navigator.serviceWorker.ready;
+            // Add timeout for service worker ready (5 seconds max)
+            const registration = await Promise.race([
+                navigator.serviceWorker.ready,
+                new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error('Service Worker timeout - not registered')), 5000)
+                )
+            ]) as ServiceWorkerRegistration;
+
             const subscription = await registration.pushManager.subscribe({
                 userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!.trim())
+                applicationServerKey: urlBase64ToUint8Array(vapidKey.trim())
             });
 
             // Save subscription to DB

@@ -95,7 +95,7 @@ export default function ClinicDashboard() {
     const [topCandidates, setTopCandidates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { loadFavorites, favorites } = useJobStore(); // Use store for favorites count if available
+    const { loadFavorites, favorites } = useJobStore();
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -105,7 +105,7 @@ export default function ClinicDashboard() {
             try {
                 setLoading(true);
 
-                // 1. Fetch Stats from RPC
+                // 1. Fetch Stats
                 // @ts-ignore
                 const { data: statsData, error: statsError } = await supabase
                     .rpc('get_dashboard_stats', {
@@ -121,27 +121,115 @@ export default function ClinicDashboard() {
                     savedProfiles = statsData.saved_profiles || 0;
                 }
 
-                // 2. Fetch Top Candidates (Recent CVs)
-                const { data: recentCVs } = await supabase
+                // 2. Fetch Clinic Profile to get preferences
+                const { data: clinicData } = await supabase
+                    .from('clinics')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                // 3. Fetch Active CVs for matching
+                const { data: allCVs } = await supabase
                     .from('cvs')
                     .select('*, users(user_type)')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
-                    .limit(3);
+                    .limit(50); // Fetch more for matching
 
-                if (recentCVs) {
-                    const mapped = recentCVs.map((cv: any) => ({
+                let mappedCandidates: any[] = [];
+
+                if (allCVs) {
+                    // Map generic CV data first
+                    const candidatesRaw = allCVs.map((cv: any) => ({
                         id: cv.id,
                         personalInfo: {
                             fullName: cv.full_name,
                             photo: cv.photo,
                             city: cv.city,
+                            verified: cv.verified
                         },
                         experience: cv.experience || [],
+                        skills: cv.skills || [],
+                        salary: { expected: cv.salary_expected, negotiable: cv.salary_negotiable },
+                        location: { preferred: cv.preferred_locations || [], willingToRelocate: cv.willing_to_relocate },
+                        availability: { type: cv.availability_type },
                         rating: cv.rating || 0
                     }));
-                    setTopCandidates(mapped);
+
+                    if (clinicData) {
+                        // Import matching logic dynamically to avoid server/client issues
+                        const { getTopMatches } = await import('@/lib/matching');
+                        const { calculateExperienceYears } = await import('@/lib/utils');
+
+                        // Run matching algorithm
+                        const matches = getTopMatches(candidatesRaw, clinicData, 3);
+
+                        mappedCandidates = matches.map(match => ({
+                            ...match.cv,
+                            matchScore: match.score,
+                            yearsExperience: calculateExperienceYears(match.cv.experience)
+                        }));
+                    } else {
+                        // Fallback if no clinic profile (just show recent)
+                        mappedCandidates = candidatesRaw.slice(0, 3).map(cv => {
+                            // Dynamic import for utility
+                            // We can't use await inside map easily, so we rely on the implementation above or basic fallback
+                            let years = 0;
+                            try {
+                                // Simple calc fallback
+                                // Real implementation handles this better but for fallback:
+                                years = cv.experience.length;
+                            } catch (e) { }
+
+                            return {
+                                ...cv,
+                                matchScore: 0,
+                                yearsExperience: years
+                            };
+                        });
+                    }
                 }
+
+                // Fix for the map above being async/complex:
+                // Let's simplify: if we have matches, use them. If not, use raw.
+                // Re-doing the logic cleanly:
+
+                if (allCVs && clinicData) {
+                    const { getTopMatches } = await import('@/lib/matching');
+                    const { calculateExperienceYears } = await import('@/lib/utils');
+
+                    const candidatesForMatching = allCVs.map((cv: any) => ({
+                        id: cv.id,
+                        personalInfo: { fullName: cv.full_name, photo: cv.photo, city: cv.city },
+                        experience: cv.experience || [],
+                        skills: cv.skills || [],
+                        salary: { expected: cv.salary_expected, negotiable: cv.salary_negotiable },
+                        location: { preferred: cv.preferred_locations || [], willingToRelocate: cv.willing_to_relocate },
+                        availability: { type: cv.availability_type },
+                        rating: cv.rating || 0
+                    })) as unknown as CV[];
+
+                    const matches = getTopMatches(candidatesForMatching, clinicData, 3);
+
+                    mappedCandidates = matches.map(m => ({
+                        ...m.cv,
+                        matchScore: m.score,
+                        yearsExperience: calculateExperienceYears(m.cv.experience)
+                    }));
+                } else if (allCVs) {
+                    // Fallback: just show recent, no scores
+                    const { calculateExperienceYears } = await import('@/lib/utils');
+                    mappedCandidates = allCVs.slice(0, 3).map((cv: any) => ({
+                        id: cv.id,
+                        personalInfo: { fullName: cv.full_name, photo: cv.photo, city: cv.city },
+                        experience: cv.experience || [],
+                        rating: cv.rating || 0,
+                        matchScore: 0,
+                        yearsExperience: calculateExperienceYears(cv.experience || [])
+                    }));
+                }
+
+                setTopCandidates(mappedCandidates);
 
                 setStats([
                     {
@@ -158,13 +246,13 @@ export default function ClinicDashboard() {
                     },
                     {
                         label: t.profileViews,
-                        value: '24', // Placeholder: Need analytics table
+                        value: '24', // Placeholder
                         icon: <Eye size={20} />,
                         change: '+5%'
                     },
                     {
                         label: t.messages,
-                        value: '3', // Placeholder: Need messages count query
+                        value: '3', // Placeholder
                         icon: <MessageSquare size={20} />,
                         change: '+1'
                     },
@@ -257,12 +345,12 @@ export default function ClinicDashboard() {
                                                 <span className="flex items-center gap-1">
                                                     <MapPin size={12} /> {cv.personalInfo.city}
                                                 </span>
-                                                <span>{cv.experience.length}{t.yearsExp}</span>
+                                                <span>{cv.yearsExperience}{t.yearsExp}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <MatchScore score={0} size="sm" />
+                                        <MatchScore score={cv.matchScore || 0} size="sm" />
 
                                         {aiScores[cv.id] ? (
                                             <div className="flex items-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full" title={aiScores[cv.id].reasoning}>

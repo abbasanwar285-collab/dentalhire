@@ -962,7 +962,7 @@ export default function ClinicSearchPage() {
                                                         className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            // Logic to open full CV directly or pass approved flag
+                                                            setCvViewMode('cv');
                                                             setSelectedCV(match.cv.id);
                                                         }}
                                                     >
@@ -1068,6 +1068,7 @@ export default function ClinicSearchPage() {
                                                         className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            setCvViewMode('cv');
                                                             setSelectedCV(match.cv.id);
                                                         }}
                                                     >
@@ -1126,6 +1127,7 @@ export default function ClinicSearchPage() {
                                                             className="w-full text-xs bg-green-600 hover:bg-green-700 text-white"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                setCvViewMode('cv');
                                                                 setSelectedCV(match.cv.id);
                                                             }}
                                                         >

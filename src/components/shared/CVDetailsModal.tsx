@@ -257,6 +257,89 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                     </section>
                                 )}
 
+                                {/* Languages */}
+                                {cv.languages && cv.languages.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Globe size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'اللغات' : 'Languages'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {cv.languages.map((lang: any, idx: number) => (
+                                                <div key={idx} className="bg-gray-50 px-4 py-2 rounded-lg border border-gray-100 flex items-center gap-2">
+                                                    <span className="font-medium text-gray-900">{lang.name || lang.language || lang}</span>
+                                                    {lang.level && (
+                                                        <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded">
+                                                            {lang.level}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Availability & Salary Info */}
+                                <section className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-100">
+                                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                        <Clock size={20} className="text-blue-600" />
+                                        {language === 'ar' ? 'التوفر والراتب' : 'Availability & Salary'}
+                                    </h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'نوع العمل' : 'Employment Type'}</p>
+                                            <p className="font-medium text-gray-900">
+                                                {cv.availability?.type === 'full_time' ? (language === 'ar' ? 'دوام كامل' : 'Full-time') :
+                                                    cv.availability?.type === 'part_time' ? (language === 'ar' ? 'دوام جزئي' : 'Part-time') :
+                                                        cv.availability?.type === 'contract' ? (language === 'ar' ? 'عقد' : 'Contract') :
+                                                            cv.availability?.type || (language === 'ar' ? 'مرن' : 'Flexible')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'تاريخ البدء' : 'Start Date'}</p>
+                                            <p className="font-medium text-gray-900">
+                                                {cv.availability?.startDate || (language === 'ar' ? 'فوري' : 'Immediate')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الراتب المتوقع' : 'Expected Salary'}</p>
+                                            <p className="font-bold text-green-600 text-lg">
+                                                {cv.salary?.expected ? formatCurrency(cv.salary.expected, cv.salary.currency) : (language === 'ar' ? 'قابل للتفاوض' : 'Negotiable')}
+                                            </p>
+                                            {cv.salary?.negotiable && (
+                                                <span className="text-xs text-gray-500">{language === 'ar' ? 'قابل للتفاوض' : 'Negotiable'}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Preferred Locations */}
+                                {cv.location?.preferred && cv.location.preferred.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <MapPin size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'المواقع المفضلة' : 'Preferred Locations'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {cv.location.preferred.map((loc: string, idx: number) => (
+                                                <span key={idx} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+                                                    {loc}
+                                                </span>
+                                            ))}
+                                            {cv.location?.willingToRelocate && (
+                                                <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-100">
+                                                    {language === 'ar' ? 'مستعد للانتقال' : 'Willing to Relocate'}
+                                                </span>
+                                            )}
+                                            {cv.location?.remoteWork && (
+                                                <span className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium border border-purple-100">
+                                                    {language === 'ar' ? 'العمل عن بعد' : 'Remote Work'}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </section>
+                                )}
+
                                 {/* Work Samples / Documents */}
                                 {cv.documents && cv.documents.length > 0 && isApproved && (
                                     <section className="print:break-inside-avoid">

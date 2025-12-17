@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { useCVStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { generateId } from '@/lib/utils';
-import { FileText, Upload, Trash2, File, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Upload, Trash2, File, CheckCircle, AlertCircle, ExternalLink } from 'lucide-react';
 import { getSupabaseClient } from '@/lib/supabase';
 
 export default function DocumentsStep() {
@@ -138,7 +138,14 @@ export default function DocumentsStep() {
                                     <FileText size={20} />
                                 </div>
                                 <div>
-                                    <p className="font-medium text-gray-900 dark:text-white">{doc.name}</p>
+                                    <a
+                                        href={doc.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors"
+                                    >
+                                        {doc.name}
+                                    </a>
                                     <div className="flex items-center gap-2 mt-0.5">
                                         <span className="text-xs text-gray-500 capitalize">{doc.type}</span>
                                         <span className="text-gray-300">•</span>
@@ -148,13 +155,24 @@ export default function DocumentsStep() {
                                     </div>
                                 </div>
                             </div>
-                            <button
-                                onClick={() => removeDocument(doc.id)}
-                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                aria-label={`${language === 'ar' ? 'حذف' : 'Remove'} ${doc.name}`}
-                            >
-                                <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <a
+                                    href={doc.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                    aria-label={language === 'ar' ? 'عرض' : 'View'}
+                                >
+                                    <FileText size={16} />
+                                </a>
+                                <button
+                                    onClick={() => removeDocument(doc.id)}
+                                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                    aria-label={`${language === 'ar' ? 'حذف' : 'Remove'} ${doc.name}`}
+                                >
+                                    <Trash2 size={16} />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

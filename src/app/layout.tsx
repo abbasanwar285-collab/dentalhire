@@ -5,7 +5,7 @@ import { AuthProvider } from "@/components/providers";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AIAssistant } from "@/components/ai";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { ToastProvider, SmartNotificationToast } from "@/components/shared";
+import { ToastProvider, SmartNotificationToast, GlobalErrorBoundary } from "@/components/shared";
 import { BottomNav } from "@/components/layout";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 import PushNotificationManager from "@/components/shared/PushNotificationManager";
@@ -65,7 +65,9 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 <ToastProvider>
-                  {children}
+                  <GlobalErrorBoundary>
+                    {children}
+                  </GlobalErrorBoundary>
                 </ToastProvider>
                 <BottomNav />
                 <PWAInstallPrompt />

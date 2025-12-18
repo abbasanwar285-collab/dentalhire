@@ -1,5 +1,6 @@
 export { default as Button } from './Button';
 export { default as Input } from './Input';
+export { GlobalErrorBoundary } from './GlobalErrorBoundary';
 export { default as LoadingSpinner } from './LoadingSpinner';
 export { PageLoader, CardSkeleton, TableRowSkeleton } from './LoadingSpinner';
 export * from './Toast';

@@ -4,8 +4,8 @@
 // DentalHire - Dashboard Layout
 // ============================================
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useMemo } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Navbar, Sidebar } from '@/components/layout';
 import { useAuthStore } from '@/store';
 import { PageLoader, NotificationBell } from '@/components/shared';
@@ -22,12 +22,12 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const { isAuthenticated, isLoading, user } = useAuthStore();
     const { language } = useLanguage();
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [checkingProfile, setCheckingProfile] = useState(true);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isRedirecting, setIsRedirecting] = useState(false);
     const { unreadCount, fetchNotifications } = useNotificationStore();
 
     // Check if employer needs to complete profile
@@ -95,24 +95,66 @@ export default function DashboardLayout({
         }
     }, [user, isAuthenticated, isLoading]);
 
-    useEffect(() => {
-        // Redirect to login if not authenticated
-        if (!isLoading && !isAuthenticated) {
-            setIsRedirecting(true);
-            router.push('/login');
-            return;
+    // Role-Based Access Control - Calculated Synchronously to prevent FOUC
+    const redirectPath = useMemo(() => {
+        if (isLoading || !user) return null;
+
+        const path = pathname;
+        // Handle root dashboard path or redirects
+        if (!path) return null;
+
+        const segment = path.split('/')[1]; // 'clinic', 'dentist', 'job-seeker', etc.
+
+        // 1. Prevent Job Seekers from accessing Employer routes
+        const employerRoutes = ['clinic', 'company', 'lab'];
+        if (user.role === 'job_seeker' && employerRoutes.includes(segment)) {
+            const map: Record<string, string> = {
+                dentist: 'dentist',
+                dental_assistant: 'assistant',
+                sales_rep: 'sales',
+                secretary: 'secretary',
+                media: 'media',
+                dental_technician: 'technician',
+            };
+            const target = map[user.userType] || 'job-seeker';
+            return `/${target}/dashboard`;
         }
 
-        // Role-Based Access Control
-        if (!isLoading && user) {
-            const path = window.location.pathname;
-            const segment = path.split('/')[1]; // 'clinic', 'dentist', 'job-seeker', etc.
+        // 2. Prevent Employers from accessing Job Seeker routes
+        const jobSeekerRoutes = ['job-seeker', 'dentist', 'assistant', 'technician', 'sales', 'secretary', 'media'];
+        if (['clinic', 'company', 'lab'].includes(user.role) && jobSeekerRoutes.includes(segment)) {
+            // Only redirect if they are trying to access a dashboard-like route
+            if (path.includes('/dashboard')) {
+                if (user.userType === 'company') return '/company/dashboard';
+                else if (user.userType === 'lab') return '/lab/dashboard';
+                else return '/clinic/dashboard';
+            }
+        }
 
-            // 1. Prevent Job Seekers from accessing Employer routes
-            const employerRoutes = ['clinic', 'company', 'lab'];
-            if (user.role === 'job_seeker' && employerRoutes.includes(segment)) {
-                // Redirect to their specific dashboard
-                const map: Record<string, string> = {
+        // 3. Prevent Employers from accessing other Employer routes
+        if (user.role === 'clinic') {
+            if (user.userType === 'company' && (segment === 'clinic' || segment === 'lab')) {
+                return '/company/dashboard';
+            } else if (user.userType === 'lab' && (segment === 'clinic' || segment === 'company')) {
+                return '/lab/dashboard';
+            } else if (user.userType === 'clinic' && (segment === 'company' || segment === 'lab')) {
+                return '/clinic/dashboard';
+            }
+        }
+
+        // 4. Force Admin to Admin Dashboard & Prevent Others from Admin
+        if (user.role === 'admin' && segment !== 'admin') {
+            return '/admin/dashboard';
+        }
+        if (user.role !== 'admin' && segment === 'admin') {
+            const map: Record<string, string> = {
+                job_seeker: 'job-seeker',
+                clinic: 'clinic',
+                company: 'company',
+                lab: 'lab'
+            };
+            if (user.role === 'job_seeker') {
+                const jsMap: Record<string, string> = {
                     dentist: 'dentist',
                     dental_assistant: 'assistant',
                     sales_rep: 'sales',
@@ -120,93 +162,33 @@ export default function DashboardLayout({
                     media: 'media',
                     dental_technician: 'technician',
                 };
-                const target = map[user.userType] || 'job-seeker';
-                setIsRedirecting(true);
-                router.push(`/${target}/dashboard`);
-                return;
-            }
-
-            // 2. Prevent Employers from accessing Job Seeker routes (except profile viewing which might be different URL)
-            const jobSeekerRoutes = ['job-seeker', 'dentist', 'assistant', 'technician', 'sales', 'secretary', 'media'];
-
-            if (['clinic', 'company', 'lab'].includes(user.role) && jobSeekerRoutes.includes(segment)) {
-                if (path.includes('/dashboard')) {
-                    // Redirect to their employer dashboard
-                    setIsRedirecting(true);
-                    if (user.userType === 'company') router.push('/company/dashboard');
-                    else if (user.userType === 'lab') router.push('/lab/dashboard');
-                    else router.push('/clinic/dashboard');
-                    return;
-                }
-            }
-
-            // 3. Prevent Employers from accessing other Employer routes
-            if (user.role === 'clinic') {
-                if (user.userType === 'company' && (segment === 'clinic' || segment === 'lab')) {
-                    setIsRedirecting(true);
-                    router.push('/company/dashboard');
-                    return;
-                } else if (user.userType === 'lab' && (segment === 'clinic' || segment === 'company')) {
-                    setIsRedirecting(true);
-                    router.push('/lab/dashboard');
-                    return;
-                } else if (user.userType === 'clinic' && (segment === 'company' || segment === 'lab')) {
-                    setIsRedirecting(true);
-                    router.push('/clinic/dashboard');
-                    return;
-                }
-            }
-
-            // 4. Force Admin to Admin Dashboard & Prevent Others from Admin
-            if (user.role === 'admin' && segment !== 'admin') {
-                setIsRedirecting(true);
-                router.push('/admin/dashboard');
-                return;
-            }
-            if (user.role !== 'admin' && segment === 'admin') {
-                const map: Record<string, string> = {
-                    job_seeker: 'job-seeker',
-                    clinic: 'clinic',
-                    company: 'company',
-                    lab: 'lab'
-                };
-                // Handle job seeker sub-types redirection
-                setIsRedirecting(true);
-                if (user.role === 'job_seeker') {
-                    // Start of Job Seeker Map logic duplication (can be cleaned up but keeping robust)
-                    const jsMap: Record<string, string> = {
-                        dentist: 'dentist',
-                        dental_assistant: 'assistant',
-                        sales_rep: 'sales',
-                        secretary: 'secretary',
-                        media: 'media',
-                        dental_technician: 'technician',
-                    };
-                    const target = jsMap[user.userType] || 'job-seeker';
-                    router.push(`/${target}/dashboard`);
-                } else {
-                    const target = map[user.role] || 'login';
-                    router.push(`/${target}/dashboard`);
-                }
-                return;
+                const target = jsMap[user.userType] || 'job-seeker';
+                return `/${target}/dashboard`;
+            } else {
+                const target = map[user.role] || 'login';
+                return `/${target}/dashboard`;
             }
         }
 
-        // Fetch notifications for badge
-        if (user) {
-            fetchNotifications(user.id);
+        return null;
+    }, [isLoading, user, pathname]);
+
+    // Handle authentication redirect
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/login');
         }
-    }, [isAuthenticated, isLoading, router, user, fetchNotifications]);
+    }, [isLoading, isAuthenticated, router]);
 
-    const handleOnboardingComplete = async () => {
-        setShowOnboarding(false);
-        // Re-check session to update user profile data (name, etc.) without reloading
-        await useAuthStore.getState().checkSession();
-        setCheckingProfile(false);
-    };
+    // Handle RBAC redirect
+    useEffect(() => {
+        if (redirectPath) {
+            router.push(redirectPath);
+        }
+    }, [redirectPath, router]);
 
-    // Show loader during loading, profile check, or active redirect
-    if (isLoading || checkingProfile || isRedirecting) {
+    // Show loader during loading, profile check, or if a redirect is pending
+    if (isLoading || checkingProfile || redirectPath) {
         return <PageLoader />;
     }
 

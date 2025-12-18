@@ -29,6 +29,7 @@ CREATE TABLE users (
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     phone TEXT,
+    city TEXT,
     avatar TEXT,
     verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

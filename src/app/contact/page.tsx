@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import { Mail, Phone, Send } from 'lucide-react';
 import { Button, Input } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -145,16 +145,7 @@ export default function ContactPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex items-start gap-4">
-                                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <MapPin className="text-blue-600" size={24} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.office')}</h3>
-                                        <p className="text-gray-600 dark:text-gray-300">123 Dental Street</p>
-                                        <p className="text-gray-600 dark:text-gray-300">New York, NY 10001</p>
-                                    </div>
-                                </div>
+
                             </div>
 
                             <div className="bg-gradient-to-br from-blue-500 to-teal-500 rounded-2xl p-8 text-white mt-8">

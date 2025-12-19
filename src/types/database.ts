@@ -13,6 +13,36 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            announcements: {
+                Row: {
+                    id: string
+                    title: string
+                    content: string
+                    target_role: string
+                    is_active: boolean
+                    created_by: string
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    content: string
+                    target_role: string
+                    is_active?: boolean
+                    created_by: string
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    title?: string
+                    content?: string
+                    target_role?: string
+                    is_active?: boolean
+                    created_by?: string
+                    updated_at?: string
+                }
+            }
             users: {
                 Row: {
                     id: string

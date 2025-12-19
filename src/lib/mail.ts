@@ -1,7 +1,9 @@
 
 import { Resend } from 'resend';
 
-export const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize Resend with a default value if key is missing to prevent build errors
+// The actual email sending checks for the key existence implicitly or fails at runtime
+export const resend = new Resend(process.env.RESEND_API_KEY || 're_123456789');
 
 export const sendEmail = async ({
     to,

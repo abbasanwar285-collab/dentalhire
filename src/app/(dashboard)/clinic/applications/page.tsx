@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useJobStore } from '@/store';
 import { useAuthStore } from '@/store';
+import { useMessageStore } from '@/store/useMessageStore';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import {
     Briefcase,
@@ -21,7 +23,8 @@ import {
     ChevronDown,
     X,
     Award,
-    Globe
+    Globe,
+    MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/shared';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -29,6 +32,8 @@ import { getSupabaseClient } from '@/lib/supabase';
 export default function ClinicApplicationsPage() {
     const { user } = useAuthStore();
     const { clinicApplications, loadClinicApplications, updateApplicationStatus, isLoading } = useJobStore();
+    const { createConversation, setActiveConversation } = useMessageStore();
+    const router = useRouter();
     const { language, t } = useLanguage();
     const [selectedJob, setSelectedJob] = useState<string>('all');
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -123,6 +128,28 @@ export default function ClinicApplicationsPage() {
             }
         } else {
             alert(language === 'ar' ? 'فشل تحديث الحالة' : 'Failed to update status');
+        }
+    };
+
+    const handleMessageApplicant = async (application: any) => {
+        if (!user || !application.cv) return;
+
+        try {
+            const conversationId = await createConversation(
+                [user.id, application.cv.userId],
+                {
+                    [user.id]: application.job?.clinicName || user.email,
+                    [application.cv.userId]: application.cv.fullName
+                }
+            );
+
+            if (conversationId) {
+                setActiveConversation(conversationId);
+                router.push('/messages');
+            }
+        } catch (error) {
+            console.error('Error creating conversation:', error);
+            alert(language === 'ar' ? 'فشل بدء المحادثة' : 'Failed to start conversation');
         }
     };
 
@@ -353,6 +380,15 @@ export default function ClinicApplicationsPage() {
                                     <Button
                                         variant="outline"
                                         className="w-full"
+                                        onClick={() => handleMessageApplicant(application)}
+                                    >
+                                        <MessageCircle size={16} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
+                                        {language === 'ar' ? 'مراسلة' : 'Message'}
+                                    </Button>
+
+                                    <Button
+                                        variant="outline"
+                                        className="w-full"
                                         onClick={() => window.open(`mailto:${application.cv?.email}`, '_blank')}
                                     >
                                         <Mail size={16} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
@@ -492,6 +528,24 @@ export default function ClinicApplicationsPage() {
                                 >
                                     <Mail size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
                                     {language === 'ar' ? 'إرسال بريد إلكتروني' : 'Send Email'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        // We need application object here. 
+                                        // But we only have selectedCV.
+                                        // We need to pass application to modal, or find it.
+                                        // Simpler: find application matching this CV? 
+                                        // Or just pass entire application to selectedCV state?
+                                        // For now, let's disable this button in modal or fix state.
+                                        // Re-finding application:
+                                        const app = clinicApplications.find(a => a.cv?.id === selectedCV.id);
+                                        if (app) handleMessageApplicant(app);
+                                    }}
+                                >
+                                    <MessageCircle size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
+                                    {language === 'ar' ? 'مراسلة' : 'Message'}
                                 </Button>
                                 <Button
                                     variant="outline"

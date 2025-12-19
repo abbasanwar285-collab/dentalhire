@@ -224,12 +224,37 @@ CREATE POLICY "Users can update their own clinic details" ON clinics
 CREATE POLICY "Public profiles are viewable by everyone" ON clinics
     FOR SELECT USING (true);
 
+CREATE POLICY "Users can create their own clinic profile" ON clinics
+    FOR INSERT WITH CHECK (user_id IN (SELECT id FROM users WHERE auth_id = auth.uid()));
+
+
 -- Messages policies
 CREATE POLICY "Users can view own conversations" ON conversations
     FOR SELECT USING (auth.uid()::text = ANY(participants::text[]));
 
+CREATE POLICY "Users can create conversations" ON conversations
+    FOR INSERT WITH CHECK (auth.uid()::text = ANY(participants::text[]));
+
+CREATE POLICY "Participants can update conversations" ON conversations
+    FOR UPDATE USING (auth.uid()::text = ANY(participants::text[]));
+
 CREATE POLICY "Users can view own messages" ON messages
     FOR SELECT USING (conversation_id IN (SELECT id FROM conversations WHERE auth.uid()::text = ANY(participants::text[])));
+
+CREATE POLICY "Participants can insert messages" ON messages
+    FOR INSERT WITH CHECK (
+        auth.uid() = sender_id AND
+        conversation_id IN (
+            SELECT id FROM conversations WHERE auth.uid()::text = ANY(participants::text[])
+        )
+    );
+
+CREATE POLICY "Participants can update messages" ON messages
+    FOR UPDATE USING (
+        conversation_id IN (
+            SELECT id FROM conversations WHERE auth.uid()::text = ANY(participants::text[])
+        )
+    );
 
 -- ============================================
 -- FUNCTIONS

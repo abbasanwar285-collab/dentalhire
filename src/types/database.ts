@@ -23,6 +23,7 @@ export interface Database {
                     first_name: string
                     last_name: string
                     phone: string | null
+                    city: string | null
                     avatar: string | null
                     verified: boolean
                     created_at: string
@@ -37,6 +38,7 @@ export interface Database {
                     first_name: string
                     last_name: string
                     phone?: string | null
+                    city?: string | null
                     avatar?: string | null
                     verified?: boolean
                     created_at?: string
@@ -50,6 +52,7 @@ export interface Database {
                     first_name?: string
                     last_name?: string
                     phone?: string | null
+                    city?: string | null
                     avatar?: string | null
                     verified?: boolean
                     updated_at?: string

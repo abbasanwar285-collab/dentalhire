@@ -9,6 +9,7 @@ import { ToastProvider, SmartNotificationToast, GlobalErrorBoundary } from "@/co
 import { BottomNav } from "@/components/layout";
 import PWAInstallPrompt from "@/components/shared/PWAInstallPrompt";
 import PushNotificationManager from "@/components/shared/PushNotificationManager";
+import AnnouncementModal from "@/components/shared/AnnouncementModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
                 <PWAInstallPrompt />
                 <PushNotificationManager />
                 <SmartNotificationToast />
+                <AnnouncementModal />
               </ThemeProvider>
             </div>
             <AIAssistant />

@@ -2,19 +2,30 @@ import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Use service role key for admin access (bypasses RLS)
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-        auth: {
-            autoRefreshToken: false,
-            persistSession: false
-        }
-    }
-);
+// Client initialized lazily inside handler
+
 
 export async function POST(request: NextRequest) {
     try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hbzuewfbqnjddoxukxyp.supabase.co';
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+        if (!serviceRoleKey) {
+            console.error('Missing SUPABASE_SERVICE_ROLE_KEY');
+            return NextResponse.json({ success: false, error: 'Configuration Error' }, { status: 500 });
+        }
+
+        const supabaseAdmin = createClient(
+            supabaseUrl,
+            serviceRoleKey,
+            {
+                auth: {
+                    autoRefreshToken: false,
+                    persistSession: false
+                }
+            }
+        );
+
         // Get the auth token from the request headers
         const authHeader = request.headers.get('authorization');
         if (!authHeader?.startsWith('Bearer ')) {
@@ -62,8 +73,48 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
         }
 
+        // Self-Healing: If user not found via update, try to insert (recover from specific auth trigger failures)
         if (!updatedUser) {
-            return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
+            console.log('User not found via update, attempting self-healing insert for:', authUser.id);
+
+            // We need email for insert
+            const email = authUser.email;
+            if (!email) {
+                return NextResponse.json({ success: false, error: 'User email not found in auth token' }, { status: 400 });
+            }
+
+            const { data: insertedUser, error: insertError } = await supabaseAdmin
+                .from('users')
+                .insert({
+                    auth_id: authUser.id,
+                    email: email,
+                    first_name: firstName || '',
+                    last_name: lastName || '',
+                    role: 'job_seeker', // Default role if recovering
+                    user_type: 'dental_assistant', // Default type
+                    ...updateData
+                })
+                .select('id, first_name, last_name, city, phone, avatar, updated_at')
+                .single();
+
+            if (insertError) {
+                console.error('Self-healing insert error:', insertError);
+                return NextResponse.json({ success: false, error: 'Failed to create profile: ' + insertError.message }, { status: 500 });
+            }
+
+            console.log('Profile self-healed successfully:', insertedUser);
+            return NextResponse.json({
+                success: true,
+                data: {
+                    id: insertedUser.id,
+                    first_name: insertedUser.first_name,
+                    last_name: insertedUser.last_name,
+                    city: insertedUser.city,
+                    phone: insertedUser.phone,
+                    avatar: insertedUser.avatar,
+                    updated_at: insertedUser.updated_at
+                }
+            });
         }
 
         console.log('Profile updated successfully:', updatedUser);

@@ -99,9 +99,7 @@ export default function PersonalInfoStep() {
         if (!personalInfo.phone) {
             updatePersonalInfo({ phone: '+964 ' });
         }
-        if (!personalInfo.nationality) {
-            updatePersonalInfo({ nationality: language === 'ar' ? 'عراقي' : 'Iraqi' });
-        }
+
         // Default City from Profile
         if (!personalInfo.city && user?.profile?.city) {
             updatePersonalInfo({ city: user.profile.city });
@@ -199,20 +197,7 @@ export default function PersonalInfoStep() {
                     </select>
                 </div>
 
-                <Input
-                    label={t('cv.personal.nationality')}
-                    placeholder={t('cv.personal.nationality.placeholder')}
-                    value={personalInfo.nationality || ''}
-                    onChange={(e) => handleChange('nationality', e.target.value)}
-                />
 
-                <Input
-                    label={t('cv.personal.address')}
-                    placeholder={t('cv.personal.address.placeholder')}
-                    value={personalInfo.address || ''}
-                    onChange={(e) => handleChange('address', e.target.value)}
-                    leftIcon={<MapPin size={18} />}
-                />
             </div>
 
             <div>

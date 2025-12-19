@@ -165,7 +165,7 @@ export default function HomePage() {
                 {language === 'ar' ? 'مرحباً بك في مستقبل التوظيف' : 'Welcome to the Future of Hiring'}
               </h1>
               <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-                {language === 'ar' ? 'من صتك الرائدة للربط بين محترفي طب الأسنان والعيادات المرموقة' : 'The premier platform connecting dental professionals with top-tier clinics'}
+                {language === 'ar' ? 'منصتك الرائدة للربط بين محترفي طب الأسنان والعيادات المرموقة' : 'The premier platform connecting dental professionals with top-tier clinics'}
               </p>
             </div>
 

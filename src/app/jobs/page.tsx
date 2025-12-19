@@ -8,6 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useJobStore } from '@/store/useJobStore';
+import { useMessageStore } from '@/store/useMessageStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCVStore } from '@/store/useCVStore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,7 +30,8 @@ import {
     Filter,
     SlidersHorizontal,
     Menu,
-    X
+    X,
+    MessageCircle
 } from 'lucide-react';
 
 // New Components
@@ -45,6 +47,7 @@ import { Suspense } from 'react';
 
 function JobsContent() {
     const { jobs, loadJobs, subscribeToJobs, isLoading, savedJobs, toggleSavedJob, applyToJob, searchJobsSmart } = useJobStore();
+    const { createConversation, setActiveConversation } = useMessageStore();
     const { user } = useAuthStore();
     const { cvId, loadCV } = useCVStore();
     const router = useRouter();
@@ -384,6 +387,43 @@ function JobsContent() {
             alert(language === 'ar' ? 'حدث خطأ غير متوقع' : 'Unexpected error');
         } finally {
             setIsApplying(false);
+        }
+    };
+
+    const handleMessageClinic = async () => {
+        if (!selectedJob) return;
+
+        if (!user) {
+            alert(language === 'ar' ? 'يرجى تسجيل الدخول أولاً' : 'Please login first');
+            return;
+        }
+
+        if (!selectedJob.clinicUserId) {
+            console.error('Clinic User ID missing');
+            return;
+        }
+
+        if (user.id === selectedJob.clinicUserId) {
+            alert(language === 'ar' ? 'لا يمكنك مراسلة نفسك' : 'You cannot message yourself');
+            return;
+        }
+
+        try {
+            const conversationId = await createConversation(
+                [user.id, selectedJob.clinicUserId],
+                {
+                    [user.id]: `${user.profile.firstName} ${user.profile.lastName}`,
+                    [selectedJob.clinicUserId]: selectedJob.clinicName
+                }
+            );
+
+            if (conversationId) {
+                setActiveConversation(conversationId);
+                router.push('/messages');
+            }
+        } catch (error) {
+            console.error('Error creating conversation:', error);
+            alert(language === 'ar' ? 'حدث خطأ أثناء بدء المحادثة' : 'Error starting conversation');
         }
     };
 
@@ -748,6 +788,15 @@ function JobsContent() {
                                             {/* Action Footer */}
                                             <div className="mt-4 pt-6 border-t border-gray-100 dark:border-gray-700 flex gap-4">
                                                 <Button
+                                                    variant="outline"
+                                                    size="lg"
+                                                    className="h-14 px-6 border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                    onClick={handleMessageClinic}
+                                                    title={language === 'ar' ? 'مراسلة العيادة' : 'Message Clinic'}
+                                                >
+                                                    <MessageCircle size={24} />
+                                                </Button>
+                                                <Button
                                                     size="lg"
                                                     className="flex-1 text-lg h-14"
                                                     leftIcon={<BookmarkPlus size={20} />}
@@ -837,6 +886,14 @@ function JobsContent() {
 
                                         {/* Action Buttons */}
                                         <div className="flex gap-3">
+                                            <Button
+                                                variant="outline"
+                                                className="h-14 w-14 p-0 border-blue-200 text-blue-600 hover:bg-blue-50 shrink-0 flex items-center justify-center rounded-xl"
+                                                onClick={handleMessageClinic}
+                                                title={language === 'ar' ? 'مراسلة العيادة' : 'Message Clinic'}
+                                            >
+                                                <MessageCircle size={24} />
+                                            </Button>
                                             <Button
                                                 className="flex-1 py-6 text-lg"
                                                 onClick={handleApply}

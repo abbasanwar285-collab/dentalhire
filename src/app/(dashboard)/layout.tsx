@@ -196,6 +196,10 @@ export default function DashboardLayout({
         return <PageLoader />;
     }
 
+    const handleOnboardingComplete = () => {
+        setShowOnboarding(false);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
             <div className="hidden md:block">

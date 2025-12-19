@@ -24,8 +24,8 @@ export default function HelpPage() {
         contactTitle: isRTL ? 'تواصل معنا' : 'Contact Us',
         guidesTitle: isRTL ? 'أدلة الاستخدام' : 'User Guides',
         backHome: isRTL ? 'العودة للرئيسية' : 'Back to Home',
-        email: 'support@dentalhire.com',
-        phone: '+964 XXX XXX XXXX',
+        email: 'abbasanwar285@gmail.com',
+        phone: '07810988380',
     };
 
     const faqs = [

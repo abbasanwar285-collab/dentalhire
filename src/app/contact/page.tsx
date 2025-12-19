@@ -130,8 +130,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('auth.email')}</h3>
-                                        <p className="text-gray-600 dark:text-gray-300">support@dentalhire.com</p>
-                                        <p className="text-gray-600 dark:text-gray-300">info@dentalhire.com</p>
+                                        <p className="text-gray-600 dark:text-gray-300">abbasanwar285@gmail.com</p>
                                     </div>
                                 </div>
 
@@ -141,7 +140,7 @@ export default function ContactPage() {
                                     </div>
                                     <div>
                                         <h3 className="font-semibold text-gray-900 dark:text-white mb-1">{t('contact.phone')}</h3>
-                                        <p className="text-gray-600 dark:text-gray-300">+1 (555) 123-4567</p>
+                                        <p className="text-gray-600 dark:text-gray-300">07810988380</p>
                                         <p className="text-gray-600 dark:text-gray-300">{language === 'ar' ? 'الإثنين-الجمعة، 9ص-6م' : 'Mon-Fri, 9am-6pm EST'}</p>
                                     </div>
                                 </div>

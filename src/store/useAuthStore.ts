@@ -211,18 +211,34 @@ export const useAuthStore = create<AuthState>()(
                     }
 
                     if (authData.user) {
-                        // Wait briefly for trigger to complete (100ms)
-                        await new Promise(resolve => setTimeout(resolve, 100));
+                        // Polling for profile creation (Trigger latency fix)
+                        // Try 5 times with increasing delays: 500ms, 1000ms, 1500ms, 2000ms, 2500ms
+                        let profileData = null;
+                        const maxRetries = 5;
 
-                        // 1. Fetch the placeholder profile created by the trigger
-                        const { data: profileData, error: profileError } = await supabase
-                            .from('users')
-                            .select('*')
-                            .eq('auth_id', authData.user.id)
-                            .single();
+                        for (let i = 0; i < maxRetries; i++) {
+                            // Wait before check (increasing delay)
+                            const delay = (i + 1) * 500;
+                            await new Promise(resolve => setTimeout(resolve, delay));
 
-                        if (profileError || !profileData) {
-                            console.error('Failed to fetch created profile:', profileError);
+                            console.log(`[Auth] Checking profile attempt ${i + 1}/${maxRetries}`);
+
+                            const { data, error } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('auth_id', authData.user.id)
+                                .single();
+
+                            if (data && !error) {
+                                profileData = data;
+                                break;
+                            }
+                        }
+
+                        if (!profileData) {
+                            console.error('Failed to fetch created profile after retries');
+                            // Fallback: If trigger completely failed, we might need manual insert here
+                            // But for now, returning error is safer than inconsistent state
                             set({ error: 'auth.registration_failed_profile', isLoading: false });
                             return false;
                         }
@@ -378,7 +394,13 @@ export const useAuthStore = create<AuthState>()(
 
                 try {
                     const supabase = getSupabaseClient();
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+                    if (sessionError) {
+                        console.error('Session error:', sessionError);
+                        set({ isLoading: false, isAuthenticated: false, user: null });
+                        return;
+                    }
 
                     if (session?.user) {
                         const { data: userData, error } = await supabase
@@ -387,11 +409,10 @@ export const useAuthStore = create<AuthState>()(
                             .eq('auth_id', session.user.id)
                             .single() as { data: any; error: any };
 
-                        // Handle database error
-                        if (error) {
+                        // Handle database error - BUT DON'T LOGOUT immediately if it's just a fetch error
+                        if (error && error.code !== 'PGRST116') {
                             console.error('Error fetching user data in checkSession:', error);
-                            set({ isLoading: false, isAuthenticated: false, user: null });
-                            return;
+                            // Fallback to basic session user instead of logging out
                         }
 
                         if (userData) {
@@ -417,13 +438,35 @@ export const useAuthStore = create<AuthState>()(
                                 isAuthenticated: true,
                                 isLoading: false,
                             });
-                            return;
                         } else {
-                            // User data not found in database
-                            console.warn('User data not found for session user:', session.user.id);
-                            set({ isLoading: false, isAuthenticated: false, user: null });
-                            return;
+                            // User data not found in database (PGRST116)
+                            // Fallback: Create a temporary user object from Auth metadata
+                            // This prevents "Access Denied" loops if the DB row is missing
+                            console.warn('User data missing in public.users, using fallback for:', session.user.id);
+
+                            const meta = session.user.user_metadata || {};
+                            const user: User = {
+                                id: session.user.id, // Auth ID (Temporary)
+                                email: session.user.email!,
+                                role: (meta.role as UserRole) || 'job_seeker',
+                                userType: (meta.user_type as UserType) || 'dental_assistant',
+                                profile: {
+                                    firstName: meta.first_name || '',
+                                    lastName: meta.last_name || '',
+                                    phone: meta.phone || '',
+                                    verified: false,
+                                },
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            };
+
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                            });
                         }
+                        return;
                     }
 
                     // No session exists

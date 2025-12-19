@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         // 3. Fetch Jobs
         let jobsQuery = supabase
             .from('jobs')
-            .select('*, clinics(name, logo)')
+            .select('*, clinics(name, logo, user_id)')
             .eq('status', 'active');
 
         // ... (Smart Filters logic)

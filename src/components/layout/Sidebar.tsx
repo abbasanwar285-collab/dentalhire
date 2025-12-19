@@ -27,7 +27,8 @@ import {
     Briefcase,
     LogOut,
     HelpCircle,
-    X
+    X,
+    Bell
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -73,7 +74,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
         // e.g. /dentist/dashboard -> dentist
         const segments = pathname.split('/');
-        const validRoles = ['dentist', 'assistant', 'dental_assistant', 'sales', 'sales_rep', 'secretary', 'media', 'technician', 'dental_technician', 'clinic', 'company', 'lab'];
+        const validRoles = ['admin', 'dentist', 'assistant', 'dental_assistant', 'sales', 'sales_rep', 'secretary', 'media', 'technician', 'dental_technician', 'clinic', 'company', 'lab'];
 
         // Check first few segments for role (handling potential locale prefix)
         const foundRole = segments.find(s => validRoles.includes(s));
@@ -103,8 +104,29 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
     // Define links based on user role or context
     const getLinks = (): SidebarLink[] => {
-        // If we are in a specific role context, show links for that role
+        const adminLinks = [
+            { href: '/admin/dashboard', label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
+            { href: '/admin/users', label: t('sidebar.manageusers'), icon: <Users size={20} /> },
+            { href: '/admin/jobs', label: 'إدارة الوظائف', icon: <Briefcase size={20} /> },
+            { href: '/admin/manage-cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
+            { href: '/admin/clinics', label: t('sidebar.manageclinics'), icon: <Building2 size={20} /> },
+            { href: '/admin/announcements', label: 'اشعار المستخدمين', icon: <Bell size={20} /> },
+            { href: '/admin/analytics', label: t('sidebar.analytics'), icon: <BarChart3 size={20} /> },
+            { href: '/admin/moderation', label: t('sidebar.moderation'), icon: <Shield size={20} /> },
+            { href: '/admin/settings', label: t('sidebar.settings'), icon: <Settings size={20} /> },
+        ];
 
+        // Failsafe: Check pathname directly for admin
+        if (pathname?.includes('/admin')) {
+            return adminLinks;
+        }
+
+        // If explicitly in admin context, return admin links
+        if (currentContext === 'admin') {
+            return adminLinks;
+        }
+
+        // If we are in a specific role context, show links for that role
         if (currentContext) {
             const isEmployer = ['clinic', 'company', 'lab'].includes(currentContext as string);
 
@@ -187,8 +209,9 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             admin: [
                 { href: '/admin/dashboard', label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
                 { href: '/admin/users', label: t('sidebar.manageusers'), icon: <Users size={20} /> },
-                { href: '/admin/cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
+                { href: '/admin/manage-cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
                 { href: '/admin/clinics', label: t('sidebar.manageclinics'), icon: <Building2 size={20} /> },
+                { href: '/admin/announcements', label: 'اشعار المستخدمين', icon: <Bell size={20} /> },
                 { href: '/admin/analytics', label: t('sidebar.analytics'), icon: <BarChart3 size={20} /> },
                 { href: '/admin/moderation', label: t('sidebar.moderation'), icon: <Shield size={20} /> },
                 { href: '/admin/settings', label: t('sidebar.settings'), icon: <Settings size={20} /> },
@@ -349,7 +372,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     </nav>
 
                     {/* Bottom Section */}
-                    <div className="border-t border-gray-200 dark:border-gray-800 p-3">
+                    <div className="border-t border-gray-200 dark:border-gray-800 p-3 pb-24 md:pb-3">
                         <Link
                             href="/help"
                             className={cn(

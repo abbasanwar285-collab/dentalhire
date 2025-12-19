@@ -1,5 +1,5 @@
 {
-  "name": "dental-hire",
+  "name": "hire-me",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -29,6 +29,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106",
     "react-hook-form": "^7.68.0",
     "react-leaflet": "^5.0.0",
+    "resend": "^6.6.0",
     "tailwind-merge": "^3.4.0",
     "uuid": "^13.0.0",
     "web-push": "^3.6.7",

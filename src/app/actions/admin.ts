@@ -103,9 +103,18 @@ export async function sendAnnouncement({ title, content, targetRole, sendEmail }
         );
 
         // Execute in parallel (might hit rate limits if many users)
-        await Promise.allSettled(emailPromises);
+        const results = await Promise.allSettled(emailPromises);
 
-        return { success: true, count: users.length };
+        // Log results for debugging
+        const rejected = results.filter(r => r.status === 'rejected');
+        if (rejected.length > 0) {
+            console.error('Failed to send some emails:', rejected);
+        }
+
+        const fulfilled = results.filter(r => r.status === 'fulfilled');
+        console.log(`Email sending results: ${fulfilled.length} sent, ${rejected.length} failed out of ${users.length} targets.`);
+
+        return { success: true, count: users.length, sent: fulfilled.length, failed: rejected.length };
     }
 
     return { success: true, count: 0 };

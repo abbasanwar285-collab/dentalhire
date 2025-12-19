@@ -16,7 +16,7 @@ export default function AnnouncementModal() {
     useEffect(() => {
         const checkAnnouncements = async () => {
             // Only for job seekers currently, as per requirement
-            if (!user || user.role !== 'job_seeker') return;
+            if (!user) return;
 
             const supabase = getSupabaseClient();
 
@@ -25,7 +25,7 @@ export default function AnnouncementModal() {
                 .from('announcements')
                 .select('id, title, content')
                 .eq('is_active', true)
-                .eq('target_role', 'job_seeker')
+                .or(`target_role.eq.${user.role},target_role.eq.all`)
                 .order('created_at', { ascending: false })
                 .limit(1);
 

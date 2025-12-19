@@ -39,7 +39,7 @@ export async function sendAnnouncement({ title, content, targetRole, sendEmail }
     // Let's stick to the requested: Job Seekers OR Employers.
     // If targetRole is 'clinic', it maps to 'clinic' in DB.
 
-    const dbTargetRole = targetRole === 'all' ? 'job_seeker' : targetRole; // Fallbck/Logic
+    const dbTargetRole = targetRole;
 
     const { error: dbError } = await supabase
         .from('announcements')

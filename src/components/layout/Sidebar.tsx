@@ -439,9 +439,17 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                         onClick={async () => {
                                             setIsDeleting(true);
                                             try {
+                                                // Get the current session token
+                                                const { getSupabaseClient } = await import('@/lib/supabase');
+                                                const supabase = getSupabaseClient();
+                                                const { data: { session } } = await supabase.auth.getSession();
+
                                                 const response = await fetch('/api/account/delete', {
                                                     method: 'DELETE',
-                                                    headers: { 'Content-Type': 'application/json' }
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'Authorization': `Bearer ${session?.access_token || ''}`
+                                                    }
                                                 });
                                                 const result = await response.json();
                                                 if (result.success) {

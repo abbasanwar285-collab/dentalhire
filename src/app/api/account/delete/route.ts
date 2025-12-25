@@ -25,35 +25,52 @@ export async function DELETE(request: NextRequest) {
             }
         );
 
-        // Use createServerClient to properly get the user session from cookies
-        const cookieStore = await cookies();
-        const supabase = createServerClient(
-            supabaseUrl,
-            supabaseAnonKey,
-            {
-                cookies: {
-                    getAll() {
-                        return cookieStore.getAll();
-                    },
-                    setAll(cookiesToSet) {
-                        try {
-                            cookiesToSet.forEach(({ name, value, options }) =>
-                                cookieStore.set(name, value, options)
-                            );
-                        } catch {
-                            // Ignore errors from Server Components
-                        }
-                    },
-                },
-            }
-        );
+        // First try to get user from Authorization header (sent from client)
+        const authHeader = request.headers.get('authorization');
+        let authUser = null;
+        let authError = null;
 
-        // Get the authenticated user from the session
-        const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.replace('Bearer ', '');
+            if (token) {
+                const result = await supabaseAdmin.auth.getUser(token);
+                authUser = result.data.user;
+                authError = result.error;
+            }
+        }
+
+        // If no user from header, try to get from cookies using createServerClient
+        if (!authUser) {
+            const cookieStore = await cookies();
+            const supabase = createServerClient(
+                supabaseUrl,
+                supabaseAnonKey,
+                {
+                    cookies: {
+                        getAll() {
+                            return cookieStore.getAll();
+                        },
+                        setAll(cookiesToSet) {
+                            try {
+                                cookiesToSet.forEach(({ name, value, options }) =>
+                                    cookieStore.set(name, value, options)
+                                );
+                            } catch {
+                                // Ignore errors from Server Components
+                            }
+                        },
+                    },
+                }
+            );
+
+            const result = await supabase.auth.getUser();
+            authUser = result.data.user;
+            authError = result.error;
+        }
 
         if (authError || !authUser) {
             console.error('Auth error:', authError);
-            return NextResponse.json({ success: false, error: 'Invalid token' }, { status: 401 });
+            return NextResponse.json({ success: false, error: 'Unauthorized - no token' }, { status: 401 });
         }
 
         const authUserId = authUser.id;

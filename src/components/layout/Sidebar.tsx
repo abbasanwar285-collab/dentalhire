@@ -439,16 +439,37 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                         onClick={async () => {
                                             setIsDeleting(true);
                                             try {
-                                                // Get the current session token
+                                                // Get the current session token - refresh first to ensure valid token
                                                 const { getSupabaseClient } = await import('@/lib/supabase');
                                                 const supabase = getSupabaseClient();
-                                                const { data: { session } } = await supabase.auth.getSession();
+
+                                                // First refresh the session to ensure we have a valid token
+                                                const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                                                let accessToken = refreshData?.session?.access_token;
+
+                                                // If refresh failed, try to get existing session
+                                                if (!accessToken) {
+                                                    const { data: { session } } = await supabase.auth.getSession();
+                                                    accessToken = session?.access_token;
+                                                }
+
+                                                // If still no token, show error
+                                                if (!accessToken) {
+                                                    alert(language === 'ar'
+                                                        ? 'انتهت جلسة الدخول. يرجى تسجيل الدخول مرة أخرى ثم المحاولة مجددًا.'
+                                                        : 'Session expired. Please log in again and try.');
+                                                    setIsDeleting(false);
+                                                    setShowDeleteConfirm(false);
+                                                    logout();
+                                                    return;
+                                                }
 
                                                 const response = await fetch('/api/account/delete', {
                                                     method: 'DELETE',
                                                     headers: {
                                                         'Content-Type': 'application/json',
-                                                        'Authorization': `Bearer ${session?.access_token || ''}`
+                                                        'Authorization': `Bearer ${accessToken}`
                                                     }
                                                 });
                                                 const result = await response.json();
@@ -460,7 +481,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                                                 }
                                             } catch (error) {
                                                 console.error('Delete error:', error);
-                                                alert('Error deleting account');
+                                                alert(language === 'ar' ? 'حدث خطأ أثناء حذف الحساب' : 'Error deleting account');
                                             } finally {
                                                 setIsDeleting(false);
                                                 setShowDeleteConfirm(false);

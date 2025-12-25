@@ -47,7 +47,7 @@ export default function JobSeekerDashboard() {
                 const { count: appCount, data: apps } = await supabase
                     .from('job_applications')
                     .select('*, job:jobs(title, location)', { count: 'exact' }) // Simplified select, ensuring job relation works
-                    .eq('applicant_id', user.id)
+                    .eq('user_id', user.id)
                     .order('created_at', { ascending: false })
                     .limit(3);
 
@@ -55,7 +55,7 @@ export default function JobSeekerDashboard() {
                 const { count: interviewCount } = await supabase
                     .from('job_applications')
                     .select('*', { count: 'exact' })
-                    .eq('applicant_id', user.id)
+                    .eq('user_id', user.id)
                     .eq('status', 'interview');
 
                 setStats({

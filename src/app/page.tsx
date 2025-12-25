@@ -147,9 +147,9 @@ export default function HomePage() {
       </div>
 
       {/* Brand Header */}
-      <div className="absolute top-8 left-0 right-0 text-center z-10">
-        <div className="inline-flex items-center gap-3 mb-2">
-          <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+      <div className="absolute top-4 md:top-8 left-0 right-0 text-center z-10">
+        <div className="inline-flex items-center gap-3 mb-2 px-4 py-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm">
+          <span className="text-2xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 tracking-tight">
             Hire Me
           </span>
         </div>
@@ -157,14 +157,14 @@ export default function HomePage() {
 
       <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
-      <div className="w-full max-w-4xl relative z-10">
+      <div className="w-full max-w-4xl relative z-10 pt-20 md:pt-0">
         {step === 'initial' ? (
           <div className="space-y-12 animate-fade-in">
             <div className="text-center space-y-4">
-              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight px-4">
                 {language === 'ar' ? 'مرحباً بك في مستقبل التوظيف' : 'Welcome to the Future of Hiring'}
               </h1>
-              <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
+              <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto px-6">
                 {language === 'ar' ? 'منصتك الرائدة للربط بين محترفي طب الأسنان والعيادات المرموقة' : 'The premier platform connecting dental professionals with top-tier clinics'}
               </p>
             </div>

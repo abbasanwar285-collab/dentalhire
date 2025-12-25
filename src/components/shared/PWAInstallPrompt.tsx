@@ -66,62 +66,69 @@ export default function PWAInstallPrompt() {
     const isRTL = language === 'ar';
 
     return (
-        <div className="fixed inset-x-0 bottom-0 z-[100] p-4 animate-in slide-in-from-bottom duration-500">
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 border border-gray-100 dark:border-gray-700 max-w-md mx-auto relative overflow-hidden">
+        <div className="fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0)] z-[110] p-3 md:p-4 animate-in slide-in-from-bottom duration-500">
+            <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 border border-gray-100 dark:border-gray-700 max-w-lg mx-auto relative overflow-hidden">
                 {/* Decorative Background */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-teal-500" />
 
                 <button
                     onClick={handleDismiss}
-                    className={`absolute top-4 ${isRTL ? 'left-4' : 'right-4'} text-gray-400 hover:text-gray-600 transition-colors`}
+                    className={`absolute top-3 ${isRTL ? 'left-3' : 'right-3'} text-gray-400 hover:text-gray-600 transition-colors z-10`}
+                    aria-label={language === 'ar' ? 'إغلاق' : 'Dismiss'}
                 >
-                    <X size={20} />
+                    <X size={18} />
                 </button>
 
-                <div className="flex flex-col gap-4">
-                    <div className="flex items-start gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-blue-600 to-teal-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shrink-0">
-                            DH
-                        </div>
-                        <div className="flex-1 pt-1">
-                            <h3 className="font-bold text-lg text-gray-900 dark:text-white">
-                                {language === 'ar' ? 'قم بتثبيت التطبيق' : 'Install App'}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 leading-relaxed">
-                                {language === 'ar'
-                                    ? 'للحصول على أفضل تجربة، أضف تطبيق DentalHire إلى شاشتك الرئيسية.'
-                                    : 'For the best experience, add DentalHire to your home screen.'}
-                            </p>
-                        </div>
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-teal-600 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md shrink-0">
+                        DH
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-sm md:text-base text-gray-900 dark:text-white truncate">
+                            {language === 'ar' ? 'ثبت تطبيق DentalHire' : 'Install DentalHire App'}
+                        </h3>
+                        <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 mt-0.5 line-clamp-1">
+                            {language === 'ar'
+                                ? 'للحصول على أفضل تجربة وسرعة في الوصول.'
+                                : 'For the best experience and faster access.'}
+                        </p>
                     </div>
 
-                    {isIOS ? (
-                        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 text-sm text-gray-600 dark:text-gray-300 space-y-3">
-                            <div className="flex items-center gap-3">
-                                <span className="flex items-center justify-center w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full text-xs font-bold">1</span>
-                                <span>
-                                    {language === 'ar' ? 'اضغط على زر المشاركة' : 'Tap the Share button'}
-                                    <Share className="inline-block w-4 h-4 mx-1 text-blue-500" />
-                                </span>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <span className="flex items-center justify-center w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded-full text-xs font-bold">2</span>
-                                <span>
-                                    {language === 'ar' ? 'اختر "إضافة إلى الصفحة الرئيسية"' : 'Select "Add to Home Screen"'}
-                                    <PlusSquare className="inline-block w-4 h-4 mx-1 text-blue-500" />
-                                </span>
-                            </div>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={handleInstallClick}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center justify-center gap-2"
-                        >
-                            <Download size={20} />
-                            {language === 'ar' ? 'تثبيت التطبيق الآن' : 'Install App Now'}
-                        </button>
-                    )}
+                    <div className="shrink-0 flex items-center ms-2">
+                        {isIOS ? (
+                            <button
+                                onClick={() => {/* iOS doesn't have programmatic prompt, maybe show tooltip? */ }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-200 text-xs font-semibold"
+                            >
+                                <Share size={14} className="text-blue-500" />
+                                {language === 'ar' ? 'كيفية التثبيت' : 'How to install'}
+                            </button>
+                        ) : (
+                            <button
+                                onClick={handleInstallClick}
+                                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded-lg text-xs shadow-md shadow-blue-500/10 active:scale-95 transition-all flex items-center gap-1.5"
+                            >
+                                <Download size={14} />
+                                {language === 'ar' ? 'تثبيت' : 'Install'}
+                            </button>
+                        )}
+                    </div>
                 </div>
+
+                {isIOS && (
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50 flex gap-4 text-[10px] text-gray-500 dark:text-gray-400">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold">1</span>
+                            <span>{language === 'ar' ? 'اضغط مشاركة' : 'Tap Share'}</span>
+                            <Share size={12} className="text-blue-500" />
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-4 h-4 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center font-bold">2</span>
+                            <span>{language === 'ar' ? 'إضافة للشاشة' : 'Add to Home'}</span>
+                            <PlusSquare size={12} className="text-blue-500" />
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

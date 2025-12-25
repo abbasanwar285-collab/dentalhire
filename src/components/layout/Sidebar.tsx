@@ -28,7 +28,8 @@ import {
     LogOut,
     HelpCircle,
     X,
-    Bell
+    Bell,
+    Trash2
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -48,6 +49,8 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     const { user, logout } = useAuthStore();
     const { t, language } = useLanguage();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Close sidebar on route change (mobile)
     useEffect(() => {
@@ -393,7 +396,79 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                             <LogOut size={20} />
                             {!isCollapsed && <span>{t('sidebar.signout')}</span>}
                         </button>
+
+                        {/* Delete Account Button */}
+                        <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className={cn(
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-700 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors w-full mt-1 border border-red-200 dark:border-red-800',
+                                isCollapsed && 'justify-center px-2'
+                            )}
+                        >
+                            <Trash2 size={20} />
+                            {!isCollapsed && <span>{language === 'ar' ? 'حذف الحساب' : 'Delete Account'}</span>}
+                        </button>
                     </div>
+
+                    {/* Delete Account Confirmation Modal */}
+                    {showDeleteConfirm && (
+                        <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                                <div className="text-center mb-6">
+                                    <div className="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                                        <Trash2 size={32} className="text-red-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                        {language === 'ar' ? 'تأكيد حذف الحساب' : 'Confirm Account Deletion'}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-300">
+                                        {language === 'ar'
+                                            ? 'هل أنت متأكد من حذف حسابك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع بياناتك.'
+                                            : 'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be deleted.'}
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        disabled={isDeleting}
+                                        className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+                                    >
+                                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            setIsDeleting(true);
+                                            try {
+                                                const response = await fetch('/api/account/delete', {
+                                                    method: 'DELETE',
+                                                    headers: { 'Content-Type': 'application/json' }
+                                                });
+                                                const result = await response.json();
+                                                if (result.success) {
+                                                    logout();
+                                                    window.location.href = '/';
+                                                } else {
+                                                    alert(result.error || 'Failed to delete account');
+                                                }
+                                            } catch (error) {
+                                                console.error('Delete error:', error);
+                                                alert('Error deleting account');
+                                            } finally {
+                                                setIsDeleting(false);
+                                                setShowDeleteConfirm(false);
+                                            }
+                                        }}
+                                        disabled={isDeleting}
+                                        className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+                                    >
+                                        {isDeleting
+                                            ? (language === 'ar' ? 'جاري الحذف...' : 'Deleting...')
+                                            : (language === 'ar' ? 'حذف نهائياً' : 'Delete Forever')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </aside>
         </>

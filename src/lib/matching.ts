@@ -47,37 +47,42 @@ function calculateLocationScore(cv: CV, clinic: Clinic): number {
     const maxScore = 20;
     const defaultRadius = 50; // km
 
+    // Safe access to nested properties
+    const cvLocation = cv?.location || {};
+    const clinicLocation = clinic?.location || {};
+    const clinicPreferences = clinic?.preferences || {};
+
     // Check if both have coordinates
-    if (cv.location.coordinates && clinic.location.coordinates) {
-        const distance = calculateDistance(cv.location.coordinates, clinic.location.coordinates);
-        const radius = clinic.preferences.radius || defaultRadius;
+    if (cvLocation.coordinates && clinicLocation.coordinates) {
+        const distance = calculateDistance(cvLocation.coordinates, clinicLocation.coordinates);
+        const radius = clinicPreferences.radius || defaultRadius;
 
         if (distance <= radius) {
-            // Linear decay: closer = higher score
             return maxScore * (1 - distance / radius);
         }
         return 0;
     }
 
     // Fallback to city matching
-    const cvCity = cv.location.preferred[0]?.toLowerCase() || cv.personalInfo.city?.toLowerCase();
-    const clinicCity = clinic.location.city?.toLowerCase();
+    const cvPreferred = cvLocation.preferred || [];
+    const cvCity = cvPreferred[0]?.toLowerCase() || cv?.personalInfo?.city?.toLowerCase();
+    const clinicCity = clinicLocation.city?.toLowerCase();
 
     if (cvCity && clinicCity && cvCity === clinicCity) {
         return maxScore;
     }
 
     // Partial match if CV lists the clinic's city in preferences
-    if (cv.location.preferred.some(loc => loc.toLowerCase() === clinicCity)) {
+    if (cvPreferred.some((loc: string) => loc?.toLowerCase() === clinicCity)) {
         return maxScore * 0.8;
     }
 
     // Willing to relocate gives partial score
-    if (cv.location.willingToRelocate) {
+    if (cvLocation.willingToRelocate) {
         return maxScore * 0.5;
     }
 
-    return 0;
+    return maxScore * 0.3; // Neutral score if no location data
 }
 
 /**
@@ -85,8 +90,12 @@ function calculateLocationScore(cv: CV, clinic: Clinic): number {
  */
 function calculateSalaryScore(cv: CV, clinic: Clinic): number {
     const maxScore = 25;
-    const { min, max } = clinic.preferences.salaryRange;
-    const expected = cv.salary.expected;
+    const clinicPreferences = clinic?.preferences || {};
+    const salaryRange = clinicPreferences.salaryRange || {};
+    const min = salaryRange.min || 0;
+    const max = salaryRange.max || 0;
+    const cvSalary = cv?.salary || {};
+    const expected = cvSalary.expected || 0;
 
     if (!expected || !min || !max) {
         return maxScore * 0.5; // Neutral if data missing
@@ -110,7 +119,7 @@ function calculateSalaryScore(cv: CV, clinic: Clinic): number {
         const percentAbove = difference / max;
 
         // Negotiable gives some leeway
-        if (cv.salary.negotiable) {
+        if (cvSalary.negotiable) {
             if (percentAbove <= 0.1) return maxScore * 0.8;
             if (percentAbove <= 0.2) return maxScore * 0.6;
             return maxScore * 0.3;
@@ -129,11 +138,14 @@ function calculateSalaryScore(cv: CV, clinic: Clinic): number {
  */
 function calculateExperienceScore(cv: CV, clinic: Clinic): number {
     const maxScore = 20;
-    const experienceYears = calculateExperienceYears(cv.experience);
-    const { min, max } = clinic.preferences.experienceYears;
+    const experienceYears = calculateExperienceYears(cv?.experience || []);
+    const clinicPreferences = clinic?.preferences || {};
+    const experienceRange = clinicPreferences.experienceYears || {};
+    const min = experienceRange.min || 0;
+    const max = experienceRange.max || 100;
 
     // Perfect match if within range
-    if (experienceYears >= min && experienceYears <= (max || 100)) {
+    if (experienceYears >= min && experienceYears <= max) {
         return maxScore;
     }
 
@@ -154,23 +166,25 @@ function calculateExperienceScore(cv: CV, clinic: Clinic): number {
  */
 function calculateSkillsScore(cv: CV, clinic: Clinic): number {
     const maxScore = 25;
-    const requiredSkills = clinic.preferences.requiredSkills;
+    const clinicPreferences = clinic?.preferences || {};
+    const requiredSkills = clinicPreferences.requiredSkills || [];
+    const cvSkills = cv?.skills || [];
 
     if (!requiredSkills || requiredSkills.length === 0) {
         return maxScore * 0.75; // Neutral if no requirements
     }
 
-    const cvSkillsLower = cv.skills.map(s => s.toLowerCase());
-    const matchedSkills = requiredSkills.filter(skill =>
-        cvSkillsLower.some(cvSkill =>
-            cvSkill.includes(skill.toLowerCase()) || skill.toLowerCase().includes(cvSkill)
+    const cvSkillsLower = cvSkills.map((s: string) => s?.toLowerCase() || '');
+    const matchedSkills = requiredSkills.filter((skill: string) =>
+        cvSkillsLower.some((cvSkill: string) =>
+            cvSkill.includes(skill?.toLowerCase() || '') || (skill?.toLowerCase() || '').includes(cvSkill)
         )
     );
 
     const matchPercentage = matchedSkills.length / requiredSkills.length;
 
     // Bonus for having more skills than required
-    const extraSkillsBonus = cv.skills.length > requiredSkills.length ? 0.05 : 0;
+    const extraSkillsBonus = cvSkills.length > requiredSkills.length ? 0.05 : 0;
 
     return maxScore * Math.min(1, matchPercentage + extraSkillsBonus);
 }
@@ -180,21 +194,24 @@ function calculateSkillsScore(cv: CV, clinic: Clinic): number {
  */
 function calculateAvailabilityScore(cv: CV, clinic: Clinic): number {
     const maxScore = 10;
-    const preferredTypes = clinic.preferences.employmentType;
+    const clinicPreferences = clinic?.preferences || {};
+    const preferredTypes = clinicPreferences.employmentType || [];
+    const cvAvailability = cv?.availability || {};
+    const cvType = cvAvailability.type || 'full_time';
 
     if (!preferredTypes || preferredTypes.length === 0) {
         return maxScore; // No preference means any type is fine
     }
 
     // Check if CV's availability type matches any preferred type
-    if (preferredTypes.includes(cv.availability.type)) {
+    if (preferredTypes.includes(cvType)) {
         return maxScore;
     }
 
     // Partial match for flexible types
     const isFlexible =
-        (cv.availability.type === 'full_time' && preferredTypes.includes('part_time')) ||
-        (cv.availability.type === 'part_time' && preferredTypes.includes('full_time'));
+        (cvType === 'full_time' && preferredTypes.includes('part_time')) ||
+        (cvType === 'part_time' && preferredTypes.includes('full_time'));
 
     if (isFlexible) {
         return maxScore * 0.6;

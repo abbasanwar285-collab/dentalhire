@@ -101,72 +101,146 @@ export default function AdminCVsPage() {
                 </div>
             </Card>
 
-            <Card>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
-                                <th className="p-4 font-medium">Name</th>
-                                <th className="p-4 font-medium">Email</th>
-                                <th className="p-4 font-medium">Phone</th>
-                                <th className="p-4 font-medium">Location</th>
-                                <th className="p-4 font-medium">Status</th>
-                                <th className="p-4 font-medium">Documents</th>
-                                <th className="p-4 font-medium">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan={7} className="text-center py-8">Loading CVs...</td></tr>
-                            ) : filteredCVs.length === 0 ? (
-                                <tr><td colSpan={7} className="text-center py-8">No CVs found.</td></tr>
-                            ) : (
-                                filteredCVs.map((cv) => (
-                                    <tr key={cv.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                        <td className="p-4 font-medium text-gray-900 dark:text-white">
-                                            {getDisplayName(cv)}
-                                        </td>
-                                        <td className="p-4 text-gray-500">{getDisplayEmail(cv)}</td>
-                                        <td className="p-4 text-gray-500 font-mono text-sm">
-                                            {cv.users?.phone || '-'}
-                                        </td>
-                                        <td className="p-4 text-gray-500">{cv.city}</td>
-                                        <td className="p-4 capitalize">{cv.status}</td>
-                                        <td className="p-4">
-                                            {cv.documents && cv.documents.length > 0 ? (
-                                                <Button
-                                                    variant="primary"
-                                                    size="sm"
-                                                    onClick={() => openDocuments(cv)}
-                                                    leftIcon={<FileText size={16} />}
-                                                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                                                >
-                                                    View ({cv.documents.length})
+            {/* Desktop Table View */}
+            <div className="hidden md:block">
+                <Card>
+                    <div className="overflow-x-auto">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                                    <th className="p-4 font-medium">Name</th>
+                                    <th className="p-4 font-medium">Email</th>
+                                    <th className="p-4 font-medium">Phone</th>
+                                    <th className="p-4 font-medium">Location</th>
+                                    <th className="p-4 font-medium">Status</th>
+                                    <th className="p-4 font-medium">Documents</th>
+                                    <th className="p-4 font-medium">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {loading ? (
+                                    <tr><td colSpan={7} className="text-center py-8">Loading CVs...</td></tr>
+                                ) : filteredCVs.length === 0 ? (
+                                    <tr><td colSpan={7} className="text-center py-8">No CVs found.</td></tr>
+                                ) : (
+                                    filteredCVs.map((cv) => (
+                                        <tr key={cv.id} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                            <td className="p-4 font-medium text-gray-900 dark:text-white">
+                                                {getDisplayName(cv)}
+                                            </td>
+                                            <td className="p-4 text-gray-500">{getDisplayEmail(cv)}</td>
+                                            <td className="p-4 text-gray-500 font-mono text-sm">
+                                                {cv.users?.phone || '-'}
+                                            </td>
+                                            <td className="p-4 text-gray-500">{cv.city}</td>
+                                            <td className="p-4 capitalize">{cv.status}</td>
+                                            <td className="p-4">
+                                                {cv.documents && cv.documents.length > 0 ? (
+                                                    <Button
+                                                        variant="primary"
+                                                        size="sm"
+                                                        onClick={() => openDocuments(cv)}
+                                                        leftIcon={<FileText size={16} />}
+                                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                    >
+                                                        View ({cv.documents.length})
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        disabled
+                                                        className="opacity-50 cursor-not-allowed"
+                                                        leftIcon={<FileText size={16} />}
+                                                    >
+                                                        No Docs
+                                                    </Button>
+                                                )}
+                                            </td>
+                                            <td className="p-4">
+                                                <Button variant="ghost" size="sm" title="View Details" onClick={() => { }} aria-label="View Details">
+                                                    <Eye size={16} />
                                                 </Button>
-                                            ) : (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    disabled
-                                                    className="opacity-50 cursor-not-allowed"
-                                                    leftIcon={<FileText size={16} />}
-                                                >
-                                                    No Docs
-                                                </Button>
-                                            )}
-                                        </td>
-                                        <td className="p-4">
-                                            <Button variant="ghost" size="sm" title="View Details" onClick={() => { }} aria-label="View Details">
-                                                <Eye size={16} />
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </Card>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </Card>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+                {loading ? (
+                    <Card><div className="p-8 text-center text-gray-500">Loading CVs...</div></Card>
+                ) : filteredCVs.length === 0 ? (
+                    <Card><div className="p-8 text-center text-gray-500">No CVs found.</div></Card>
+                ) : (
+                    filteredCVs.map((cv) => (
+                        <Card key={cv.id}>
+                            <div className="p-4 space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 dark:text-white">{getDisplayName(cv)}</h3>
+                                        <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
+                                            <span>{cv.city}</span>
+                                        </div>
+                                    </div>
+                                    <span className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-blue-50 text-blue-700 capitalize border border-blue-100">
+                                        {cv.status}
+                                    </span>
+                                </div>
+
+                                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg">
+                                    <div className="flex items-center gap-2 break-all">
+                                        <span className="font-medium min-w-[50px]">Email:</span>
+                                        {getDisplayEmail(cv)}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="font-medium min-w-[50px]">Phone:</span>
+                                        <span className="font-mono">{cv.users?.phone || '-'}</span>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
+                                    {cv.documents && cv.documents.length > 0 ? (
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={() => openDocuments(cv)}
+                                            leftIcon={<FileText size={16} />}
+                                            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white justify-center"
+                                        >
+                                            Documents ({cv.documents.length})
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            disabled
+                                            className="flex-1 opacity-50 cursor-not-allowed justify-center bg-gray-100 dark:bg-gray-800"
+                                            leftIcon={<FileText size={16} />}
+                                        >
+                                            No Docs
+                                        </Button>
+                                    )}
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => { }}
+                                        className="px-3"
+                                        aria-label="View Details"
+                                    >
+                                        <Eye size={16} />
+                                    </Button>
+                                </div>
+                            </div>
+                        </Card>
+                    ))
+                )}
+            </div>
 
             {/* Document Modal */}
             {showDocsModal && selectedCV && (

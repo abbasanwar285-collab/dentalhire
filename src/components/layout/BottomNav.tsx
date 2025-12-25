@@ -109,24 +109,32 @@ export default function BottomNav() {
                 !isVisible ? 'translate-y-full' : 'translate-y-0'
             )}
         >
-            <div className="grid grid-cols-4 h-16 items-center">
+            <div className="grid grid-cols-4 h-18 py-1 items-center">
                 {navItems.map((item) => (
                     <Link
                         key={item.href}
                         href={item.href}
                         className={cn(
-                            'flex flex-col items-center justify-center gap-1 h-full w-full app-touch transition-all duration-200 active:scale-95',
+                            'flex flex-col items-center justify-center gap-1.5 h-full w-full app-touch transition-all duration-200 active:scale-90',
                             item.isActive
                                 ? 'text-blue-600 dark:text-blue-500'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                                : 'text-gray-400 dark:text-gray-500 hover:text-gray-900 dark:hover:text-gray-200'
                         )}
                     >
-                        <item.icon
-                            size={24}
-                            strokeWidth={item.isActive ? 2.5 : 2}
-                            className={cn('transition-transform duration-200', item.isActive && 'scale-110')}
-                        />
-                        <span className="text-[10px] font-medium truncate w-full text-center px-1 font-cairo">
+                        <div className={cn(
+                            "p-2 rounded-xl transition-all duration-300",
+                            item.isActive && "bg-blue-50 dark:bg-blue-900/30 ring-1 ring-blue-100 dark:ring-blue-800"
+                        )}>
+                            <item.icon
+                                size={22}
+                                strokeWidth={item.isActive ? 2.5 : 2}
+                                className={cn('transition-all duration-300', item.isActive && 'scale-110')}
+                            />
+                        </div>
+                        <span className={cn(
+                            "text-[10px] md:text-[11px] font-bold truncate w-full text-center px-1 font-cairo transition-all duration-300",
+                            item.isActive ? "translate-y-0 opacity-100" : "translate-y-0.5 opacity-80"
+                        )}>
                             {item.label}
                         </span>
                     </Link>

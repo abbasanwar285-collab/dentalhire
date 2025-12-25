@@ -141,29 +141,41 @@ export default function ClinicSettingsPage() {
 
         try {
             const supabase = getSupabaseClient();
+            const { data: { session } } = await supabase.auth.getSession();
 
-            // 1. Update User Profile
+            if (!session?.access_token) {
+                throw new Error('No active session');
+            }
+
+            // 1. Update User Profile via API
             await updateProfile({
                 firstName,
                 lastName,
-                phone // Sync phone to user profile as well
+                phone
             });
 
-            // 2. Update Clinic Details
-            const { error } = await supabase
-                .from('clinics')
-                .update({
+            // 2. Update Clinic Details via API (bypasses RLS)
+            const response = await fetch('/api/clinic/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
                     name: clinicName,
                     description: description,
                     website: website,
                     city: city,
                     address: address,
-                    phone: phone,
-                    updated_at: new Date().toISOString()
+                    phone: phone
                 })
-                .eq('user_id', user.id);
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to update clinic');
+            }
 
             if (isAutoSave) {
                 setSaveStatus('saved');

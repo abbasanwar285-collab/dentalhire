@@ -22,7 +22,7 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { CV } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ReviewModal from '@/components/reviews/ReviewModal';
 import RatingDisplay from '@/components/reviews/RatingDisplay';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -36,8 +36,8 @@ export default function ClinicDashboard() {
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState<{ id: string, name: string } | null>(null);
 
-    // Translations
-    const t = {
+    // Translations (memoized to prevent re-renders)
+    const t = useMemo(() => ({
         welcomeBack: language === 'ar' ? 'مرحباً بعودتك،' : 'Welcome back,',
         findPerfect: language === 'ar' ? 'ابحث عن أفضل المتخصصين في طب الأسنان لعيادتك' : 'Find the perfect dental professionals for your clinic',
         findCandidates: language === 'ar' ? 'البحث عن مرشحين' : 'Find Candidates',
@@ -64,7 +64,7 @@ export default function ClinicDashboard() {
         completeProfile: language === 'ar' ? 'أكمل ملف عيادتك لجذب المزيد من المرشحين المؤهلين. العيادات التي لديها ملفات مفصلة تحصل على 3 أضعاف الطلبات.' : 'Complete your clinic profile to attract more qualified candidates. Clinics with detailed profiles get 3x more applications.',
         completeProfileBtn: language === 'ar' ? '← أكمل الملف' : 'Complete Profile →',
         employee: language === 'ar' ? 'موظف' : 'Employee',
-    };
+    }), [language]);
 
     const handleRate = (cv: CV) => {
         setSelectedCandidate({ id: cv.id, name: cv.personalInfo.fullName });
@@ -102,135 +102,70 @@ export default function ClinicDashboard() {
             const supabase = getSupabaseClient();
             if (!user) return;
 
+            // DEBUG: Log user object to verify correct ID is being used
+            console.log('[ClinicDashboard] DEBUG - User object:', {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                userType: user.userType
+            });
+
             try {
                 setLoading(true);
 
-                // 1. Fetch Stats
+                // 1. Fetch Data (Parallel)
+                const [
+                    { count: candidatesCount, error: candidatesError },
+                    { data: clinicData, error: clinicError },
+                    messagesRes
+                ] = await Promise.all([
+                    // Total Candidates (Active CVs)
+                    supabase
+                        .from('cvs')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('status', 'active'),
+
+                    // Clinic Details & Favorites
+                    supabase
+                        .from('clinics')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .maybeSingle(),
+
+                    // Unread Messages Count
+                    supabase
+                        .from('messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('read', false)
+                        .neq('sender_id', user.id)
+                ]);
+
+                // DEBUG: Log all query results
+                console.log('[ClinicDashboard] DEBUG - CVs count:', { count: candidatesCount, error: candidatesError });
+                console.log('[ClinicDashboard] DEBUG - Clinic data:', { data: clinicData, error: clinicError });
+                console.log('[ClinicDashboard] DEBUG - Messages:', messagesRes);
+
+                if (candidatesError) console.error('Error fetching candidates count:', candidatesError);
+                if (clinicError) console.error('Error fetching clinic data:', clinicError);
+
+                const totalCandidates = candidatesCount || 0;
                 // @ts-ignore
-                const { data: statsData, error: statsError } = await supabase
-                    .rpc('get_dashboard_stats', {
-                        p_user_id: user.id,
-                        p_role: 'clinic'
-                    });
+                const savedProfiles = clinicData?.favorites?.length || 0;
+                // @ts-ignore
+                const messagesCount = messagesRes?.count || 0;
 
-                let totalCandidates = 0;
-                let savedProfiles = 0;
+                // Profile views not yet implemented in DB
+                const profileViews = 0;
 
-                if (!statsError && statsData) {
-                    totalCandidates = statsData.total_candidates || 0;
-                    savedProfiles = statsData.saved_profiles || 0;
-                }
+                // DEBUG: Log computed stats
+                console.log('[ClinicDashboard] DEBUG - Computed Stats:', {
+                    totalCandidates,
+                    savedProfiles,
+                    messagesCount,
+                    profileViews
+                });
 
-                // 2. Fetch Clinic Profile to get preferences
-                const { data: clinicData } = await supabase
-                    .from('clinics')
-                    .select('*')
-                    .eq('user_id', user.id)
-                    .single();
-
-                // 3. Fetch Active CVs for matching
-                const { data: allCVs } = await supabase
-                    .from('cvs')
-                    .select('*, users(user_type)')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false })
-                    .limit(50); // Fetch more for matching
-
-                let mappedCandidates: any[] = [];
-
-                if (allCVs) {
-                    // Map generic CV data first
-                    const candidatesRaw = allCVs.map((cv: any) => ({
-                        id: cv.id,
-                        personalInfo: {
-                            fullName: cv.full_name,
-                            photo: cv.photo,
-                            city: cv.city,
-                            verified: cv.verified
-                        },
-                        experience: cv.experience || [],
-                        skills: cv.skills || [],
-                        salary: { expected: cv.salary_expected, negotiable: cv.salary_negotiable },
-                        location: { preferred: cv.preferred_locations || [], willingToRelocate: cv.willing_to_relocate },
-                        availability: { type: cv.availability_type },
-                        rating: cv.rating || 0
-                    }));
-
-                    if (clinicData) {
-                        // Import matching logic dynamically to avoid server/client issues
-                        const { getTopMatches } = await import('@/lib/matching');
-                        const { calculateExperienceYears } = await import('@/lib/utils');
-
-                        // Run matching algorithm
-                        const matches = getTopMatches(candidatesRaw, clinicData, 3);
-
-                        mappedCandidates = matches.map(match => ({
-                            ...match.cv,
-                            matchScore: match.score,
-                            yearsExperience: calculateExperienceYears(match.cv.experience)
-                        }));
-                    } else {
-                        // Fallback if no clinic profile (just show recent)
-                        mappedCandidates = candidatesRaw.slice(0, 3).map(cv => {
-                            // Dynamic import for utility
-                            // We can't use await inside map easily, so we rely on the implementation above or basic fallback
-                            let years = 0;
-                            try {
-                                // Simple calc fallback
-                                // Real implementation handles this better but for fallback:
-                                years = cv.experience.length;
-                            } catch (e) { }
-
-                            return {
-                                ...cv,
-                                matchScore: 0,
-                                yearsExperience: years
-                            };
-                        });
-                    }
-                }
-
-                // Fix for the map above being async/complex:
-                // Let's simplify: if we have matches, use them. If not, use raw.
-                // Re-doing the logic cleanly:
-
-                if (allCVs && clinicData) {
-                    const { getTopMatches } = await import('@/lib/matching');
-                    const { calculateExperienceYears } = await import('@/lib/utils');
-
-                    const candidatesForMatching = allCVs.map((cv: any) => ({
-                        id: cv.id,
-                        personalInfo: { fullName: cv.full_name, photo: cv.photo, city: cv.city },
-                        experience: cv.experience || [],
-                        skills: cv.skills || [],
-                        salary: { expected: cv.salary_expected, negotiable: cv.salary_negotiable },
-                        location: { preferred: cv.preferred_locations || [], willingToRelocate: cv.willing_to_relocate },
-                        availability: { type: cv.availability_type },
-                        rating: cv.rating || 0
-                    })) as unknown as CV[];
-
-                    const matches = getTopMatches(candidatesForMatching, clinicData, 3);
-
-                    mappedCandidates = matches.map(m => ({
-                        ...m.cv,
-                        matchScore: m.score,
-                        yearsExperience: calculateExperienceYears(m.cv.experience)
-                    }));
-                } else if (allCVs) {
-                    // Fallback: just show recent, no scores
-                    const { calculateExperienceYears } = await import('@/lib/utils');
-                    mappedCandidates = allCVs.slice(0, 3).map((cv: any) => ({
-                        id: cv.id,
-                        personalInfo: { fullName: cv.full_name, photo: cv.photo, city: cv.city },
-                        experience: cv.experience || [],
-                        rating: cv.rating || 0,
-                        matchScore: 0,
-                        yearsExperience: calculateExperienceYears(cv.experience || [])
-                    }));
-                }
-
-                setTopCandidates(mappedCandidates);
-
+                // SET STATS IMMEDIATELY (before any potentially failing code)
                 setStats([
                     {
                         label: t.totalCandidates,
@@ -246,17 +181,76 @@ export default function ClinicDashboard() {
                     },
                     {
                         label: t.profileViews,
-                        value: '24', // Placeholder
+                        value: profileViews.toString(),
                         icon: <Eye size={20} />,
-                        change: '+5%'
+                        change: '-' // No data yet
                     },
                     {
                         label: t.messages,
-                        value: '3', // Placeholder
+                        value: messagesCount.toString(),
                         icon: <MessageSquare size={20} />,
-                        change: '+1'
+                        change: language === 'ar' ? 'جديد' : 'New'
                     },
                 ]);
+
+                // 3. Fetch Active CVs for matching (wrapped in try-catch to not affect stats)
+                try {
+                    const { data: allCVs } = await supabase
+                        .from('cvs')
+                        .select('*, users(user_type)')
+                        .eq('status', 'active')
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+
+                    let mappedCandidates: any[] = [];
+
+                    if (allCVs && clinicData) {
+                        const { getTopMatches } = await import('@/lib/matching');
+                        const { calculateExperienceYears } = await import('@/lib/utils');
+
+                        const candidatesForMatching = allCVs.filter((cv: any) => cv).map((cv: any) => ({
+                            id: cv?.id,
+                            personalInfo: {
+                                fullName: cv?.full_name || 'Unknown',
+                                photo: cv?.photo,
+                                city: cv?.city || ''
+                            },
+                            experience: cv?.experience || [],
+                            skills: cv?.skills || [],
+                            salary: { expected: cv?.salary_expected, negotiable: cv?.salary_negotiable },
+                            location: { preferred: cv?.preferred_locations || [], willingToRelocate: cv?.willing_to_relocate },
+                            availability: { type: cv?.availability_type },
+                            rating: cv?.rating || 0
+                        })) as unknown as CV[];
+
+                        const matches = getTopMatches(candidatesForMatching, clinicData, 3);
+
+                        mappedCandidates = matches.map(m => ({
+                            ...m.cv,
+                            matchScore: m.score,
+                            yearsExperience: calculateExperienceYears(m.cv.experience)
+                        }));
+                    } else if (allCVs) {
+                        const { calculateExperienceYears } = await import('@/lib/utils');
+                        mappedCandidates = allCVs.slice(0, 3).filter((cv: any) => cv).map((cv: any) => ({
+                            id: cv?.id,
+                            personalInfo: {
+                                fullName: cv?.full_name || 'Unknown',
+                                photo: cv?.photo,
+                                city: cv?.city || ''
+                            },
+                            experience: cv?.experience || [],
+                            rating: cv?.rating || 0,
+                            matchScore: 0,
+                            yearsExperience: calculateExperienceYears(cv?.experience || [])
+                        }));
+                    }
+
+                    setTopCandidates(mappedCandidates);
+                } catch (matchingError) {
+                    console.error('Error in CV matching (stats still displayed):', matchingError);
+                    // Stats are already set, so this error won't affect them
+                }
 
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -266,7 +260,8 @@ export default function ClinicDashboard() {
         };
 
         fetchDashboardData();
-    }, [user, favorites, language, t]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, language]);
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -329,7 +324,7 @@ export default function ClinicDashboard() {
                                         {cv.personalInfo.photo ? (
                                             <img src={cv.personalInfo.photo} alt={cv.personalInfo.fullName} className="w-full h-full object-cover" />
                                         ) : (
-                                            cv.personalInfo.fullName.split(' ').map(n => n[0]).join('')
+                                            cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">

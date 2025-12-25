@@ -6,7 +6,7 @@ export async function GET() {
     try {
         const url = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://hbzuewfbqnjddoxukxyp.supabase.co';
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        const targetEmail = 'toqaquiz@gmail.com';
+        const targetEmail = 'reammuath2002@gmail.com';
 
         if (!key) {
             return NextResponse.json({ success: false, error: 'Missing SUPABASE_SERVICE_ROLE_KEY environment variable.' });

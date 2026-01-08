@@ -141,6 +141,7 @@ export default function JobSeekerProfilePage() {
                                 {firstName} {lastName}
                                 {verified && <CheckCircle size={20} className="text-blue-500" />}
                             </h2>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium">
                                 {language === 'ar' ? (roleTranslations[user.userType] || user.userType) : user.userType?.replace('_', ' ')}
                             </p>
                         </div>

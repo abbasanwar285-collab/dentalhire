@@ -198,14 +198,16 @@ export const useAuthStore = create<AuthState>()(
                     if (authError) {
                         // Handle rate limiting error
                         let errorMessage = authError.message; // Show raw error for debugging
-                        /*
-                        let errorMessage = 'auth.registration_failed';
+
+                        // Improve error mapping
                         if (authError.message.includes('security purposes')) {
                             errorMessage = 'auth.rate_limit';
                         } else if (authError.message.includes('already registered')) {
                             errorMessage = 'auth.email_exists';
+                        } else if (authError.message.includes('invalid input syntax')) {
+                            errorMessage = 'auth.registration_failed'; // Generic fall back for DB enum errors
                         }
-                        */
+
                         set({ error: errorMessage, isLoading: false });
                         return false;
                     }

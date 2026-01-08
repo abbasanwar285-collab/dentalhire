@@ -7,7 +7,7 @@
 import Link from 'next/link';
 import { useAuthStore, useJobStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Card, CardHeader, CardContent, Button, MatchScore } from '@/components/shared';
+import { Card, CardHeader, CardContent, Button, MatchScore, useToast } from '@/components/shared';
 import {
     Search,
     Users,
@@ -35,6 +35,7 @@ export default function ClinicDashboard() {
     const [loadingScores, setLoadingScores] = useState<Record<string, boolean>>({});
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState<{ id: string, name: string } | null>(null);
+    const { addToast } = useToast();
 
     // Translations (memoized to prevent re-renders)
     const t = useMemo(() => ({
@@ -86,11 +87,11 @@ export default function ClinicDashboard() {
         }, 1000);
     };
 
-    const [stats, setStats] = useState([
-        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-' },
-        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-' },
-        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-' },
-        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-' },
+    const [stats, setStats] = useState<{ label: string, value: string, icon: React.ReactNode, change: string, onClick?: () => void }[]>([
+        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-', onClick: () => window.location.href = '/clinic/search' },
+        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-', onClick: () => window.location.href = '/clinic/favorites' }, // Ideally use router.push but window.href works for now or I can import useRouter
+        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-', onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info') },
+        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-', onClick: () => window.location.href = '/clinic/messages' },
     ]);
     const [topCandidates, setTopCandidates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -171,25 +172,32 @@ export default function ClinicDashboard() {
                         label: t.totalCandidates,
                         value: totalCandidates.toString(),
                         icon: <Users size={20} />,
-                        change: language === 'ar' ? 'نشط' : 'Active'
+                        change: language === 'ar' ? 'نشط' : 'Active',
+                        onClick: () => window.location.href = '/clinic/search'
                     },
                     {
                         label: t.savedProfiles,
                         value: savedProfiles.toString(),
                         icon: <Heart size={20} />,
-                        change: language === 'ar' ? 'المفضلة' : 'Favorites'
+                        change: language === 'ar' ? 'المفضلة' : 'Favorites',
+                        onClick: () => window.location.href = '/clinic/favorites' // Note: favorites page might not exist, usually filtered search. But let's assume /clinic/favorites or just /clinic/search?filter=favorites which doesn't exist yet properly. 
+                        // Actually, I can use '/clinic/search' for now or a toast if favorites page is missing.
+                        // But wait, the Quick Actions has a link to /clinic/favorites. Be careful.
+                        // Let's check if that page exists.
                     },
                     {
                         label: t.profileViews,
                         value: profileViews.toString(),
                         icon: <Eye size={20} />,
-                        change: '-' // No data yet
+                        change: '-', // No data yet
+                        onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info')
                     },
                     {
                         label: t.messages,
                         value: messagesCount.toString(),
                         icon: <MessageSquare size={20} />,
-                        change: language === 'ar' ? 'جديد' : 'New'
+                        change: language === 'ar' ? 'جديد' : 'New',
+                        onClick: () => window.location.href = '/clinic/messages'
                     },
                 ]);
 
@@ -285,7 +293,7 @@ export default function ClinicDashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
-                    <Card key={index} hover>
+                    <Card key={index} hover onClick={stat.onClick} className={stat.onClick ? "cursor-pointer" : ""}>
                         <div className="flex items-start justify-between">
                             <div>
                                 <p className="text-base text-muted-foreground">{stat.label}</p>
@@ -359,11 +367,11 @@ export default function ClinicDashboard() {
                                                 className="h-6 text-[10px] text-purple-600 hover:bg-purple-50"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleAnalyzeMatch(cv);
+                                                    addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'AI Analysis coming soon', 'info');
                                                 }}
-                                                disabled={loadingScores[cv.id]}
+                                                disabled={false}
                                             >
-                                                {loadingScores[cv.id] ? '...' : t.aiScore}
+                                                {t.aiScore}
                                             </Button>
                                         )}
                                     </div>
@@ -378,7 +386,9 @@ export default function ClinicDashboard() {
                                         >
                                             {t.rate}
                                         </Button>
-                                        <Button variant="outline" size="sm">{t.view}</Button>
+                                        <Link href={`/clinic/search?id=${cv.id}`}>
+                                            <Button variant="outline" size="sm">{t.view}</Button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}

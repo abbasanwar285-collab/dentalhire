@@ -7,7 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMessageStore, useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button, Input } from '@/components/shared';
+import { Button, Input, useToast } from '@/components/shared';
 import { formatRelativeTime } from '@/lib/utils';
 import {
     Search,
@@ -38,6 +38,8 @@ export default function MessagesPage() {
         subscribeToMessages,
         isLoading,
     } = useMessageStore();
+
+    const { addToast } = useToast();
 
     const [message, setMessage] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
@@ -189,13 +191,25 @@ export default function MessagesPage() {
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title={language === 'ar' ? 'مكالمة صوتية' : 'Phone call'}>
+                                <button
+                                    onClick={() => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Voice call coming soon', 'info')}
+                                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    title={language === 'ar' ? 'مكالمة صوتية' : 'Phone call'}
+                                >
                                     <Phone size={20} />
                                 </button>
-                                <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title={language === 'ar' ? 'مكالمة فيديو' : 'Video call'}>
+                                <button
+                                    onClick={() => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Video call coming soon', 'info')}
+                                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    title={language === 'ar' ? 'مكالمة فيديو' : 'Video call'}
+                                >
                                     <Video size={20} />
                                 </button>
-                                <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title={language === 'ar' ? 'خيارات أخرى' : 'More options'}>
+                                <button
+                                    onClick={() => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'More options coming soon', 'info')}
+                                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    title={language === 'ar' ? 'خيارات أخرى' : 'More options'}
+                                >
                                     <MoreVertical size={20} />
                                 </button>
                             </div>
@@ -240,7 +254,12 @@ export default function MessagesPage() {
                         {/* Message Input */}
                         <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-3">
-                                <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title={language === 'ar' ? 'إرفاق ملف' : 'Attach file'}>
+                                <button
+                                    type="button"
+                                    onClick={() => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'File attachment coming soon', 'info')}
+                                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    title={language === 'ar' ? 'إرفاق ملف' : 'Attach file'}
+                                >
                                     <Paperclip size={20} />
                                 </button>
                                 <input
@@ -251,7 +270,12 @@ export default function MessagesPage() {
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                     className="flex-1 px-4 py-2.5 rounded-full border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                                 />
-                                <button className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg" title={language === 'ar' ? 'رموز تعبيرية' : 'Emoji'}>
+                                <button
+                                    type="button"
+                                    onClick={() => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Emoji picker coming soon', 'info')}
+                                    className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                                    title={language === 'ar' ? 'رموز تعبيرية' : 'Emoji'}
+                                >
                                     <Smile size={20} />
                                 </button>
                                 <Button

@@ -24,6 +24,15 @@ export default function JobSeekerProfilePage() {
     const { firstName, lastName, phone, avatar, verified } = user.profile;
     const completion = getCompletionPercentage();
 
+    const roleTranslations: Record<string, string> = {
+        dentist: 'طبيب أسنان',
+        dental_assistant: 'مساعد طبيب',
+        dental_technician: 'فني أسنان',
+        secretary: 'سكرتارية/استقبال',
+        sales_rep: 'مندوب مبيعات',
+        media: 'صانع محتوى',
+    };
+
     const formatDate = (date: Date) => {
         return new Date(date).toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US', {
             year: 'numeric',
@@ -132,8 +141,7 @@ export default function JobSeekerProfilePage() {
                                 {firstName} {lastName}
                                 {verified && <CheckCircle size={20} className="text-blue-500" />}
                             </h2>
-                            <p className="text-gray-500 dark:text-gray-400 capitalize">
-                                {language === 'ar' ? 'مساعد طب أسنان' : user.userType?.replace('_', ' ')}
+                                {language === 'ar' ? (roleTranslations[user.userType] || user.userType) : user.userType?.replace('_', ' ')}
                             </p>
                         </div>
 
@@ -221,6 +229,6 @@ export default function JobSeekerProfilePage() {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 }

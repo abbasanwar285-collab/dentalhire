@@ -132,31 +132,67 @@ export default function ClinicSearchPage() {
     };
 
 
-    // Fetch initial data
+    // Fetch CVs with server-side filtering
     useEffect(() => {
         const fetchCVs = async () => {
             setIsLoading(true);
             try {
-                // Join with users table to get user_type and verified status
-                const { data, error } = await supabase
+                let query = supabase
                     .from('cvs')
-                    .select('*, users(user_type, verified)');
+                    .select('*, users!inner(user_type, verified)'); // Inner join to filter by user_type
+
+                // 1. Role Filter (Server-side)
+                if (filters.role) {
+                    query = query.eq('users.user_type', filters.role);
+                }
+
+                // 2. Location Filter (Server-side ILIKE)
+                if (filters.location) {
+                    // Search in city OR preferred locations
+                    // Note: This simple OR check might need an RPC for complex array searching, 
+                    // but for now we'll check the 'city' column which is the primary indexed location.
+                    // For array searching 'location_preferred', we'd need: .contains('location_preferred', [filters.location])
+                    // But standard text search is often better.
+                    query = query.ilike('city', `%${filters.location}%`);
+                }
+
+                // 3. Experience Filter (Server-side)
+                // Note: 'experience' is a JSONB column. Exact querying depends on structure.
+                // For 'Min Years', it's hard to do in SQL without a generated column or RPC.
+                // We will keep Experience filtering CLIENT-SIDE for now as it requires parsing JSON array length.
+
+                // 4. Salary Filter (Server-side)
+                if (filters.salaryMin !== undefined) {
+                    query = query.gte('salary_expected', filters.salaryMin);
+                }
+                if (filters.salaryMax !== undefined) {
+                    query = query.lte('salary_expected', filters.salaryMax);
+                }
+
+                // 5. Employment Type (Server-side)
+                if (filters.employmentType && filters.employmentType.length > 0) {
+                    // availability_type is string text
+                    query = query.in('availability_type', filters.employmentType);
+                }
+
+                const { data, error } = await query;
 
                 if (error) {
                     console.error('Error fetching CVs:', error);
+                    addToast('Error fetching candidates', 'error');
                 }
 
                 if (data) {
-                    // Map the raw DB CVs (flat structure) to MatchResult structure (nested)
-                    const mappedResults = data.map((cv: any) => ({
+                    // Map results
+                    let mappedResults = data.map((cv: any) => ({
                         cv: {
                             id: cv.id,
                             userId: cv.user_id,
-                            userType: cv.users?.user_type, // Map user_type from joined users table
+                            userType: cv.users?.user_type,
                             personalInfo: {
                                 fullName: cv.full_name,
                                 email: cv.email,
-                                verified: cv.users?.verified, // Map verified status
+                                verified: cv.users?.verified,
                                 phone: cv.phone,
                                 city: cv.city,
                                 bio: cv.bio,
@@ -186,7 +222,7 @@ export default function ClinicSearchPage() {
                             createdAt: cv.created_at,
                             updatedAt: cv.updated_at,
                         },
-                        score: cv.matchScore || Math.floor(Math.random() * 30) + 70, // Mock score if missing
+                        score: cv.matchScore || Math.floor(Math.random() * 30) + 70,
                         matchDetails: {
                             location: 0,
                             salary: 0,
@@ -202,9 +238,38 @@ export default function ClinicSearchPage() {
                             availability: 0
                         }
                     }));
+
+                    // --- Client-side Refinement (where Server-side is limited) ---
+
+                    // Filter by Text Query (Name, Skills, Title)
+                    if (filters.query) {
+                        const q = filters.query.toLowerCase();
+                        mappedResults = mappedResults.filter((m: any) =>
+                            m.cv.personalInfo.fullName.toLowerCase().includes(q) ||
+                            m.cv.skills.some((s: string) => s.toLowerCase().includes(q)) ||
+                            m.cv.experience.some((e: any) => e.title.toLowerCase().includes(q))
+                        );
+                    }
+
+                    // Filter by Experience (Calculated)
+                    if (filters.experienceMin !== undefined) {
+                        mappedResults = mappedResults.filter((m: any) => {
+                            // Approximation: just array length or reuse the helper if imported
+                            return (m.cv.experience?.length || 0) >= filters.experienceMin!;
+                        });
+                    }
+
+                    // Filter by Skills (Client side check for array overlap)
+                    if (filters.skills && filters.skills.length > 0) {
+                        mappedResults = mappedResults.filter((m: any) =>
+                            filters.skills!.some(skill =>
+                                m.cv.skills.some((s: string) => s.toLowerCase().includes(skill.toLowerCase()))
+                            )
+                        );
+                    }
+
                     setResults(mappedResults);
                 } else {
-                    // If no data, ensure results are empty
                     setResults([]);
                 }
             } catch (error) {
@@ -214,8 +279,14 @@ export default function ClinicSearchPage() {
             }
         };
 
-        fetchCVs();
-    }, [setResults, supabase]);
+        // Debounce fetching if needed, but for now we fetch on filter change
+        const timeoutId = setTimeout(() => {
+            fetchCVs();
+        }, 300); // Small debounce to prevent rapid firing on typing
+
+        return () => clearTimeout(timeoutId);
+
+    }, [filters, supabase, setResults, addToast]); // Re-run when filters change
 
     // Handle initial location parsing if needed (simple check)
     useEffect(() => {
@@ -315,161 +386,11 @@ export default function ClinicSearchPage() {
         return Array.from(skillsSet).sort();
     }, [results]);
 
-    // Filter and sort results
-    const filteredResults = useMemo(() => {
-        let currentResults = [...results];
-
-        if (filters.query) {
-            const query = filters.query.toLowerCase();
-            currentResults = currentResults.filter(m =>
-                m.cv.personalInfo.fullName.toLowerCase().includes(query) ||
-                m.cv.skills.some((s: string) => s.toLowerCase().includes(query)) ||
-                m.cv.experience.some((e: any) => e.title.toLowerCase().includes(query))
-            );
-        }
-
-        if (filters.role) {
-            // Check against userType or experience title
-            currentResults = currentResults.filter(m => {
-                const roleMatch = (m.cv as any).userType === filters.role; // Use userType from joined users table
-                const titleMatch = m.cv.experience.some((e: any) =>
-                    e.title.toLowerCase().includes(filters.role!.replace('_', ' ').toLowerCase())
-                );
-                return roleMatch || titleMatch;
-            });
-        }
-
-        if (filters.location) {
-            const locFilter = filters.location.toLowerCase();
-            const isGovernorate = Object.keys(iraqLocations).some(k => k.toLowerCase() === locFilter);
-
-            let possibleMatches = [locFilter];
-            let parentGovernorate = '';
-
-            if (isGovernorate) {
-                // Find casing content key
-                const govKey = Object.keys(iraqLocations).find(k => k.toLowerCase() === locFilter);
-                if (govKey) {
-                    parentGovernorate = govKey.toLowerCase();
-                    const govAr = (iraqLocations as any)[govKey].ar;
-                    const districts = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.en.toLowerCase()) || [];
-                    const districtsAr = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.ar) || [];
-
-                    possibleMatches = [locFilter, govAr, ...districts, ...districtsAr];
-
-                    // Add stripped Arabic versions (e.g. remove "قضاء ", "ناحية ", "مركز ")
-                    if (govAr.startsWith('محافظة ')) possibleMatches.push(govAr.replace('محافظة ', ''));
-                    districtsAr.forEach((d: string) => {
-                        const stripped = d.replace(/^(قضاء|ناحية|مركز)\s+/, '');
-                        if (stripped !== d) possibleMatches.push(stripped);
-                    });
-                }
-            } else {
-                // Check if it matches a district significantly
-                for (const [govName, gov] of Object.entries(iraqLocations)) {
-                    const foundDist = (gov as any).districts.find((d: any) => d.en.toLowerCase() === locFilter);
-                    if (foundDist) {
-                        parentGovernorate = govName.toLowerCase();
-                        possibleMatches.push(foundDist.ar);
-                        // Strip prefix
-                        const stripped = foundDist.ar.replace(/^(قضاء|ناحية|مركز)\s+/, '');
-                        if (stripped !== foundDist.ar) possibleMatches.push(stripped);
-
-                        // Also add the governorate name to prevent cross-governorate matches
-                        possibleMatches.push(govName.toLowerCase());
-                        possibleMatches.push((gov as any).ar);
-                        break;
-                    }
-                }
-            }
-
-            currentResults = currentResults.filter(m => {
-                const cityLower = m.cv.personalInfo.city?.toLowerCase() || '';
-                const preferredLower = m.cv.location.preferred.map((l: string) => l.toLowerCase());
-
-                // Helper function for more precise matching (Fixed for Arabic)
-                const matchesLocation = (text: string, pattern: string): boolean => {
-                    if (!text || !pattern) return false;
-
-                    // Exact match
-                    if (text === pattern) return true;
-
-                    // Regex check with custom boundaries (works for Arabic unlike \b)
-                    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    // Matches start OR separator + pattern + end OR separator
-                    const regex = new RegExp(`(^|[\\s.,;:\\-،])(${escapedPattern})($|[\\s.,;:\\-،])`, 'i');
-
-                    if (regex.test(text)) {
-                        // If searching for a governorate, ensure it's not a district of another governorate
-                        if (isGovernorate && parentGovernorate) {
-                            // Check if the text contains markers of being in a different governorate
-                            const otherGovernorates = Object.entries(iraqLocations)
-                                .filter(([key]) => key.toLowerCase() !== parentGovernorate)
-                                .map(([_, val]) => [(val as any).ar, ...Object.keys(iraqLocations).filter(k => k.toLowerCase() !== parentGovernorate)])
-                                .flat();
-
-                            // If text contains another governorate name, it's not a match
-                            const containsOtherGov = otherGovernorates.some(otherGov =>
-                                // Simple includes check for exclusion is usually safer/enough
-                                text.includes(String(otherGov).toLowerCase())
-                            );
-
-                            if (containsOtherGov) return false;
-                        }
-                        return true;
-                    }
-
-                    return false;
-                };
-
-                // Check city field
-                const cityMatches = possibleMatches.some(pm => matchesLocation(cityLower, pm?.toLowerCase() || ''));
-
-                // Check preferred locations
-                const preferredMatches = preferredLower.some(pl =>
-                    possibleMatches.some(pm => matchesLocation(pl, pm?.toLowerCase() || ''))
-                );
-
-                return cityMatches || preferredMatches;
-            });
-        }
-
-        if (filters.skills && filters.skills.length > 0) {
-            currentResults = currentResults.filter(m =>
-                filters.skills!.some(skill =>
-                    m.cv.skills.some((s: string) => s.toLowerCase().includes(skill.toLowerCase()))
-                )
-            );
-        }
-
-        if (filters.experienceMin !== undefined) {
-            currentResults = currentResults.filter(m => {
-                const years = m.cv.experience.length;
-                return years >= filters.experienceMin!;
-            });
-        }
-
-        if (filters.salaryMin !== undefined) {
-            currentResults = currentResults.filter(m => m.cv.salary.expected >= filters.salaryMin!);
-        }
-
-        if (filters.salaryMax !== undefined) {
-            currentResults = currentResults.filter(m => m.cv.salary.expected <= filters.salaryMax!);
-        }
-
-        if (filters.employmentType && filters.employmentType.length > 0) {
-            currentResults = currentResults.filter(m =>
-                filters.employmentType!.some(t => m.cv.availability?.type === t)
-            );
-        }
-
-        return currentResults.sort((a, b) => b.score - a.score);
-    }, [results, filters]);
-
-    // Use deferred value for loading detection
+    // Use deferred value for loading detection UI
     const deferredFilters = useDeferredValue(filters);
     const isSearching = filters !== deferredFilters;
 
+    const filteredResults = results; // Results are now already filtered by the server/client logic above
     const selectedCandidate = selectedCV ? filteredResults.find(m => m.cv.id === selectedCV) : null;
 
     // Helper to format role label

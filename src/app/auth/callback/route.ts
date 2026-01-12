@@ -36,10 +36,8 @@ export async function GET(request: NextRequest) {
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            const isLocal = process.env.NODE_ENV === 'development'
-
-            // Force production URL in production environment
-            const baseUrl = isLocal ? origin : 'https://dentalhire.vercel.app';
+            // Use the origin from the request URL to support branches/previews/layouts
+            const baseUrl = origin;
 
             // Force password recovery flow
             if (type === 'recovery') {

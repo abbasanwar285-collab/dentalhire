@@ -36,8 +36,9 @@ export default function ForgotPasswordPage() {
 
         try {
             const supabase = getSupabaseClient();
+            const origin = typeof window !== 'undefined' ? window.location.origin : 'https://dentalhire.vercel.app';
             const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-                redirectTo: `https://dentalhire.vercel.app/auth/callback?next=/update-password`,
+                redirectTo: `${origin}/auth/callback?next=/update-password`,
             });
 
             if (error) throw error;

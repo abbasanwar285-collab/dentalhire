@@ -130,7 +130,7 @@ export default function AdminDashboard() {
             if (recentUsersResult.data) {
                 setRecentUsers(recentUsersResult.data.map(user => ({
                     id: user.id,
-                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email?.split('@')[0] || 'Unknown',
+                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || (user.email?.split('@')[0] ?? 'Unknown'),
                     email: user.email || '',
                     type: getUserTypeLabel(user.role, user.user_type),
                     status: user.verified ? 'active' : 'pending',
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
             if (pendingData) {
                 setPendingApprovals(pendingData.map(user => ({
                     id: user.id,
-                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.email?.split('@')[0] || 'Unknown',
+                    name: `${user.first_name || ''} ${user.last_name || ''}`.trim() || (user.email?.split('@')[0] ?? 'Unknown'),
                     type: getUserTypeLabel(user.role, user.user_type),
                     date: formatRelativeTime(user.created_at)
                 })));

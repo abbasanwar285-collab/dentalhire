@@ -15,8 +15,13 @@ const nextConfig = {
     ignoreBuildErrors: false, // ✅ Fixed: Will now show TypeScript errors
   },
 
-  // Note: experimental.turbopack config removed - it was invalid in Next.js 16
-  // The PWA plugin uses webpack by default, which is compatible
+  experimental: {
+    // IMPORTANT: Must keep turbopack disabled because:
+    // - @ducanh2912/next-pwa uses webpack configuration
+    // - Turbopack doesn't support workbox plugins yet
+    // - Next.js 16 defaults to Turbopack, so explicit disable is required
+    turbopack: false,
+  },
 
   images: {
     remotePatterns: [

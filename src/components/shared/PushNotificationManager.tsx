@@ -16,9 +16,11 @@ export default function PushNotificationManager() {
     useEffect(() => {
         if (typeof window !== 'undefined' && 'Notification' in window) {
             setPermission(Notification.permission);
-            // Show prompt if user is logged in and permission is not granted
+            // Show prompt after delay if user is logged in and permission is not granted
+            // Delay prevents interrupting user's first experience
             if (user && Notification.permission !== 'granted') {
-                setShowPrompt(true);
+                const timer = setTimeout(() => setShowPrompt(true), 20000); // 20 seconds delay
+                return () => clearTimeout(timer);
             }
         }
     }, [user]);

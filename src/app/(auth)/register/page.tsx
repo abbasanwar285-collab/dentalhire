@@ -214,7 +214,7 @@ function RegisterContent() {
 
     // Show loading state if language is somehow undefined (should be caught by context, but extra safety)
     if (!language || !t) {
-        return <div className="min-h-[50vh] flex items-center justify-center">Loading...</div>;
+        return <div className="min-h-[50vh] flex items-center justify-center">جاري التحميل...</div>;
     }
 
     const mainRoles = [
@@ -452,14 +452,14 @@ function RegisterContent() {
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <Input
                                         label={t.firstName}
-                                        placeholder="John"
+                                        placeholder={language === 'ar' ? 'أحمد' : 'John'}
                                         leftIcon={<User size={18} />}
                                         error={errors.firstName?.message}
                                         {...register('firstName')}
                                     />
                                     <Input
                                         label={t.lastName}
-                                        placeholder="Doe"
+                                        placeholder={language === 'ar' ? 'العتيبي' : 'Doe'}
                                         error={errors.lastName?.message}
                                         {...register('lastName')}
                                     />
@@ -475,7 +475,7 @@ function RegisterContent() {
                                 />
 
                                 <Input
-                                    label="Phone Number"
+                                    label={language === 'ar' ? 'رقم الجوال' : 'Phone Number'}
                                     type="tel"
                                     placeholder="0501234567"
                                     leftIcon={<Phone size={18} />}
@@ -557,7 +557,7 @@ function RegisterContent() {
 
 export default function RegisterPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">جاري التحميل...</div>}>
             <RegisterContent />
         </Suspense>
     );

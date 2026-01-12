@@ -24,8 +24,8 @@ export default function PWAInstallPrompt() {
         if (isStandalone) return;
 
         if (isIOSDevice) {
-            // For iOS, show prompt after a small delay
-            const timer = setTimeout(() => setShowPrompt(true), 3000);
+            // For iOS, show prompt after a longer delay to not interrupt user
+            const timer = setTimeout(() => setShowPrompt(true), 15000); // 15 seconds instead of 3
             return () => clearTimeout(timer);
         } else {
             // For/Android/Desktop, wait for event
@@ -66,7 +66,7 @@ export default function PWAInstallPrompt() {
     const isRTL = language === 'ar';
 
     return (
-        <div className="fixed inset-x-0 bottom-[env(safe-area-inset-bottom,0)] z-[110] p-3 md:p-4 animate-in slide-in-from-bottom duration-500">
+        <div className="fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom,0)+70px)] z-[60] p-3 md:p-4 animate-in slide-in-from-bottom duration-500">
             <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-md rounded-2xl shadow-2xl p-4 border border-gray-100 dark:border-gray-700 max-w-lg mx-auto relative overflow-hidden">
                 {/* Decorative Background */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-teal-500" />

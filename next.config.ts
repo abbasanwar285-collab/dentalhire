@@ -12,13 +12,12 @@ const withPWA = require("@ducanh2912/next-pwa").default({
 
 const nextConfig = {
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false, // ✅ Fixed: Will now show TypeScript errors
   },
 
-  experimental: {
-    // Force webpack for compatibility with PWA plugin
-    turbopack: false,
-  },
+  // Note: experimental.turbopack config removed - it was invalid in Next.js 16
+  // The PWA plugin uses webpack by default, which is compatible
+
   images: {
     remotePatterns: [
       {

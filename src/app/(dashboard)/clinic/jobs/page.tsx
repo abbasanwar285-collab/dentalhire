@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { useJobStore } from '@/store/useJobStore';
 import { useAuthStore } from '@/store';
 import { Card, Button, Input, TimeSelect } from '@/components/shared';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { iraqLocations } from '@/data/iraq_locations';
 import { formatRelativeTime, formatTime } from '@/lib/utils';
 import { Job, EmploymentType } from '@/types';
@@ -41,6 +41,7 @@ export default function ClinicJobsPage() {
     const [clinicName, setClinicName] = useState<string>('');
     const [loadingClinic, setLoadingClinic] = useState(true);
     const searchParams = useSearchParams();
+    const router = useRouter();
 
     // Check for 'new' query param to open modal
     useEffect(() => {
@@ -181,41 +182,113 @@ export default function ClinicJobsPage() {
         skills: '',
     });
 
-    const smartSkills = {
+    const smartTemplates: Record<string, {
+        ar: { description: string, requirements: string, salary: { min: number, max: number } },
+        en: { description: string, requirements: string, salary: { min: number, max: number } },
+        skills: { ar: string[], en: string[] }
+    }> = {
         'dentist': {
-            ar: ['علاج جذور', 'حشوات تجميلية', 'قلع جراحي', 'تقويم أسنان', 'زراعة أسنان', 'تيجان وجسور'],
-            en: ['Root Canal', 'Cosmetic Fillings', 'Surgical Extraction', 'Orthodontics', 'Implants', 'Crowns & Bridges']
+            ar: {
+                description: "نبحث عن طبيب أسنان ذو خبرة وكفاءة للانضمام إلى فريقنا. المرشح المثالي يجب أن يكون شغوفًا بتقديم رعاية ممتازة للمرضى ويمتلك مهارات تواصل قوية.",
+                requirements: "بكالوريوس طب وفم أسنان, ممارسة المهنة لمدة لا تقل عن سنتين, ترخيص مزاولة مهنة ساري المفعول",
+                salary: { min: 1500000, max: 3000000 }
+            },
+            en: {
+                description: "We are looking for an experienced and skilled Dentist to join our team. The ideal candidate should be passionate about providing excellent patient care and possess strong communication skills.",
+                requirements: "BDS or DMD degree, Minimum 2 years of practice, Valid license",
+                salary: { min: 1500000, max: 3000000 }
+            },
+            skills: {
+                ar: ['علاج جذور', 'حشوات تجميلية', 'قلع جراحي', 'تقويم أسنان', 'زراعة أسنان', 'تيجان وجسور'],
+                en: ['Root Canal', 'Cosmetic Fillings', 'Surgical Extraction', 'Orthodontics', 'Implants', 'Crowns & Bridges']
+            }
         },
-        'assistant': {
-            ar: ['تعقيم', 'مساعدة كرسي (4-handed)', 'إدارة مخزون', 'أشعة سينية', 'تحضير المواد', 'استقبال المرضى'],
-            en: ['Sterilization', '4-Handed Dentistry', 'Inventory Management', 'X-Ray', 'Material Prep', 'Patient Reception']
+        'dental_assistant': {
+            ar: {
+                description: "مطلوب مساعد/ة طبيب أسنان منظم ونشيط للمساعدة في العمليات اليومية للعيادة. ستشمل المسؤوليات تعقيم الأدوات، وتحضير المواد، ومساعدة الطبيب أثناء الإجراءات.",
+                requirements: "خبرة سابقة في عيادات الأسنان, معرفة بأسماء الأدوات والمواد, مهارات تواصل جيدة",
+                salary: { min: 500000, max: 800000 }
+            },
+            en: {
+                description: "We require an organized and energetic Dental Assistant to help with daily clinic operations. Responsibilities include sterilization, material prep, and chairside assistance.",
+                requirements: "Previous dental clinic experience, Knowledge of instruments/materials, Good communication skills",
+                salary: { min: 500000, max: 800000 }
+            },
+            skills: {
+                ar: ['تعقيم', 'مساعدة كرسي (4-handed)', 'إدارة مخزون', 'أشعة سينية', 'تحضير المواد', 'استقبال المرضى'],
+                en: ['Sterilization', '4-Handed Dentistry', 'Inventory Management', 'X-Ray', 'Material Prep', 'Patient Reception']
+            }
         },
         'secretary': {
-            ar: ['إدارة مواعيد', 'إكسل و وورد', 'رد على الهاتف', 'حسابات بسيطة', 'لباقة في الكلام', 'تنظيم ملفات'],
-            en: ['Scheduling', 'Excel & Word', 'Phone Etiquette', 'Basic Accounting', 'Communication', 'Filing']
+            ar: {
+                description: "نبحث عن سكرتير/ة لإدارة استقبال العيادة والمواعيد. الوجه البشوش والتعامل اللبق مع المرضى هو أولويتنا.",
+                requirements: "لباقة في الحديث, استخدام الحاسوب (Word/Excel), القدرة على تنظيم المواعيد",
+                salary: { min: 400000, max: 700000 }
+            },
+            en: {
+                description: "Looking for a specialized Secretary to manage clinic reception and appointments. A welcoming attitude and polite interaction with patients is our priority.",
+                requirements: "Polite communication, Computer literacy (Word/Excel), Scheduling ability",
+                salary: { min: 400000, max: 700000 }
+            },
+            skills: {
+                ar: ['إدارة مواعيد', 'إكسل و وورد', 'رد على الهاتف', 'حسابات بسيطة', 'لباقة في الكلام', 'تنظيم ملفات'],
+                en: ['Scheduling', 'Excel & Word', 'Phone Etiquette', 'Basic Accounting', 'Communication', 'Filing']
+            }
         },
-        'technician': {
-            ar: ['تشميع', 'صب قوالب', 'سيراميك', 'أكريلك', 'تصميم CAD/CAM'],
-            en: ['Waxing', 'Casting', 'Ceramics', 'Acrylic', 'CAD/CAM Design']
+        'dental_technician': {
+            ar: {
+                description: "مختبرنا بحاجة إلى فني أسنان ماهر لديه خبرة في صناعة التعويضات السنية بدقة واحترافية.",
+                requirements: "دبلوم صناعة أسنان, دقة في العمل, خبرة في السيراميك أو الأكريلك",
+                salary: { min: 800000, max: 1500000 }
+            },
+            en: {
+                description: "Our lab needs a skilled Dental Technician experienced in crafting dental prosthetics with precision and professionalism.",
+                requirements: "Dental Technology Diploma, Attention to detail, Experience in Ceramics or Acrylics",
+                salary: { min: 800000, max: 1500000 }
+            },
+            skills: {
+                ar: ['تشميع', 'صب قوالب', 'سيراميك', 'أكريلك', 'تصميم CAD/CAM'],
+                en: ['Waxing', 'Casting', 'Ceramics', 'Acrylic', 'CAD/CAM Design']
+            }
         },
-        'sales': {
-            ar: ['تسويق ميداني', 'إغلاق صفقات', 'بناء علاقات', 'قيادة سيارة', 'تفاوض'],
-            en: ['Field Marketing', 'Closing Deals', 'Relationship Building', 'Driving', 'Negotiation']
+        'sales_rep': {
+            ar: {
+                description: "مطلوب مندوب مبيعات لشركة مستلزمات طبية/سنية. العمل يتطلب زيارة العيادات وبناء علاقات مع الأطباء.",
+                requirements: "سيارة خاصة, خبرة في المبيعات (يفضل في المجال الطبي), مهارات إقناع",
+                salary: { min: 600000, max: 1200000 }
+            },
+            en: {
+                description: "Sales Representative needed for a dental/medical supply company. Work involves visiting clinics and building relationships with doctors.",
+                requirements: "Own car, Sales experience (medical preferred), Persuasion skills",
+                salary: { min: 600000, max: 1200000 }
+            },
+            skills: {
+                ar: ['تسويق ميداني', 'إغلاق صفقات', 'بناء علاقات', 'قيادة سيارة', 'تفاوض'],
+                en: ['Field Marketing', 'Closing Deals', 'Relationship Building', 'Driving', 'Negotiation']
+            }
         }
     };
 
-    const getSmartSkills = (title: string) => {
-        const lowerTitle = title.toLowerCase();
-        let matchedRole = '';
+    const applyTemplate = (roleId: string) => {
+        const template = smartTemplates[roleId];
+        if (!template) return;
 
-        if (lowerTitle.includes('dentist') || lowerTitle.includes('طبيب')) matchedRole = 'dentist';
-        else if (lowerTitle.includes('assistant') || lowerTitle.includes('مساعد')) matchedRole = 'assistant';
-        else if (lowerTitle.includes('secretary') || lowerTitle.includes('سكرتير') || lowerTitle.includes('استقبال')) matchedRole = 'secretary';
-        else if (lowerTitle.includes('technician') || lowerTitle.includes('تقني')) matchedRole = 'technician';
-        else if (lowerTitle.includes('sales') || lowerTitle.includes('مندوب') || lowerTitle.includes('مبيعات')) matchedRole = 'sales';
+        const langData = language === 'ar' ? template.ar : template.en;
+        const skills = language === 'ar' ? template.skills.ar : template.skills.en;
 
-        if (!matchedRole) return [];
-        return language === 'ar' ? smartSkills[matchedRole as keyof typeof smartSkills].ar : smartSkills[matchedRole as keyof typeof smartSkills].en;
+        setForm(prev => ({
+            ...prev,
+            description: langData.description,
+            requirements: langData.requirements,
+            salary: langData.salary,
+            skills: skills.join(', ')
+        }));
+    };
+
+    const getSmartSkills = (roleId: string) => {
+        const template = smartTemplates[roleId];
+        if (!template) return [];
+        return language === 'ar' ? template.skills.ar : template.skills.en;
     };
 
     const resetForm = () => {
@@ -419,14 +492,52 @@ export default function ClinicJobsPage() {
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            <Input
-                                label={t.jobTitle}
-                                placeholder={t.jobTitlePlaceholder}
-                                value={form.title}
-                                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                required
-                            />
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        {language === 'ar' ? 'نوع الوظيفة (قوالب جاهزة) ✨' : 'Job Type (Smart Templates) ✨'}
+                                    </label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                                        {[
+                                            { id: 'dentist', label: language === 'ar' ? 'طبيب أسنان' : 'Dentist', icon: '👨‍⚕️' },
+                                            { id: 'dental_assistant', label: language === 'ar' ? 'مساعد طبيب' : 'Assistant', icon: '🦷' },
+                                            { id: 'dental_technician', label: language === 'ar' ? 'فني أسنان' : 'Technician', icon: '🛠️' },
+                                            { id: 'secretary', label: language === 'ar' ? 'سكرتارية' : 'Secretary', icon: '📝' },
+                                            { id: 'sales_rep', label: language === 'ar' ? 'مندوب' : 'Sales', icon: '💼' },
+                                            { id: 'custom', label: language === 'ar' ? 'آخر' : 'Other', icon: '✏️' },
+                                        ].map((role) => (
+                                            <button
+                                                key={role.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (role.id === 'custom') {
+                                                        setForm(prev => ({ ...prev, title: '' }));
+                                                    } else {
+                                                        setForm(prev => ({ ...prev, title: role.label }));
+                                                        applyTemplate(role.id);
+                                                    }
+                                                }}
+                                                className={`p-3 rounded-xl border text-sm font-medium transition-all flex flex-col items-center gap-2 ${(role.id === 'custom' && !Object.keys(smartTemplates).includes(Object.keys(smartTemplates).find(k => form.title.includes(smartTemplates[k].ar.description.split(' ')[0])) || '')) ||
+                                                    (role.id !== 'custom' && form.title === role.label)
+                                                    ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-200 hover:bg-gray-50 dark:hover:bg-gray-800'
+                                                    }`}
+                                            >
+                                                <span className="text-xl">{role.icon}</span>
+                                                {role.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
 
+                                <Input
+                                    label={t.jobTitle}
+                                    placeholder={t.jobTitlePlaceholder}
+                                    value={form.title}
+                                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                                    required
+                                />
+                            </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex justify-between items-center">
                                     <span>{t.description}</span>
@@ -630,28 +741,39 @@ export default function ClinicJobsPage() {
                                             {language === 'ar' ? 'مهارات مقترحة:' : 'Suggested Skills:'}
                                         </p>
                                         <div className="flex flex-wrap gap-2">
-                                            {getSmartSkills(form.title).map((skill) => {
-                                                const currentSkills = form.skills.toLowerCase().split(',').map(s => s.trim());
-                                                const isSelected = currentSkills.includes(skill.toLowerCase());
+                                            {/* Heuristic to find role ID from title for skills */}
+                                            {(() => {
+                                                const titleLower = form.title.toLowerCase();
+                                                let roleId = 'custom';
+                                                if (titleLower.includes('dentist') || titleLower.includes('طبيب')) roleId = 'dentist';
+                                                else if (titleLower.includes('assistant') || titleLower.includes('مساعد')) roleId = 'dental_assistant';
+                                                else if (titleLower.includes('technician') || titleLower.includes('فني')) roleId = 'dental_technician';
+                                                else if (titleLower.includes('secretary') || titleLower.includes('سكرتير')) roleId = 'secretary';
+                                                else if (titleLower.includes('sales') || titleLower.includes('مندوب')) roleId = 'sales_rep';
 
-                                                if (isSelected) return null;
+                                                return getSmartSkills(roleId).map((skill) => {
+                                                    const currentSkills = form.skills.toLowerCase().split(',').map(s => s.trim());
+                                                    const isSelected = currentSkills.includes(skill.toLowerCase());
 
-                                                return (
-                                                    <button
-                                                        key={skill}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            const newSkills = form.skills
-                                                                ? `${form.skills}, ${skill}`
-                                                                : skill;
-                                                            setForm({ ...form, skills: newSkills });
-                                                        }}
-                                                        className="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors border border-blue-100 dark:border-blue-800"
-                                                    >
-                                                        + {skill}
-                                                    </button>
-                                                );
-                                            })}
+                                                    if (isSelected) return null;
+
+                                                    return (
+                                                        <button
+                                                            key={skill}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                const newSkills = form.skills
+                                                                    ? `${form.skills}, ${skill}`
+                                                                    : skill;
+                                                                setForm({ ...form, skills: newSkills });
+                                                            }}
+                                                            className="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors border border-blue-100 dark:border-blue-800"
+                                                        >
+                                                            + {skill}
+                                                        </button>
+                                                    );
+                                                });
+                                            })()}
                                         </div>
                                     </div>
                                 )}
@@ -720,6 +842,34 @@ export default function ClinicJobsPage() {
                                     <span className="flex items-center gap-1 text-blue-600">
                                         <Users size={16} /> {job.applications} {t.applicants}
                                     </span>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50 dark:border-blue-800 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                        onClick={() => {
+                                            const lowerTitle = job.title.toLowerCase();
+                                            let roleId = '';
+                                            if (lowerTitle.includes('dentist') || lowerTitle.includes('طبيب')) roleId = 'dentist';
+                                            else if (lowerTitle.includes('assistant') || lowerTitle.includes('مساعد')) roleId = 'dental_assistant';
+                                            else if (lowerTitle.includes('technician') || lowerTitle.includes('فني')) roleId = 'dental_technician';
+                                            else if (lowerTitle.includes('secretary') || lowerTitle.includes('سكرتير')) roleId = 'secretary';
+                                            else if (lowerTitle.includes('sales') || lowerTitle.includes('مندوب')) roleId = 'sales_rep';
+
+                                            const locParts = job.location.split(' - ');
+                                            const province = locParts[0] || '';
+
+                                            const params = new URLSearchParams();
+                                            if (roleId) params.set('role', roleId);
+                                            if (province) params.set('location', province);
+                                            if (job.salary.min) params.set('minSalary', job.salary.min.toString());
+                                            if (job.salary.max) params.set('maxSalary', job.salary.max.toString());
+
+                                            router.push(`/clinic/search?${params.toString()}`);
+                                        }}
+                                    >
+                                        <span className="text-lg">⚡</span>
+                                        {language === 'ar' ? 'عرض المرشحين' : 'View Matches'}
+                                    </Button>
                                     <span className="text-xs text-gray-400">
                                         {t.posted} {formatRelativeTime(job.createdAt)}
                                     </span>

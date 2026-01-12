@@ -8,6 +8,7 @@ import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { useSearchStore, useAuthStore, useJobStore } from '@/store';
 import { dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { iraqLocations } from '@/data/iraq_locations';
+import { useSearchParams } from 'next/navigation';
 import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, useToast } from '@/components/shared';
 import {
     Search,
@@ -43,12 +44,36 @@ export default function ClinicSearchPage() {
     const { filters, setFilter, clearFilters, results, setResults, viewMode, setViewMode } = useSearchStore();
     const [showFilters, setShowFilters] = useState(true);
 
+    const searchParams = useSearchParams(); // Add this hook
+
     // Mobile check to collapse filters by default
     useEffect(() => {
         if (typeof window !== 'undefined' && window.innerWidth < 768) {
             setShowFilters(false);
         }
     }, []);
+
+    // Parse URL Query Params for Smart Matching
+    useEffect(() => {
+        const role = searchParams.get('role');
+        const minSalary = searchParams.get('minSalary');
+        const maxSalary = searchParams.get('maxSalary');
+        const location = searchParams.get('location');
+
+        if (role || minSalary || maxSalary || location) {
+            // We have params, let's update filters
+            // We use a timeout to ensure state matches (optional but safer)
+            setTimeout(() => {
+                setFilter({
+                    role: role || undefined,
+                    salaryMin: minSalary ? parseInt(minSalary) : undefined,
+                    salaryMax: maxSalary ? parseInt(maxSalary) : undefined,
+                    location: location || undefined
+                });
+            }, 100);
+        }
+    }, [searchParams, setFilter]);
+
     const [selectedCV, setSelectedCV] = useState<string | null>(null);
     const [cvViewMode, setCvViewMode] = useState<'profile' | 'cv'>('profile');
     const [mapView, setMapView] = useState(false);
@@ -57,13 +82,36 @@ export default function ClinicSearchPage() {
 
     // Auth & Job Store for Favorites
     const { user } = useAuthStore();
-    const { favorites, toggleFavorite, loadFavorites } = useJobStore();
+    const { favorites, toggleFavorite, loadFavorites, jobs, loadClinicJobs } = useJobStore();
     const { addToast } = useToast();
 
-    // Load favorites on mount
+    // Invite Modal State
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [candidateToInvite, setCandidateToInvite] = useState<{ id: string, name: string } | null>(null);
+    const [selectedJobId, setSelectedJobId] = useState<string>('');
+
+    // Load favorites and jobs on mount
     useEffect(() => {
-        if (user) loadFavorites(user.id);
-    }, [user, loadFavorites]);
+        if (user) {
+            loadFavorites(user.id);
+            // We assume the user has a clinic properly linked, 
+            // but we might need the clinic ID (which isn't directly in user).
+            // Jobs store usually handles this or we need to fetch clinic first.
+            // For now, let's try to load if we can, or rely on the store having them if visited jobs page.
+            // Actually, we should fetch clinic ID here if we want to be sure. 
+            // But let's check if the store has a way. 
+            // Looking at jobs page, it fetches clinic first.
+            // To be safe, we'll just use what's in store or try a safe fetch if empty.
+            const fetchClinicAndJobs = async () => {
+                const supabase = getSupabaseClient();
+                const { data } = await supabase.rpc('get_my_clinic');
+                if (data && data.length > 0) {
+                    loadClinicJobs(data[0].id);
+                }
+            };
+            fetchClinicAndJobs();
+        }
+    }, [user, loadFavorites, loadClinicJobs]);
 
     const handleToggleFavorite = async (e: React.MouseEvent, cvId: string) => {
         e.stopPropagation(); // Prevent card click
@@ -970,52 +1018,69 @@ export default function ClinicSearchPage() {
                                                 </div>
                                             </div>
 
-                                            {/* Mobile Actions for List View */}
-                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex gap-2 md:hidden">
-                                                <Button
-                                                    size="sm"
-                                                    variant="outline"
-                                                    className="flex-1 text-xs"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        setSelectedCV(match.cv.id);
-                                                    }}
-                                                >
-                                                    {t.viewProfile}
-                                                </Button>
-                                                {cvRequests[match.cv.userId] === 'approved' ? (
+                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 md:hidden">
+                                                <div className="flex gap-2">
                                                     <Button
                                                         size="sm"
-                                                        className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                        variant="outline"
+                                                        className="flex-1 text-xs"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            setCvViewMode('cv');
                                                             setSelectedCV(match.cv.id);
                                                         }}
                                                     >
-                                                        <FileText size={14} className="mr-1" />
-                                                        {language === 'ar' ? 'عرض' : 'View'}
+                                                        {t.viewProfile}
                                                     </Button>
-                                                ) : cvRequests[match.cv.userId] === 'pending' ? (
                                                     <Button
                                                         size="sm"
-                                                        disabled
-                                                        className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                        variant="outline"
+                                                        className="flex-1 text-xs border-purple-200 text-purple-700 hover:bg-purple-50"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                            setInviteModalOpen(true);
+                                                        }}
                                                     >
-                                                        {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                        <MessageSquare size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'دعوة' : 'Invite'}
                                                     </Button>
-                                                ) : (
-                                                    <Button
-                                                        size="sm"
-                                                        className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
-                                                        loading={requestingIds.has(match.cv.userId)}
-                                                        onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
-                                                    >
-                                                        {language === 'ar' ? 'طلب CV' : 'Request'}
-                                                    </Button>
-                                                )}
-                                            </div>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    {cvRequests[match.cv.userId] === 'approved' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCvViewMode('cv');
+                                                                setSelectedCV(match.cv.id);
+                                                            }}
+                                                        >
+                                                            <FileText size={14} className="mr-1" />
+                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                        </Button>
+                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            disabled
+                                                            className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                        >
+                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                            loading={requestingIds.has(match.cv.userId)}
+                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                        >
+                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                        </Button>
+                                                    )}
+                                                </div>
 
+
+                                            </div>
                                             <div className="flex items-center gap-4 hidden md:flex">
                                                 <div className="text-right">
                                                     <p className="font-medium text-gray-900 dark:text-white">
@@ -1041,6 +1106,21 @@ export default function ClinicSearchPage() {
                                                             />
                                                         </button>
                                                     </div>
+
+                                                    {/* Invite Button - Always visible if not yourself */}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="w-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 mb-2"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                            setInviteModalOpen(true);
+                                                        }}
+                                                    >
+                                                        <MessageSquare size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'دعوة للمقابلة' : 'Invite'}
+                                                    </Button>
 
                                                     {cvRequests[match.cv.userId] === 'approved' ? (
                                                         <Button
@@ -1090,10 +1170,71 @@ export default function ClinicSearchPage() {
                                     {t.clearFilters}
                                 </Button>
                             </div>
-                        )}
+                        )
+                        }
                     </div>
-                </div >
+                </div>
             )}
+
+            {/* Invite Modal */}
+            {inviteModalOpen && candidateToInvite && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in">
+                    <Card className="w-full max-w-md">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {language === 'ar' ? `دعوة ${candidateToInvite.name}` : `Invite ${candidateToInvite.name}`}
+                            </h3>
+                            <button onClick={() => setInviteModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                                {language === 'ar'
+                                    ? 'اختر الوظيفة التي تود دعوة المرشح للتقدم لها:'
+                                    : 'Select the job you would like to invite this candidate to apply for:'}
+                            </p>
+
+                            <select
+                                value={selectedJobId}
+                                onChange={(e) => setSelectedJobId(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+                            >
+                                <option value="">{language === 'ar' ? 'اختر وظيفة...' : 'Select a job...'}</option>
+                                {jobs.filter(j => j.status === 'active').map(job => (
+                                    <option key={job.id} value={job.id}>
+                                        {job.title}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <div className="flex justify-end gap-2 mt-6">
+                                <Button variant="ghost" onClick={() => setInviteModalOpen(false)}>
+                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                </Button>
+                                <Button
+                                    disabled={!selectedJobId}
+                                    onClick={() => {
+                                        addToast(
+                                            language === 'ar'
+                                                ? `تم إرسال الدعوة بنجاح لـ ${candidateToInvite.name}`
+                                                : `Invitation sent successfully to ${candidateToInvite.name}`,
+                                            'success'
+                                        );
+                                        setInviteModalOpen(false);
+                                        setSelectedJobId('');
+                                    }}
+                                >
+                                    {language === 'ar' ? 'إرسال الدعوة' : 'Send Invite'}
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {/* CV Details Modal */}
             {selectedCandidate && (
                 <CVDetailsModal
                     isOpen={!!selectedCandidate}

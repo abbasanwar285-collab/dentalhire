@@ -33,7 +33,7 @@ export function PageLoader() {
         <div className="fixed inset-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm flex flex-col items-center justify-center z-50">
             <div className="flex flex-col items-center gap-4">
                 <LoadingSpinner size="lg" />
-                <p className="text-gray-600 dark:text-gray-400 animate-pulse">Loading...</p>
+                <p className="text-gray-600 dark:text-gray-400 animate-pulse">جاري التحميل...</p>
             </div>
         </div>
     );

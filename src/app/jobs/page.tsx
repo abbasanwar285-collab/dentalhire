@@ -443,7 +443,7 @@ function JobsContent() {
         }
 
         if (job.employmentType === 'part_time') {
-            return `${job.salary.min.toLocaleString()}-${job.salary.max.toLocaleString()} د.ع/${language === 'ar' ? 'ساعة' : 'hr'}`;
+            return `${job.salary.min.toLocaleString()}-${job.salary.max.toLocaleString()} د.ع/${language === 'ar' ? 'يوم' : 'day'}`;
         }
 
         // Ensure values are numbers before toFixed and handle "K" inputs

@@ -9,6 +9,7 @@ import { useSearchStore, useAuthStore, useJobStore } from '@/store';
 import { dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { iraqLocations } from '@/data/iraq_locations';
 import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, InviteCandidateModal } from '@/components/shared';
+import MobileSearchFilters from '@/components/shared/MobileSearchFilters';
 import {
     Search,
     Grid3X3,
@@ -426,65 +427,251 @@ export default function ClinicSearchPage() {
 
     return (
         <div className="space-y-6 animate-fade-in pb-12">
-            {/* Header with Search Bar */}
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {/* Header with Search and Quick Filters */}
+            <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 sticky top-16 md:top-20 z-20">
+                <div className="flex flex-col gap-4">
+                    {/* Top Row: Title & Count */}
+                    <div className="flex justify-between items-center md:hidden">
+                        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
                             {t.findCandidates}
                         </h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-                            {isLoading ? t.searching : (isSearching ? t.searching : `${filteredResults.length} ${t.candidatesMatch}`)}
-                        </p>
+                        <span className="text-xs font-medium px-2 py-1 bg-blue-50 text-blue-600 rounded-full">
+                            {filteredResults.length}
+                        </span>
                     </div>
 
-                    <div className="flex-1 max-w-xl w-full">
-                        <Input
-                            placeholder={t.searchCandidates}
-                            value={filters.query || ''}
-                            onChange={(e) => setFilter('query', e.target.value)}
-                            leftIcon={<Search size={18} />}
-                            className="w-full bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 focus:border-blue-500"
-                        />
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <div className="flex items-center border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-900">
-                            <button
-                                aria-label="Grid View"
-                                onClick={() => { setViewMode('grid'); setMapView(false); }}
-                                className={`p-2 transition-colors ${!mapView && viewMode === 'grid' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-                            >
-                                <Grid3X3 size={20} />
-                            </button>
-                            <button
-                                aria-label="List View"
-                                onClick={() => { setViewMode('list'); setMapView(false); }}
-                                className={`p-2 transition-colors ${!mapView && viewMode === 'list' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800'}`}
-                            >
-                                <List size={20} />
-                            </button>
+                    {/* Search Bar Row */}
+                    <div className="flex gap-3">
+                        <div className="relative flex-1">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <Search size={20} />
+                            </div>
+                            <input
+                                type="text"
+                                placeholder={t.searchCandidates}
+                                value={filters.query || ''}
+                                onChange={(e) => setFilter('query', e.target.value)}
+                                className="w-full pl-10 pr-4 py-3 rounded-xl border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                            />
                         </div>
 
                         <Button
                             variant={mapView ? 'primary' : 'outline'}
-                            leftIcon={<MapIcon size={18} />}
                             onClick={() => setMapView(!mapView)}
+                            className="hidden md:flex px-4"
+                            title={t.mapView}
                         >
-                            {mapView ? t.listView : t.mapView}
+                            <MapIcon size={20} />
                         </Button>
 
-                        <Button
-                            variant={showFilters ? 'primary' : 'outline'}
-                            leftIcon={<SlidersHorizontal size={18} />}
-                            onClick={() => setShowFilters(!showFilters)}
-                            className="md:hidden"
+                        <button
+                            aria-label="Filter"
+                            onClick={() => setShowFilters(true)}
+                            className="md:hidden p-3 bg-blue-600 text-white rounded-xl shadow-lg shadow-blue-200 dark:shadow-none active:scale-95 transition-transform"
                         >
-                            {t.filters}
-                        </Button>
+                            <SlidersHorizontal size={22} />
+                        </button>
+                    </div>
+
+                    {/* Quick Role Filters (Horizontal Scroll) */}
+                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar scroll-smooth">
+                        <button
+                            onClick={() => setFilter('role', undefined)}
+                            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${!filters.role
+                                ? 'bg-gray-900 text-white dark:bg-white dark:text-gray-900'
+                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400'
+                                }`}
+                        >
+                            {language === 'ar' ? 'الكل' : 'All'}
+                        </button>
+                        {roles.map(role => (
+                            <button
+                                key={role.id}
+                                onClick={() => setFilter('role', role.id === filters.role ? undefined : role.id)}
+                                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filters.role === role.id
+                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-200 dark:shadow-none'
+                                    : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300'
+                                    }`}
+                            >
+                                {role.icon}
+                                <span>{role.label}</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
             </div>
+
+            {/* Mobile Filters Modal */}
+            <MobileSearchFilters
+                isOpen={showFilters}
+                onClose={() => setShowFilters(false)}
+                t={t}
+                onReset={() => {
+                    clearFilters();
+                    setSelectedGov('');
+                    setSelectedDistrict('');
+                    setArea('');
+                }}
+            >
+                {/* Re-using the filter content logic */}
+                <div className="space-y-6">
+                    {/* Role Filter */}
+                    <div>
+                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                            {t.role}
+                        </label>
+                        <select
+                            aria-label={t.role}
+                            value={filters.role || ''}
+                            onChange={(e) => setFilter('role', e.target.value)}
+                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-shadow appearance-none"
+                            style={{ backgroundImage: 'none' }}
+                        >
+                            <option value="" className="text-gray-500">{t.select}</option>
+                            {roles.map(role => (
+                                <option key={role.id} value={role.id} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                    {role.label}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <hr className="border-gray-100 dark:border-gray-700" />
+
+                    {/* Location Filter */}
+                    <div>
+                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                            {t.location}
+                        </label>
+                        <div className="space-y-3">
+                            {/* Governorate */}
+                            <div>
+                                <label className="text-xs text-gray-500 mb-1 block">{t.governorate}</label>
+                                <select
+                                    aria-label={t.governorate}
+                                    value={selectedGov}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        setSelectedGov(val);
+                                        setSelectedDistrict('');
+                                        setArea('');
+                                        updateLocationFilter(val, '', '');
+                                    }}
+                                    className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                    style={{ backgroundImage: 'none' }}
+                                >
+                                    <option value="" className="text-gray-500">{t.select}</option>
+                                    {Object.keys(iraqLocations).map(gov => (
+                                        <option key={gov} value={gov} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                            {language === 'ar' ? (iraqLocations as any)[gov].ar : gov}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* District */}
+                            {selectedGov && (
+                                <div className="animate-fade-in">
+                                    <label className="text-xs text-gray-500 mb-1 block">{t.district}</label>
+                                    <select
+                                        aria-label={t.district}
+                                        value={selectedDistrict}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setSelectedDistrict(val);
+                                            setArea('');
+                                            updateLocationFilter(selectedGov, val, '');
+                                        }}
+                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                        style={{ backgroundImage: 'none' }}
+                                    >
+                                        <option value="" className="text-gray-500">{t.select}</option>
+                                        {(iraqLocations as any)[selectedGov]?.districts.map((d: any) => (
+                                            <option key={d.en} value={d.en} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                                {language === 'ar' ? d.ar : d.en}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )}
+
+                            {/* Area / Neighborhood */}
+                            {selectedDistrict && (
+                                <div className="animate-fade-in">
+                                    <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
+                                    <Input
+                                        placeholder={t.area}
+                                        value={area}
+                                        onChange={(e) => {
+                                            setArea(e.target.value);
+                                            updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
+                                        }}
+                                        className="bg-gray-50 dark:bg-gray-800"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <hr className="border-gray-100 dark:border-gray-700" />
+
+                    {/* Salary Range */}
+                    <div>
+                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                            {t.salaryRange}
+                        </label>
+                        <select
+                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
+                            onChange={(e) => {
+                                const [min, max] = e.target.value.split('-').map(Number);
+                                setFilter('salaryMin', min);
+                                setFilter('salaryMax', max);
+                            }}
+                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                            style={{ backgroundImage: 'none' }}
+                        >
+                            <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
+                            <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
+                            <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
+                            <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>
+                            <option value="2000-3000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$2,000 - $3,000</option>
+                            <option value="3000-5000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$3,000 - $5,000</option>
+                            <option value="5000-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من $5,000' : 'Above $5,000'}</option>
+                        </select>
+                    </div>
+
+                    {/* Employment Type */}
+                    <div>
+                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                            {t.employmentType}
+                        </label>
+                        <div className="space-y-2">
+                            {['full_time', 'part_time', 'contract', 'temporary'].map(type => (
+                                <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={filters.employmentType?.includes(type as any) || false}
+                                            onChange={(e) => {
+                                                const current = filters.employmentType || [];
+                                                if (e.target.checked) {
+                                                    setFilter('employmentType', [...current, type as any]);
+                                                } else {
+                                                    setFilter('employmentType', current.filter((t: any) => t !== type));
+                                                }
+                                            }}
+                                            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                        />
+                                    </div>
+                                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
+                                        {employmentTypeLabels[type]}
+                                    </span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </MobileSearchFilters>
 
             {mapView ? (
                 // Map View
@@ -527,241 +714,211 @@ export default function ClinicSearchPage() {
                 </div>
             ) : (
                 <div className="flex flex-col md:flex-row gap-6">
-                    {/* Filters Sidebar */}
-                    {showFilters && (
-                        <div className="w-full md:w-72 flex-shrink-0">
-                            <Card className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                        <SlidersHorizontal size={18} />
-                                        {t.filters}
-                                    </h3>
-                                    <button onClick={() => {
-                                        clearFilters();
-                                        setSelectedGov('');
-                                        setSelectedDistrict('');
-                                        setArea('');
-                                    }} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                                        {t.clearAll}
-                                    </button>
+                    {/* Filters Sidebar (Desktop Only) */}
+                    <div className="hidden md:block w-72 flex-shrink-0">
+                        <Card className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+                            <div className="flex items-center justify-between mb-6">
+                                <h3 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                    <SlidersHorizontal size={18} />
+                                    {t.filters}
+                                </h3>
+                                <button onClick={() => {
+                                    clearFilters();
+                                    setSelectedGov('');
+                                    setSelectedDistrict('');
+                                    setArea('');
+                                }} className="text-xs text-blue-600 hover:text-blue-700 font-medium">
+                                    {t.clearAll}
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                {/* Role Filter */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                        {t.role}
+                                    </label>
+                                    <select
+                                        aria-label={t.role}
+                                        value={filters.role || ''}
+                                        onChange={(e) => setFilter('role', e.target.value)}
+                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-shadow appearance-none"
+                                        style={{ backgroundImage: 'none' }}
+                                    >
+                                        <option value="" className="text-gray-500">{t.select}</option>
+                                        {roles.map(role => (
+                                            <option key={role.id} value={role.id} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                                {role.label}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
 
-                                <div className="space-y-6">
-                                    {/* Role Filter */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.role}
-                                        </label>
-                                        <select
-                                            aria-label={t.role}
-                                            value={filters.role || ''}
-                                            onChange={(e) => setFilter('role', e.target.value)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 transition-shadow appearance-none"
-                                            style={{ backgroundImage: 'none' }}
-                                        >
-                                            <option value="" className="text-gray-500">{t.select}</option>
-                                            {roles.map(role => (
-                                                <option key={role.id} value={role.id} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
-                                                    {role.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+                                <hr className="border-gray-100 dark:border-gray-700" />
 
-                                    <hr className="border-gray-100 dark:border-gray-700" />
+                                {/* Location Filter */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                                        {t.location}
+                                    </label>
+                                    <div className="space-y-3">
+                                        {/* Governorate */}
+                                        <div>
+                                            <label className="text-xs text-gray-500 mb-1 block">{t.governorate}</label>
+                                            <select
+                                                aria-label={t.governorate}
+                                                value={selectedGov}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    setSelectedGov(val);
+                                                    setSelectedDistrict('');
+                                                    setArea('');
+                                                    updateLocationFilter(val, '', '');
+                                                }}
+                                                className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                                style={{ backgroundImage: 'none' }}
+                                            >
+                                                <option value="" className="text-gray-500">{t.select}</option>
+                                                {Object.keys(iraqLocations).map(gov => (
+                                                    <option key={gov} value={gov} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                                        {language === 'ar' ? (iraqLocations as any)[gov].ar : gov}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
 
-                                    {/* Location Filter */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
-                                            {t.location}
-                                        </label>
-                                        <div className="space-y-3">
-                                            {/* Governorate */}
-                                            <div>
-                                                <label className="text-xs text-gray-500 mb-1 block">{t.governorate}</label>
+                                        {/* District */}
+                                        {selectedGov && (
+                                            <div className="animate-fade-in">
+                                                <label className="text-xs text-gray-500 mb-1 block">{t.district}</label>
                                                 <select
-                                                    aria-label={t.governorate}
-                                                    value={selectedGov}
+                                                    aria-label={t.district}
+                                                    value={selectedDistrict}
                                                     onChange={(e) => {
                                                         const val = e.target.value;
-                                                        setSelectedGov(val);
-                                                        setSelectedDistrict('');
+                                                        setSelectedDistrict(val);
                                                         setArea('');
-                                                        updateLocationFilter(val, '', '');
+                                                        updateLocationFilter(selectedGov, val, '');
                                                     }}
                                                     className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
                                                     style={{ backgroundImage: 'none' }}
                                                 >
                                                     <option value="" className="text-gray-500">{t.select}</option>
-                                                    {Object.keys(iraqLocations).map(gov => (
-                                                        <option key={gov} value={gov} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
-                                                            {language === 'ar' ? (iraqLocations as any)[gov].ar : gov}
+                                                    {(iraqLocations as any)[selectedGov]?.districts.map((d: any) => (
+                                                        <option key={d.en} value={d.en} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                                            {language === 'ar' ? d.ar : d.en}
                                                         </option>
                                                     ))}
                                                 </select>
                                             </div>
+                                        )}
 
-                                            {/* District */}
-                                            {selectedGov && (
-                                                <div className="animate-fade-in">
-                                                    <label className="text-xs text-gray-500 mb-1 block">{t.district}</label>
-                                                    <select
-                                                        aria-label={t.district}
-                                                        value={selectedDistrict}
-                                                        onChange={(e) => {
-                                                            const val = e.target.value;
-                                                            setSelectedDistrict(val);
-                                                            setArea('');
-                                                            updateLocationFilter(selectedGov, val, '');
-                                                        }}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
-                                                        style={{ backgroundImage: 'none' }}
-                                                    >
-                                                        <option value="" className="text-gray-500">{t.select}</option>
-                                                        {(iraqLocations as any)[selectedGov]?.districts.map((d: any) => (
-                                                            <option key={d.en} value={d.en} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
-                                                                {language === 'ar' ? d.ar : d.en}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            )}
-
-                                            {/* Area / Neighborhood */}
-                                            {selectedDistrict && (
-                                                <div className="animate-fade-in">
-                                                    <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
-                                                    <Input
-                                                        placeholder={t.area}
-                                                        value={area}
-                                                        onChange={(e) => {
-                                                            setArea(e.target.value);
-                                                            updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
-                                                        }}
-                                                        className="bg-gray-50 dark:bg-gray-800"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Experience Filter (Kept as is) */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.minimumExperience}
-                                        </label>
-                                        <select
-                                            aria-label={t.minimumExperience}
-                                            value={filters.experienceMin || ''}
-                                            onChange={(e) => setFilter('experienceMin', e.target.value ? parseInt(e.target.value) : undefined)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
-                                        >
-                                            <option value="">{t.any}</option>
-                                            <option value="1">1 {t.yearsPlus}</option>
-                                            <option value="2">2 {t.yearsPlus}</option>
-                                            <option value="3">3 {t.yearsPlus}</option>
-                                            <option value="5">5 {t.yearsPlus}</option>
-                                            <option value="10">10 {t.yearsPlus}</option>
-                                        </select>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Salary Range - Simplified Dropdown */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
-                                            {t.salaryRange}
-                                        </label>
-                                        <select
-                                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
-                                            onChange={(e) => {
-                                                const [min, max] = e.target.value.split('-').map(Number);
-                                                setFilter('salaryMin', min);
-                                                setFilter('salaryMax', max);
-                                            }}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
-                                            style={{ backgroundImage: 'none' }}
-                                        >
-                                            <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
-                                            <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
-                                            <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
-                                            <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>
-                                            <option value="2000-3000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$2,000 - $3,000</option>
-                                            <option value="3000-5000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$3,000 - $5,000</option>
-                                            <option value="5000-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من $5,000' : 'Above $5,000'}</option>
-                                        </select>
-                                        <div className="mt-2 text-xs text-center text-gray-400">
-                                            {t.min}: ${filters.salaryMin || 0} - {t.max}: ${filters.salaryMax || 10000}
-                                        </div>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Employment Type */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.employmentType}
-                                        </label>
-                                        <div className="space-y-2">
-                                            {['full_time', 'part_time', 'contract', 'temporary'].map(type => (
-                                                <label key={type} className="flex items-center gap-2 cursor-pointer group">
-                                                    <div className="relative flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={filters.employmentType?.includes(type as any) || false}
-                                                            onChange={(e) => {
-                                                                const current = filters.employmentType || [];
-                                                                if (e.target.checked) {
-                                                                    setFilter('employmentType', [...current, type as any]);
-                                                                } else {
-                                                                    setFilter('employmentType', current.filter((t: any) => t !== type));
-                                                                }
-                                                            }}
-                                                            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                        />
-                                                    </div>
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
-                                                        {employmentTypeLabels[type]}
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Skills Filter */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.skills}
-                                        </label>
-                                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                                            {(language === 'ar' ? dentalSkillsAr : dentalSkills).slice(0, 15).map(skill => (
-                                                <button
-                                                    key={skill}
-                                                    onClick={() => {
-                                                        const current = filters.skills || [];
-                                                        if (current.includes(skill)) {
-                                                            setFilter('skills', current.filter(s => s !== skill));
-                                                        } else {
-                                                            setFilter('skills', [...current, skill]);
-                                                        }
+                                        {/* Area / Neighborhood */}
+                                        {selectedDistrict && (
+                                            <div className="animate-fade-in">
+                                                <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
+                                                <Input
+                                                    placeholder={t.area}
+                                                    value={area}
+                                                    onChange={(e) => {
+                                                        setArea(e.target.value);
+                                                        updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
                                                     }}
-                                                    className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
-                                                        ? 'bg-blue-500 text-white shadow-md'
-                                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                        }`}
-                                                >
-                                                    {skill}
-                                                </button>
-                                            ))}
-                                        </div>
+                                                    className="bg-gray-50 dark:bg-gray-800"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </Card>
-                        </div>
-                    )
-                    }
+
+                                <hr className="border-gray-100 dark:border-gray-700" />
+
+                                {/* Salary Range */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                                        {t.salaryRange}
+                                    </label>
+                                    <select
+                                        value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
+                                        onChange={(e) => {
+                                            const [min, max] = e.target.value.split('-').map(Number);
+                                            setFilter('salaryMin', min);
+                                            setFilter('salaryMax', max);
+                                        }}
+                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                        style={{ backgroundImage: 'none' }}
+                                    >
+                                        <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
+                                        <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
+                                        <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
+                                        <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>
+                                        <option value="2000-3000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$2,000 - $3,000</option>
+                                        <option value="3000-5000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$3,000 - $5,000</option>
+                                        <option value="5000-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من $5,000' : 'Above $5,000'}</option>
+                                    </select>
+                                </div>
+
+                                {/* Employment Type */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                        {t.employmentType}
+                                    </label>
+                                    <div className="space-y-2">
+                                        {['full_time', 'part_time', 'contract', 'temporary'].map(type => (
+                                            <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                                                <div className="relative flex items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.employmentType?.includes(type as any) || false}
+                                                        onChange={(e) => {
+                                                            const current = filters.employmentType || [];
+                                                            if (e.target.checked) {
+                                                                setFilter('employmentType', [...current, type as any]);
+                                                            } else {
+                                                                setFilter('employmentType', current.filter((t: any) => t !== type));
+                                                            }
+                                                        }}
+                                                        className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                                <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
+                                                    {employmentTypeLabels[type]}
+                                                </span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Skills Filter */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                        {t.skills}
+                                    </label>
+                                    <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
+                                        {(language === 'ar' ? dentalSkillsAr : dentalSkills).slice(0, 15).map(skill => (
+                                            <button
+                                                key={skill}
+                                                onClick={() => {
+                                                    const current = filters.skills || [];
+                                                    if (current.includes(skill)) {
+                                                        setFilter('skills', current.filter(s => s !== skill));
+                                                    } else {
+                                                        setFilter('skills', [...current, skill]);
+                                                    }
+                                                }}
+                                                className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
+                                                    ? 'bg-blue-500 text-white shadow-md'
+                                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                    }`}
+                                            >
+                                                {skill}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </Card>
+                    </div>
 
                     {/* Results Grid */}
                     <div className="flex-1">
@@ -797,19 +954,115 @@ export default function ClinicSearchPage() {
                                                                 fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
                                                             />
                                                         </button>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setInviteCandidate({ id: match.cv.id, name: match.cv?.personalInfo?.fullName || 'Candidate' });
-                                                            }}
-                                                            className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
-                                                            title={t.invite}
-                                                        >
-                                                            <Send size={18} />
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            <div className="mb-4">
+                                                <h3 className="font-bold text-gray-900 dark:text-white truncate">
+                                                    {match.cv.personalInfo.fullName || t.dentalProfessional}
+                                                </h3>
+                                                <p className="text-sm text-blue-600 dark:text-blue-400 font-medium truncate">
+                                                    {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
+                                                </p>
+                                                <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+                                                    <MapPin size={12} />
+                                                    <span className="truncate">{match.cv.personalInfo.city || t.location}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-wrap gap-1 mb-4">
+                                                {match.cv.skills.slice(0, 3).map((skill: string, i: number) => (
+                                                    <span key={i} className="px-2 py-1 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-[10px] rounded-md">
+                                                        {skill}
+                                                    </span>
+                                                ))}
+                                                {match.cv.skills.length > 3 && (
+                                                    <span className="px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-400 text-[10px] rounded-md">
+                                                        +{match.cv.skills.length - 3}
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
+                                                <span>{getExperienceLabel(match.cv.experience)}</span>
+                                                <span>{(match.cv.salary.expected / 1000).toFixed(0)}k {match.cv.salary.currency || 'IQD'}</span>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {filteredResults.map((match) => (
+                                        <Card key={match.cv.id} hover onClick={() => setSelectedCV(match.cv.id)}>
+                                            <div className="flex gap-4">
+                                                <div className="w-16 h-16 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex-shrink-0 flex items-center justify-center text-white font-bold text-xl">
+                                                    {match.cv?.personalInfo?.photo ? (
+                                                        <img src={match.cv.personalInfo.photo} alt={match.cv.personalInfo.fullName || 'Candidate'} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        (match.cv?.personalInfo?.fullName || 'C').split(' ').map((n: string) => n[0]).join('').substring(0, 2)
+                                                    )}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex justify-between items-start">
+                                                        <div>
+                                                            <h3 className="font-bold text-gray-900 dark:text-white truncate">
+                                                                {match.cv.personalInfo.fullName || t.dentalProfessional}
+                                                            </h3>
+                                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                                                                {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
+                                                            </p>
+                                                        </div>
+                                                        <MatchScore score={match.score} size="sm" />
+                                                    </div>
+
+                                                    <div className="flex gap-4 text-sm text-gray-500 mt-2">
+                                                        <div className="flex items-center gap-1">
+                                                            <Briefcase size={14} />
+                                                            <span>{getExperienceLabel(match.cv.experience)}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <MapPin size={14} />
+                                                            <span>{match.cv.personalInfo.city || t.location}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </Card>
+                                    ))}
+                                </div>
+                            )
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-20 text-center">
+                                <div className="w-20 h-20 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
+                                    <Search size={32} className="text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                                    {t.noCandidatesFound}
+                                </h3>
+                                <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto mb-6">
+                                    {t.tryAdjusting}
+                                </p>
+                                <Button variant="outline" onClick={clearFilters}>
+                                    {t.clearFilters}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+            onClick={(e) => {
+                e.stopPropagation();
+                setInviteCandidate({ id: match.cv.id, name: match.cv?.personalInfo?.fullName || 'Candidate' });
+            }}
+            className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+            title={t.invite}
+                                                        >
+            <Send size={18} />
+        </button>
+                                                    </div >
+                                                </div >
+                                            </div >
                                             <h3 className="font-semibold text-gray-900 dark:text-white truncate">
                                                 {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
                                             </h3>
@@ -840,111 +1093,114 @@ export default function ClinicSearchPage() {
                                                     </span>
                                                 )}
                                             </div>
-                                        </Card>
-                                    ))}
-                                </div>
+                                        </Card >
+                                    ))
+}
+                                </div >
                             ) : (
-                                <div className="space-y-3">
-                                    {filteredResults.map((match) => (
-                                        <Card key={match.cv.id} hover onClick={() => setSelectedCV(match.cv.id)}>
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                                                    {match.cv.personalInfo.photo ? (
-                                                        <img src={match.cv.personalInfo.photo} alt={match.cv.personalInfo.fullName} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        match.cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
-                                                    )}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="font-semibold text-gray-900 dark:text-white">
-                                                        {match.cv.personalInfo.fullName}
-                                                    </h3>
-                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                        {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
-                                                    </p>
-                                                    <div className="flex flex-wrap gap-1 mt-2">
-                                                        {match.cv.skills.slice(0, 4).map((skill: string) => (
-                                                            <SkillBadge key={skill} skill={skill} size="sm" />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
-                                                    <span className="flex items-center gap-1" title={match.cv.location.preferred?.[0] || match.cv.personalInfo.city}>
-                                                        <MapPin size={14} /> <span className="truncate max-w-[150px]">{match.cv.location.preferred?.[0] || match.cv.personalInfo.city}</span>
-                                                    </span>
-                                                    <span className="flex items-center gap-1">
-                                                        <Briefcase size={14} /> {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
-                                                    </span>
-                                                    <span className="flex items-center gap-1">
-                                                        <DollarSign size={14} /> {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-4 hidden md:flex">
-                                                <div className="text-right">
-                                                    <p className="font-medium text-gray-900 dark:text-white">
-                                                        {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
-                                                    </p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
-                                                    </p>
-                                                </div>
-                                                <div className="flex flex-col items-end gap-2">
-                                                    <MatchScore score={match.score} size="sm" />
-                                                    <div className="flex gap-1">
-                                                        <button
-                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                                }`}
-                                                        >
-                                                            <Heart
-                                                                size={18}
-                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                            />
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setInviteCandidate({ id: match.cv.id, name: match.cv.personalInfo.fullName });
-                                                            }}
-                                                            className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
-                                                            title={t.invite}
-                                                        >
-                                                            <Send size={18} />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )
+    <div className="space-y-3">
+        {filteredResults.map((match) => (
+            <Card key={match.cv.id} hover onClick={() => setSelectedCV(match.cv.id)}>
+                <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                        {match.cv.personalInfo.photo ? (
+                            <img src={match.cv.personalInfo.photo} alt={match.cv.personalInfo.fullName} className="w-full h-full object-cover" />
                         ) : (
-                            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-                                    <Search size={32} className="text-gray-400" />
-                                </div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t.noCandidatesFound}</h3>
-                                <p className="text-gray-500 mt-1 mb-4">{t.tryAdjusting}</p>
-                                <Button variant="outline" onClick={clearFilters}>
-                                    {t.clearFilters}
-                                </Button>
-                            </div>
+                            match.cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
                         )}
                     </div>
+                    <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                            {match.cv.personalInfo.fullName}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                            {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
+                        </p>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                            {match.cv.skills.slice(0, 4).map((skill: string) => (
+                                <SkillBadge key={skill} skill={skill} size="sm" />
+                            ))}
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
+                        <span className="flex items-center gap-1" title={match.cv.location.preferred?.[0] || match.cv.personalInfo.city}>
+                            <MapPin size={14} /> <span className="truncate max-w-[150px]">{match.cv.location.preferred?.[0] || match.cv.personalInfo.city}</span>
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <Briefcase size={14} /> {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <DollarSign size={14} /> {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع
+                        </span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-4 hidden md:flex">
+                    <div className="text-right">
+                        <p className="font-medium text-gray-900 dark:text-white">
+                            {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
+                        </p>
+                        <p className="text-xs text-gray-500">
+                            {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
+                        </p>
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                        <MatchScore score={match.score} size="sm" />
+                        <div className="flex gap-1">
+                            <button
+                                onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                    ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                    : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                    }`}
+                            >
+                                <Heart
+                                    size={18}
+                                    fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                />
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setInviteCandidate({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                }}
+                                className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                                title={t.invite}
+                            >
+                                <Send size={18} />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Card>
+        ))}
+    </div>
+)
+                        ) : (
+    <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+            <Search size={32} className="text-gray-400" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t.noCandidatesFound}</h3>
+        <p className="text-gray-500 mt-1 mb-4">{t.tryAdjusting}</p>
+        <Button variant="outline" onClick={clearFilters}>
+            {t.clearFilters}
+        </Button>
+    </div>
+)}
+                    </div >
                 </div >
             )}
-            {inviteCandidate && (
-                <InviteCandidateModal
-                    isOpen={!!inviteCandidate}
-                    onClose={() => setInviteCandidate(null)}
-                    candidateId={inviteCandidate.id}
-                    candidateName={inviteCandidate.name}
-                />
-            )}
+{
+    inviteCandidate && (
+        <InviteCandidateModal
+            isOpen={!!inviteCandidate}
+            onClose={() => setInviteCandidate(null)}
+            candidateId={inviteCandidate.id}
+            candidateName={inviteCandidate.name}
+        />
+    )
+}
         </div >
     );
 }

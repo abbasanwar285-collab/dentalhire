@@ -22,45 +22,54 @@ import {
     MoreVertical,
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import MobileStatsCarousel from '@/components/dashboard/widgets/MobileStatsCarousel';
+import MobileUserListItem from '@/components/dashboard/widgets/MobileUserListItem';
 
 export default function AdminDashboard() {
     const { t } = useLanguage();
     const router = useRouter();
 
-    const stats = [
-        {
-            label: t('admin.stats.users'),
-            value: mockAnalytics.totalUsers.toLocaleString(),
-            icon: <Users size={24} />,
-            change: '-',
-            changeType: 'positive',
-            color: 'blue',
-        },
-        {
-            label: t('admin.stats.jobseekers'),
-            value: mockAnalytics.totalJobSeekers.toLocaleString(),
-            icon: <Briefcase size={24} />,
-            change: '-',
-            changeType: 'positive',
-            color: 'green',
-        },
-        {
-            label: t('admin.stats.clinics'),
-            value: mockAnalytics.totalClinics.toLocaleString(),
-            icon: <Building2 size={24} />,
-            change: '-',
-            changeType: 'positive',
-            color: 'purple',
-        },
-        {
-            label: t('admin.stats.activecvs'),
-            value: mockAnalytics.totalCVs.toLocaleString(),
-            icon: <FileText size={24} />,
-            change: '-',
-            changeType: 'positive',
-            color: 'teal',
-        },
-    ];
+    const stats: {
+        label: string;
+        value: string;
+        icon: React.ReactNode;
+        change: string;
+        changeType: 'positive' | 'negative';
+        color: string;
+    }[] = [
+            {
+                label: t('admin.stats.users'),
+                value: mockAnalytics.totalUsers.toLocaleString(),
+                icon: <Users size={24} />,
+                change: '-',
+                changeType: 'positive',
+                color: 'blue',
+            },
+            {
+                label: t('admin.stats.jobseekers'),
+                value: mockAnalytics.totalJobSeekers.toLocaleString(),
+                icon: <Briefcase size={24} />,
+                change: '-',
+                changeType: 'positive',
+                color: 'green',
+            },
+            {
+                label: t('admin.stats.clinics'),
+                value: mockAnalytics.totalClinics.toLocaleString(),
+                icon: <Building2 size={24} />,
+                change: '-',
+                changeType: 'positive',
+                color: 'purple',
+            },
+            {
+                label: t('admin.stats.activecvs'),
+                value: mockAnalytics.totalCVs.toLocaleString(),
+                icon: <FileText size={24} />,
+                change: '-',
+                changeType: 'positive',
+                color: 'teal',
+            },
+        ];
 
     // Real users will come from database
     const recentUsers: { id: string; name: string; email: string; type: string; status: string; date: string }[] = [];
@@ -87,7 +96,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                     <Card key={index} hover>
                         <div className="flex items-start justify-between">
@@ -110,6 +119,11 @@ export default function AdminDashboard() {
                 ))}
             </div>
 
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden">
+                <MobileStatsCarousel stats={stats} />
+            </div>
+
             <div className="grid lg:grid-cols-3 gap-6">
                 {/* Recent Users */}
                 <Card className="lg:col-span-2">
@@ -123,7 +137,8 @@ export default function AdminDashboard() {
                         }
                     />
                     <CardContent>
-                        <div className="overflow-x-auto">
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
                             <table className="w-full">
                                 <thead>
                                     <tr className="text-left text-sm text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
@@ -173,6 +188,13 @@ export default function AdminDashboard() {
                                     ))}
                                 </tbody>
                             </table>
+                        </div>
+
+                        {/* Mobile List View */}
+                        <div className="md:hidden space-y-3">
+                            {recentUsers.map((user) => (
+                                <MobileUserListItem key={user.id} user={user} />
+                            ))}
                         </div>
                     </CardContent>
                 </Card>

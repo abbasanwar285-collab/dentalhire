@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Navbar, Sidebar } from '@/components/layout';
+import { Navbar, Sidebar, BottomNav } from '@/components/layout';
 import { useAuthStore } from '@/store';
 import { PageLoader, NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -160,42 +160,48 @@ export default function DashboardLayout({
             </div>
             <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-            {/* Mobile Sticky Header */}
-            <div className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 z-30 flex items-center justify-between px-4 transition-all duration-300">
-                <div className="flex items-center gap-3">
+            {/* Mobile Native-Style Header */}
+            <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 z-30 flex items-center justify-between px-4 transition-all duration-300 safe-top">
+                <div className="flex items-center gap-2">
                     <button
                         onClick={() => setIsSidebarOpen(true)}
-                        className="p-2 -ms-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+                        className="p-2 -ms-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors active:scale-95"
                         aria-label={language === 'ar' ? 'فتح القائمة' : 'Open Menu'}
                     >
                         <Menu size={24} />
                     </button>
+                    {/* Centered Logo/Title for Mobile */}
                     <span className="font-bold text-lg bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
                         Hire Me
                     </span>
                 </div>
-                {/* Actions */}
-                <div className="flex items-center gap-2">
+
+                {/* Right Actions */}
+                <div className="flex items-center gap-1">
                     <Link
                         href="/notifications"
                         aria-label={language === 'ar' ? 'الإشعارات' : 'Notifications'}
-                        className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                        className="relative p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 active:scale-95"
                     >
-                        <Bell size={20} />
+                        <Bell size={22} />
                         {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-[10px] font-bold text-white bg-red-500 rounded-full animate-pulse shadow-sm">
-                                {unreadCount > 9 ? '9+' : unreadCount}
+                            <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-2.5 h-2.5 bg-red-500 rounded-full ring-2 ring-white dark:ring-gray-900 animate-pulse">
                             </span>
                         )}
                     </Link>
                 </div>
-            </div>
+            </header>
 
-            <main className="md:ps-64 pt-20 md:pt-28 min-h-screen transition-all duration-300">
-                <div className="px-4 md:px-6 pb-20 md:pb-6">
+            <main className="md:ps-64 pt-16 md:pt-28 min-h-screen transition-all duration-300">
+                <div className="px-4 md:px-6 pb-24 md:pb-6">
                     {children}
                 </div>
             </main>
+
+            {/* Mobile Bottom Navigation */}
+            <div className="md:hidden">
+                <BottomNav />
+            </div>
 
             {/* Employer Onboarding Modal */}
             <EmployerOnboardingModal

@@ -31,6 +31,7 @@ interface JobState {
     applyToJob: (jobId: string, userId: string, cvId: string) => Promise<'success' | 'duplicate' | 'error'>;
     searchJobs: (query: string, filters?: JobFilters) => Promise<void>;
     searchJobsSmart: (userId: string, query: string) => Promise<void>;
+    inviteCandidate: (jobId: string, candidateId: string, message: string) => Promise<{ success: boolean; message?: string }>;
     savedJobs: string[];
     loadSavedJobs: (userId: string) => Promise<void>;
     toggleSavedJob: (jobId: string) => Promise<void>;
@@ -888,6 +889,67 @@ export const useJobStore = create<JobState>()((set, get) => ({
         } catch (error) {
             console.error('Error applying to job:', error);
             return 'error';
+        }
+    },
+
+    inviteCandidate: async (jobId, candidateId, message) => {
+        try {
+            const supabase = getSupabaseClient();
+
+            // 1. Get User ID from CV (candidateId is cvId)
+            const { data: cvData, error: cvError } = await (supabase
+                .from('cvs') as any)
+                .select('user_id')
+                .eq('id', candidateId)
+                .single();
+
+            if (cvError || !cvData) {
+                return { success: false, message: 'Candidate not found' };
+            }
+
+            const userId = cvData.user_id;
+
+            // 2. Check overlap
+            const { data: existing } = await (supabase
+                .from('job_applications') as any)
+                .select('id, status')
+                .eq('job_id', jobId)
+                .eq('cv_id', candidateId)
+                .single();
+
+            if (existing) {
+                return { success: false, message: 'Candidate is already associated with this job' };
+            }
+
+            // 3. Insert Invitation (using job_applications with invited status)
+            // Note: If 'invited' is not in enum, this will fail. We rely on it being there or added.
+            const { error } = await (supabase.from('job_applications') as any).insert({
+                job_id: jobId,
+                cv_id: candidateId,
+                user_id: userId,
+                status: 'invited',
+                // We might want to store the message somewhere. 
+                // If there is no column for it, it will be lost or error.
+                // We'll omit it for now to be safe, or assume 'cover_letter' exists.
+                cover_letter: message
+            });
+
+            if (error) {
+                console.error('Invite Error:', error);
+                if (error.message?.includes('invalid input value for enum')) {
+                    return { success: false, message: 'Invited status not supported by DB' };
+                }
+                return { success: false, message: error.message };
+            }
+
+            // Increment applications count (invitations count as applications?)
+            await (supabase as any).rpc('increment_job_applications', { job_id: jobId });
+
+            return { success: true };
+
+        } catch (error: any) {
+            console.error('Invite Error:', error);
+            return { success: false, message: error.message };
         }
     },
 

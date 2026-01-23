@@ -16,11 +16,12 @@ import {
     Clock,
     Download,
     Share2,
-    CheckCircle2
+    CheckCircle2,
+    Send
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/shared';
+import { Button, InviteCandidateModal } from '@/components/shared';
 
 interface CVDetailsModalProps {
     isOpen: boolean;
@@ -35,6 +36,7 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
 }) => {
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState<'overview' | 'experience' | 'skills'>('overview');
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
     if (!cv) return null;
 
@@ -156,10 +158,17 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                     {/* Action Buttons */}
                                     <div className="flex gap-3 pb-2">
                                         <Button
+                                            onClick={() => setInviteModalOpen(true)}
+                                            className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/30 backdrop-blur-sm"
+                                        >
+                                            <Send size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
+                                            {language === 'ar' ? 'دعوة للتقديم' : 'Invite to Apply'}
+                                        </Button>
+                                        <Button
                                             onClick={() => window.open(`mailto:${cv.personalInfo?.email || cv.email}`, '_blank')}
                                             className="bg-white/90 hover:bg-white text-blue-700 border-none shadow-lg backdrop-blur-sm"
                                         >
-                                            <Mail size={18} className="mr-2" />
+                                            <Mail size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
                                             {language === 'ar' ? 'تواصل' : 'Contact'}
                                         </Button>
                                     </div>
@@ -376,6 +385,13 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                     </motion.div>
                 </div>
             )}
+            {/* Invite Modal */}
+            <InviteCandidateModal
+                isOpen={inviteModalOpen}
+                onClose={() => setInviteModalOpen(false)}
+                candidateId={cv.id}
+                candidateName={cv.personalInfo?.fullName || cv.full_name}
+            />
         </AnimatePresence>
     );
 };

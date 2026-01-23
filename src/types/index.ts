@@ -292,7 +292,7 @@ export interface JobApplication {
     jobId: string;
     userId: string;
     cvId: string;
-    status: 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected';
+    status: 'pending' | 'reviewed' | 'interview' | 'accepted' | 'rejected' | 'invited';
     job?: Job;
     cv?: {
         id: string;

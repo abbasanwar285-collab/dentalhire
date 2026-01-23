@@ -8,7 +8,7 @@ import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { useSearchStore, useAuthStore, useJobStore } from '@/store';
 import { dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { iraqLocations } from '@/data/iraq_locations';
-import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal } from '@/components/shared';
+import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, InviteCandidateModal } from '@/components/shared';
 import {
     Search,
     Grid3X3,
@@ -23,7 +23,8 @@ import {
     Building2,
     User,
     Stethoscope,
-    Heart
+    Heart,
+    Send
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -40,6 +41,7 @@ export default function ClinicSearchPage() {
     const { filters, setFilter, clearFilters, results, setResults, viewMode, setViewMode } = useSearchStore();
     const [showFilters, setShowFilters] = useState(true);
     const [selectedCV, setSelectedCV] = useState<string | null>(null);
+    const [inviteCandidate, setInviteCandidate] = useState<{ id: string, name: string } | null>(null);
     const [mapView, setMapView] = useState(false);
     const { language } = useLanguage();
     const [isLoading, setIsLoading] = useState(true);
@@ -217,6 +219,7 @@ export default function ClinicSearchPage() {
         sales: language === 'ar' ? 'مندوب مبيعات' : 'Sales Representative',
         media: language === 'ar' ? 'وجه إعلاني' : 'Public Figure',
         technician: language === 'ar' ? 'فني أسنان' : 'Dental Technician',
+        invite: language === 'ar' ? 'دعوة' : 'Invite',
     };
 
     const roles = [
@@ -781,18 +784,30 @@ export default function ClinicSearchPage() {
                                                 </div>
                                                 <div className="flex flex-col items-end gap-2">
                                                     <MatchScore score={match.score} size="sm" />
-                                                    <button
-                                                        onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                        className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                            }`}
-                                                    >
-                                                        <Heart
-                                                            size={18}
-                                                            fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                        />
-                                                    </button>
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                                }`}
+                                                        >
+                                                            <Heart
+                                                                size={18}
+                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                                            />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setInviteCandidate({ id: match.cv.id, name: match.cv?.personalInfo?.fullName || 'Candidate' });
+                                                            }}
+                                                            className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                                                            title={t.invite}
+                                                        >
+                                                            <Send size={18} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <h3 className="font-semibold text-gray-900 dark:text-white truncate">
@@ -877,18 +892,30 @@ export default function ClinicSearchPage() {
                                                 </div>
                                                 <div className="flex flex-col items-end gap-2">
                                                     <MatchScore score={match.score} size="sm" />
-                                                    <button
-                                                        onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                        className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                            }`}
-                                                    >
-                                                        <Heart
-                                                            size={18}
-                                                            fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                        />
-                                                    </button>
+                                                    <div className="flex gap-1">
+                                                        <button
+                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                                }`}
+                                                        >
+                                                            <Heart
+                                                                size={18}
+                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                                            />
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setInviteCandidate({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                            }}
+                                                            className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
+                                                            title={t.invite}
+                                                        >
+                                                            <Send size={18} />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Card>
@@ -909,6 +936,14 @@ export default function ClinicSearchPage() {
                         )}
                     </div>
                 </div >
+            )}
+            {inviteCandidate && (
+                <InviteCandidateModal
+                    isOpen={!!inviteCandidate}
+                    onClose={() => setInviteCandidate(null)}
+                    candidateId={inviteCandidate.id}
+                    candidateName={inviteCandidate.name}
+                />
             )}
         </div >
     );

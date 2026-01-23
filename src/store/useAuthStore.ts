@@ -22,6 +22,7 @@ interface AuthState {
     logout: () => Promise<void>;
     updateProfile: (updates: Partial<User['profile']>) => Promise<void>;
     checkSession: () => Promise<void>;
+    resetPassword: (email: string) => Promise<boolean>;
     clearError: () => void;
 }
 
@@ -364,6 +365,31 @@ export const useAuthStore = create<AuthState>()(
                     set({ isLoading: false });
                 } catch (error) {
                     set({ isLoading: false });
+                }
+            },
+
+            resetPassword: async (email: string) => {
+                set({ isLoading: true, error: null });
+                try {
+                    const supabase = getSupabaseClient();
+                    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                        redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/update-password` : undefined,
+                    });
+
+                    if (error) {
+                        let errorMessage = error.message;
+                        if (error.message.includes('rate limit')) {
+                            errorMessage = 'auth.rate_limit';
+                        }
+                        set({ error: errorMessage, isLoading: false });
+                        return false;
+                    }
+
+                    set({ isLoading: false });
+                    return true;
+                } catch (error) {
+                    set({ error: 'auth.error_generic', isLoading: false });
+                    return false;
                 }
             },
 

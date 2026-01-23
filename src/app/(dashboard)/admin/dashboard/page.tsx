@@ -4,9 +4,11 @@
 // DentalHire - Admin Dashboard
 // ============================================
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardContent, Button } from '@/components/shared';
-import { mockAnalytics } from '@/data/mockData';
+// import { mockAnalytics } from '@/data/mockData';
+import { getSupabaseClient } from '@/lib/supabase';
 import {
     Users,
     Briefcase,
@@ -29,6 +31,71 @@ export default function AdminDashboard() {
     const { t } = useLanguage();
     const router = useRouter();
 
+    const [statsData, setStatsData] = useState({
+        totalUsers: 0,
+        totalJobSeekers: 0,
+        totalClinics: 0,
+        totalCVs: 0,
+    });
+    const [recentUsers, setRecentUsers] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const supabase = getSupabaseClient();
+
+                // Fetch counts
+                const [
+                    { count: totalUsers },
+                    { count: totalJobSeekers },
+                    { count: totalClinics },
+                    { count: totalCVs }
+                ] = await Promise.all([
+                    supabase.from('users').select('*', { count: 'exact', head: true }),
+                    supabase.from('users').select('*', { count: 'exact', head: true }).eq('role', 'job_seeker'),
+                    supabase.from('users').select('*', { count: 'exact', head: true }).in('role', ['clinic', 'company', 'lab']),
+                    supabase.from('job_seeker_profiles').select('*', { count: 'exact', head: true }) // active CVs assumption
+                ]);
+
+                setStatsData({
+                    totalUsers: totalUsers || 0,
+                    totalJobSeekers: totalJobSeekers || 0,
+                    totalClinics: totalClinics || 0,
+                    totalCVs: totalCVs || 0,
+                });
+
+                // Fetch recent users
+                const { data: usersData } = await supabase
+                    .from('users')
+                    .select('id, first_name, last_name, email, role, user_type, created_at, phone_verified')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+
+                if (usersData) {
+                    setRecentUsers(usersData.map(u => ({
+                        id: u.id,
+                        name: `${u.first_name || ''} ${u.last_name || ''}`.trim() || 'No Name',
+                        email: u.email,
+                        type: u.user_type === 'clinic' ? 'Clinic' :
+                            u.user_type === 'dentist' ? 'Dentist' :
+                                u.user_type === 'dental_assistant' ? 'Assistant' :
+                                    u.role === 'clinic' ? 'Employer' : 'Job Seeker',
+                        status: u.phone_verified ? 'active' : 'pending', // using phone_verified as proxy for active status for now
+                        date: new Date(u.created_at).toLocaleDateString()
+                    })));
+                }
+
+            } catch (error) {
+                console.error('Error fetching admin stats:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     const stats: {
         label: string;
         value: string;
@@ -39,40 +106,37 @@ export default function AdminDashboard() {
     }[] = [
             {
                 label: t('admin.stats.users'),
-                value: mockAnalytics.totalUsers.toLocaleString(),
+                value: isLoading ? '-' : statsData.totalUsers.toLocaleString(),
                 icon: <Users size={24} />,
-                change: '-',
+                change: '+',
                 changeType: 'positive',
                 color: 'blue',
             },
             {
                 label: t('admin.stats.jobseekers'),
-                value: mockAnalytics.totalJobSeekers.toLocaleString(),
+                value: isLoading ? '-' : statsData.totalJobSeekers.toLocaleString(),
                 icon: <Briefcase size={24} />,
-                change: '-',
+                change: '+',
                 changeType: 'positive',
                 color: 'green',
             },
             {
                 label: t('admin.stats.clinics'),
-                value: mockAnalytics.totalClinics.toLocaleString(),
+                value: isLoading ? '-' : statsData.totalClinics.toLocaleString(),
                 icon: <Building2 size={24} />,
-                change: '-',
+                change: '+',
                 changeType: 'positive',
                 color: 'purple',
             },
             {
                 label: t('admin.stats.activecvs'),
-                value: mockAnalytics.totalCVs.toLocaleString(),
+                value: isLoading ? '-' : statsData.totalCVs.toLocaleString(),
                 icon: <FileText size={24} />,
-                change: '-',
+                change: '+',
                 changeType: 'positive',
                 color: 'teal',
             },
         ];
-
-    // Real users will come from database
-    const recentUsers: { id: string; name: string; email: string; type: string; status: string; date: string }[] = [];
 
     // Pending approvals will come from database
     const pendingApprovals: { id: string; name: string; type: string; date: string }[] = [];
@@ -241,7 +305,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-blue-100">{t('admin.matches')}</p>
-                            <p className="text-3xl font-bold mt-1">{mockAnalytics.matchesThisMonth}</p>
+                            <p className="text-3xl font-bold mt-1">{isLoading ? '-' : '0'}</p>
                         </div>
                         <TrendingUp size={40} className="text-blue-300" />
                     </div>
@@ -250,7 +314,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-green-100">{t('admin.activejobseekers')}</p>
-                            <p className="text-3xl font-bold mt-1">{mockAnalytics.activeJobSeekers}</p>
+                            <p className="text-3xl font-bold mt-1">{isLoading ? '-' : statsData.totalJobSeekers.toLocaleString()}</p>
                         </div>
                         <UserCheck size={40} className="text-green-300" />
                     </div>
@@ -259,7 +323,7 @@ export default function AdminDashboard() {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-purple-100">{t('admin.newusers')}</p>
-                            <p className="text-3xl font-bold mt-1">{mockAnalytics.newUsersThisWeek}</p>
+                            <p className="text-3xl font-bold mt-1">{isLoading ? '-' : recentUsers.length}<span className="text-sm font-normal ml-1">/ {t('admin.thisweek')}</span></p>
                         </div>
                         <UserPlus size={40} className="text-purple-300" />
                     </div>

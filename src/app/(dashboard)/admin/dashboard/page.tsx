@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatRelativeTime } from '@/lib/utils';
+import MobileStatsCarousel from '@/components/dashboard/widgets/MobileStatsCarousel';
+import MobileUserListItem from '@/components/dashboard/widgets/MobileUserListItem';
 
 interface DashboardStats {
     totalUsers: number;
@@ -200,7 +202,7 @@ export default function AdminDashboard() {
             value: stats.totalUsers.toLocaleString(),
             icon: <Users size={24} />,
             change: `+${stats.newUsersThisMonth}`,
-            changeType: 'positive',
+            changeType: 'positive' as 'positive' | 'negative',
             color: 'blue',
         },
         {
@@ -208,7 +210,7 @@ export default function AdminDashboard() {
             value: stats.totalJobSeekers.toLocaleString(),
             icon: <Briefcase size={24} />,
             change: `-`,
-            changeType: 'positive',
+            changeType: 'positive' as 'positive' | 'negative',
             color: 'green',
         },
         {
@@ -216,7 +218,7 @@ export default function AdminDashboard() {
             value: stats.totalClinics.toLocaleString(),
             icon: <Building2 size={24} />,
             change: `-`,
-            changeType: 'positive',
+            changeType: 'positive' as 'positive' | 'negative',
             color: 'purple',
         },
         {
@@ -224,7 +226,7 @@ export default function AdminDashboard() {
             value: stats.totalCVs.toLocaleString(),
             icon: <FileText size={24} />,
             change: `-`,
-            changeType: 'positive',
+            changeType: 'positive' as 'positive' | 'negative',
             color: 'teal',
         },
     ];
@@ -280,7 +282,7 @@ export default function AdminDashboard() {
 
             {/* Mobile Stats Carousel */}
             <div className="md:hidden">
-                <MobileStatsCarousel stats={stats} />
+                <MobileStatsCarousel stats={statsDisplay} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">

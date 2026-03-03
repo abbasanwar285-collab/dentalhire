@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Users, FileText, Plus, ShoppingBag, Search } from 'lucide-react';
 import Link from 'next/link';
 import { getSupabaseClient } from '@/lib/supabase';
+import MobileStatsCarousel from './MobileStatsCarousel';
 import { useAuthStore } from '@/store';
 import { useEffect, useState } from 'react';
 
@@ -37,9 +38,9 @@ export default function CompanyDashboard() {
     const text = t[language as keyof typeof t] || t.en;
 
     const [stats, setStats] = useState([
-        { label: text.openPositions, value: '0', icon: <FileText size={20} /> },
-        { label: text.applications, value: '0', icon: <Users size={20} /> },
-        { label: text.topCandidates, value: '0', icon: <ShoppingBag size={20} /> },
+        { label: text.openPositions, value: '0', icon: <FileText size={20} />, color: 'cyan', change: '0', changeType: 'positive' as const },
+        { label: text.applications, value: '0', icon: <Users size={20} />, color: 'blue', change: '0', changeType: 'positive' as const },
+        { label: text.topCandidates, value: '0', icon: <ShoppingBag size={20} />, color: 'purple', change: '+2', changeType: 'positive' as const },
     ]);
 
     const { user } = useAuthStore();
@@ -115,20 +116,26 @@ export default function CompanyDashboard() {
 
     return (
         <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Desktop Stats Grid */}
+            <div className="hidden md:grid grid-cols-1 md:grid-cols-3 gap-4">
                 {stats.map((stat, i) => (
                     <Card key={i}>
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-base text-muted-foreground dark:text-gray-200">{stat.label}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
                                 <p className="text-3xl font-bold mt-1 text-gray-900 dark:text-white">{stat.value}</p>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-600 dark:bg-${stat.color}-900/30 dark:text-${stat.color}-400`}>
                                 {stat.icon}
                             </div>
                         </div>
                     </Card>
                 ))}
+            </div>
+
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden">
+                <MobileStatsCarousel stats={stats as any} />
             </div>
 
             <Card>

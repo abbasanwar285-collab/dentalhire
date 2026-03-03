@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Briefcase, Eye, DollarSign, MapPin, CheckCircle2, Award } from 'lucide-react';
 import { useAuthStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
+import MobileStatsCarousel from './MobileStatsCarousel';
 
 export default function AssistantDashboard() {
     const { language } = useLanguage();
@@ -88,7 +89,9 @@ export default function AssistantDashboard() {
             label: language === 'ar' ? 'الوظائف القريبة' : 'Nearby Jobs',
             value: loading ? '-' : statsData.nearby_jobs.toString(),
             icon: <MapPin size={20} />,
-            change: language === 'ar' ? 'نطاق مدينتك' : 'Your City'
+            color: 'teal',
+            change: language === 'ar' ? 'نطاق مدينتك' : 'Your City',
+            changeType: 'positive' as const
         },
         {
             label: language === 'ar' ? 'الراتب المتوقع' : 'Est. Salary',
@@ -96,19 +99,25 @@ export default function AssistantDashboard() {
                 ? `${statsData.avg_salary.toLocaleString()} ${language === 'ar' ? 'د.ع' : 'IQD'}`
                 : (language === 'ar' ? 'غير متوفر' : 'N/A')),
             icon: <DollarSign size={20} />,
-            change: 'Monthly'
+            color: 'green',
+            change: 'Monthly',
+            changeType: 'positive' as const
         },
         {
             label: language === 'ar' ? 'مشاهدات العيادات' : 'Clinic Views',
             value: loading ? '-' : statsData.profile_views.toString(),
             icon: <Eye size={20} />,
-            change: language === 'ar' ? 'آخر 30 يوم' : 'Last 30 days'
+            color: 'blue',
+            change: language === 'ar' ? 'آخر 30 يوم' : 'Last 30 days',
+            changeType: 'positive' as const
         },
         {
             label: language === 'ar' ? 'جاهزية الملف' : 'Profile Ready',
             value: '85%', // Keep static or implement separate logic
             icon: <Award size={20} />,
-            change: 'High'
+            color: 'purple',
+            change: 'High',
+            changeType: 'positive' as const
         },
     ];
 
@@ -123,26 +132,28 @@ export default function AssistantDashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Assistant Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Desktop Stats Grid */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                     <Card key={index} hover>
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-base text-gray-600 dark:text-gray-300">{stat.label}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                                     {stat.value}
                                 </p>
-                                <p className="text-xs text-teal-600 dark:text-teal-400 mt-1">
-                                    {stat.change}
-                                </p>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-900/20 flex items-center justify-center text-teal-600 dark:text-teal-400">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-600 dark:bg-${stat.color}-900/30 dark:text-${stat.color}-400`}>
                                 {stat.icon}
                             </div>
                         </div>
                     </Card>
                 ))}
+            </div>
+
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden">
+                <MobileStatsCarousel stats={stats as any} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
@@ -156,17 +167,17 @@ export default function AssistantDashboard() {
                         <div className="space-y-3">
                             {nearbyJobs.length > 0 ? (
                                 nearbyJobs.map((job, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-white dark:bg-gray-700 p-2 rounded shadow-sm">
+                                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg gap-3">
+                                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                                            <div className="bg-white dark:bg-gray-700 p-2 rounded shadow-sm shrink-0">
                                                 <Briefcase size={16} className="text-teal-600" />
                                             </div>
-                                            <div>
-                                                <h4 className="font-medium text-gray-900 dark:text-white text-sm">{job.title}</h4>
-                                                <p className="text-xs text-gray-500 dark:text-gray-300">{job.clinic} • <span className="text-teal-600 dark:text-teal-400 font-medium">{job.dist}</span></p>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-gray-900 dark:text-white text-sm truncate">{job.title}</h4>
+                                                <p className="text-xs text-gray-500 dark:text-gray-300 truncate">{job.clinic} • <span className="text-teal-600 dark:text-teal-400 font-medium">{job.dist}</span></p>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto">
                                             <div className="text-sm font-bold text-gray-900 dark:text-white">{job.salary}</div>
                                             <Button size="sm" variant="ghost" className="h-6 p-0 text-xs">{language === 'ar' ? 'تفاصيل' : 'Details'}</Button>
                                         </div>

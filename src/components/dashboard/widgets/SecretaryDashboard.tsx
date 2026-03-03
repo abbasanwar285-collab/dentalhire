@@ -1,15 +1,16 @@
 import { Card, CardHeader, CardContent, Button } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Calendar, Eye, Users, FolderOpen, Star, BookOpen, Check } from 'lucide-react';
+import MobileStatsCarousel from './MobileStatsCarousel';
 
 export default function SecretaryDashboard() {
     const { language } = useLanguage();
 
     const stats = [
-        { label: language === 'ar' ? 'دعوات المقابلة' : 'Interview Invites', value: '0', icon: <Calendar size={20} />, change: '0 New' },
-        { label: language === 'ar' ? 'مشاهدات العيادات' : 'Clinic Views', value: '0', icon: <Eye size={20} />, change: '0' },
-        { label: language === 'ar' ? 'نقاط المهارات الناعمة' : 'Soft Skills Score', value: 'N/A', icon: <Star size={20} />, change: '/10' },
-        { label: language === 'ar' ? 'الوظائف الإدارية' : 'Admin Jobs', value: '0', icon: <FolderOpen size={20} />, change: '0 Available' },
+        { label: language === 'ar' ? 'دعوات المقابلة' : 'Interview Invites', value: '0', icon: <Calendar size={20} />, color: 'blue', change: '0 New', changeType: 'positive' as const },
+        { label: language === 'ar' ? 'مشاهدات العيادات' : 'Clinic Views', value: '0', icon: <Eye size={20} />, color: 'purple', change: '0', changeType: 'positive' as const },
+        { label: language === 'ar' ? 'نقاط المهارات الناعمة' : 'Soft Skills Score', value: 'N/A', icon: <Star size={20} />, color: 'yellow', change: '/10', changeType: 'positive' as const },
+        { label: language === 'ar' ? 'الوظائف الإدارية' : 'Admin Jobs', value: '0', icon: <FolderOpen size={20} />, color: 'green', change: '0 Available', changeType: 'positive' as const },
     ];
 
     const adminTasks: { title: string; clinic: string; tasks: string[] }[] = [];
@@ -18,26 +19,28 @@ export default function SecretaryDashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Secretary Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Desktop Stats Grid */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                     <Card key={index} hover>
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-base text-muted-foreground">{stat.label}</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                                     {stat.value}
                                 </p>
-                                <p className="text-xs text-purple-600 dark:text-purple-400 mt-1">
-                                    {stat.change}
-                                </p>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600 dark:text-purple-400">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-600 dark:bg-${stat.color}-900/30 dark:text-${stat.color}-400`}>
                                 {stat.icon}
                             </div>
                         </div>
                     </Card>
                 ))}
+            </div>
+
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden">
+                <MobileStatsCarousel stats={stats as any} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
@@ -52,19 +55,19 @@ export default function SecretaryDashboard() {
                         <div className="space-y-3">
                             {adminTasks.length > 0 ? (
                                 adminTasks.map((job, idx) => (
-                                    <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600">
+                                    <div key={idx} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg gap-3">
+                                        <div className="flex items-center gap-3 w-full sm:w-auto">
+                                            <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 shrink-0">
                                                 <Users size={18} />
                                             </div>
-                                            <div>
-                                                <h4 className="font-medium text-gray-900 dark:text-white">{job.title}</h4>
-                                                <div className="flex gap-2 text-xs text-muted-foreground mt-0.5">
-                                                    {job.tasks.map(t => <span key={t} className="bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded border dark:border-gray-600">{t}</span>)}
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className="font-medium text-gray-900 dark:text-white truncate">{job.title}</h4>
+                                                <div className="flex gap-2 text-xs text-muted-foreground mt-0.5 flex-wrap">
+                                                    {job.tasks.map(t => <span key={t} className="bg-white dark:bg-gray-700 px-1.5 py-0.5 rounded border dark:border-gray-600 whitespace-nowrap">{t}</span>)}
                                                 </div>
                                             </div>
                                         </div>
-                                        <Button size="sm" variant="outline">{language === 'ar' ? 'تقديم' : 'Apply'}</Button>
+                                        <Button size="sm" variant="outline" className="w-full sm:w-auto">{language === 'ar' ? 'تقديم' : 'Apply'}</Button>
                                     </div>
                                 ))
                             ) : (

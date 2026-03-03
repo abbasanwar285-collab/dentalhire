@@ -16,6 +16,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { getSupabaseClient } from '@/lib/supabase';
+import MobileStatsCarousel from './MobileStatsCarousel';
 
 export default function JobSeekerDashboard() {
     const { user } = useAuthStore();
@@ -79,54 +80,63 @@ export default function JobSeekerDashboard() {
         {
             label: t('dashboard.applications'),
             value: stats.applications,
-            icon: <Briefcase size={24} />,
-            color: 'text-blue-600',
-            bg: 'bg-blue-50 dark:bg-blue-900/20'
+            icon: <Briefcase size={20} />,
+            color: 'blue',
+            change: '+1',
+            changeType: 'positive' as 'positive' | 'negative',
         },
         {
             label: t('dashboard.saved'),
             value: savedJobs.length,
-            icon: <Bookmark size={24} />,
-            color: 'text-purple-600',
-            bg: 'bg-purple-50 dark:bg-purple-900/20'
+            icon: <Bookmark size={20} />,
+            color: 'purple',
+            change: '-',
+            changeType: 'positive' as 'positive' | 'negative',
         },
         {
             label: t('dashboard.interviews'),
             value: stats.interviews,
-            icon: <Clock size={24} />,
-            color: 'text-orange-600',
-            bg: 'bg-orange-50 dark:bg-orange-900/20'
+            icon: <Clock size={20} />,
+            color: 'orange',
+            change: '0',
+            changeType: 'positive' as 'positive' | 'negative',
         },
         {
             label: t('dashboard.profileviews'),
             value: stats.views,
-            icon: <Eye size={24} />,
-            color: 'text-green-600',
-            bg: 'bg-green-50 dark:bg-green-900/20'
+            icon: <Eye size={20} />,
+            color: 'green',
+            change: '0',
+            changeType: 'positive' as 'positive' | 'negative',
         }
     ];
 
     return (
         <div className="space-y-8 animate-fade-in">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Desktop Stats Grid */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {statCards.map((stat, index) => (
                     <Card key={index} hover className="border-none shadow-sm">
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-base font-medium text-gray-600 dark:text-gray-300">
+                                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                     {stat.label}
                                 </p>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
                                     {stat.value}
                                 </p>
                             </div>
-                            <div className={`p-2 rounded-xl ${stat.bg} ${stat.color}`}>
+                            <div className={`p-2.5 rounded-xl bg-${stat.color}-50 text-${stat.color}-600 dark:bg-${stat.color}-900/20 dark:text-${stat.color}-400`}>
                                 {stat.icon}
                             </div>
                         </div>
                     </Card>
                 ))}
+            </div>
+
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden">
+                <MobileStatsCarousel stats={statCards.map(s => ({ ...s, value: s.value.toString() }))} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-8">
@@ -149,19 +159,19 @@ export default function JobSeekerDashboard() {
                         ) : recentApplications.length > 0 ? (
                             recentApplications.map((app) => (
                                 <Card key={app.id} className="group hover:border-blue-200 dark:hover:border-blue-800 transition-colors">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex gap-4">
-                                            <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-muted-foreground">
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                        <div className="flex gap-4 w-full sm:w-auto">
+                                            <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-muted-foreground shrink-0">
                                                 <Building size={24} />
                                             </div>
-                                            <div>
-                                                <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors truncate">
                                                     {app.job?.title || 'Unknown Job'}
                                                 </h3>
-                                                <p className="text-sm text-gray-500 dark:text-gray-300">
+                                                <p className="text-sm text-gray-500 dark:text-gray-300 truncate">
                                                     {app.job?.location || 'Unknown Location'}
                                                 </p>
-                                                <div className="flex items-center gap-2 mt-2">
+                                                <div className="flex items-center gap-2 mt-2 flex-wrap">
                                                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium 
                                                         ${app.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
                                                             app.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
@@ -170,17 +180,19 @@ export default function JobSeekerDashboard() {
                                                         }`}>
                                                         {app.status ? (app.status.charAt(0).toUpperCase() + app.status.slice(1)) : 'Unknown'}
                                                     </span>
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className="text-xs text-gray-400 whitespace-nowrap">
                                                         {new Date(app.created_at).toLocaleDateString()}
                                                     </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <Link href={`/job-seeker/applications/${app.id}`}>
-                                            <Button variant="ghost" size="sm">
-                                                {language === 'ar' ? 'التفاصيل' : 'Details'}
-                                            </Button>
-                                        </Link>
+                                        <div className="w-full sm:w-auto mt-2 sm:mt-0 pt-3 sm:pt-0 border-t border-gray-100 sm:border-0 dark:border-gray-800">
+                                            <Link href={`/job-seeker/applications/${app.id}`} className="block w-full">
+                                                <Button variant="ghost" size="sm" className="w-full">
+                                                    {language === 'ar' ? 'التفاصيل' : 'Details'}
+                                                </Button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </Card>
                             ))

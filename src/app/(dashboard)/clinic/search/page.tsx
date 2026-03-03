@@ -872,173 +872,53 @@ export default function ClinicSearchPage() {
                                             </div>
                                         )}
 
-                                            {/* District */}
-                                            {selectedGov && (
-                                                <div className="animate-fade-in">
-                                                    <label className="text-xs text-gray-500 mb-1 block">{t.district}</label>
-                                                    <select
-                                                        aria-label={t.district}
-                                                        value={selectedDistrict}
-                                                        onChange={(e) => {
-                                                            const val = e.target.value;
-                                                            setSelectedDistrict(val);
-                                                            setArea('');
-                                                            updateLocationFilter(selectedGov, val, '');
-                                                        }}
-                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
-                                                        style={{ backgroundImage: 'none' }}
-                                                    >
-                                                        <option value="" className="text-gray-500">{t.select}</option>
-                                                        {(iraqLocations as any)[selectedGov]?.districts.map((d: any) => (
-                                                            <option key={d.en} value={d.en} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
-                                                                {language === 'ar' ? d.ar : d.en}
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            )}
 
-                                            {/* Area / Neighborhood */}
-                                            {selectedDistrict && (
-                                                <div className="animate-fade-in">
-                                                    <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
-                                                    <Input
-                                                        placeholder={t.area}
-                                                        value={area}
-                                                        onChange={(e) => {
-                                                            setArea(e.target.value);
-                                                            updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
-                                                        }}
-                                                        className="bg-gray-50 dark:bg-gray-800"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Experience Filter (Kept as is) */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.minimumExperience}
-                                        </label>
-                                        <select
-                                            aria-label={t.minimumExperience}
-                                            value={filters.experienceMin || ''}
-                                            onChange={(e) => setFilter('experienceMin', e.target.value ? parseInt(e.target.value) : undefined)}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
-                                        >
-                                            <option value="">{t.any}</option>
-                                            <option value="1">1 {t.yearsPlus}</option>
-                                            <option value="2">2 {t.yearsPlus}</option>
-                                            <option value="3">3 {t.yearsPlus}</option>
-                                            <option value="5">5 {t.yearsPlus}</option>
-                                            <option value="10">10 {t.yearsPlus}</option>
-                                        </select>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Salary Range - Iraqi Dinar */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
-                                            {t.salaryRange} <span className="text-xs font-normal text-gray-500">({language === 'ar' ? 'د.ع' : 'IQD'})</span>
-                                        </label>
-                                        <select
-                                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
-                                            onChange={(e) => {
-                                                const [min, max] = e.target.value.split('-').map(Number);
-                                                setFilter('salaryMin', min);
-                                                setFilter('salaryMax', max);
-                                            }}
-                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
-                                            style={{ backgroundImage: 'none' }}
-                                        >
-                                            <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
-                                            <option value="0-500000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من 500 ألف د.ع' : 'Under 500,000 IQD'}</option>
-                                            <option value="500000-1000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '500 ألف - 1 مليون د.ع' : '500K - 1M IQD'}</option>
-                                            <option value="1000000-2000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '1 مليون - 2 مليون د.ع' : '1M - 2M IQD'}</option>
-                                            <option value="2000000-4000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '2 مليون - 4 مليون د.ع' : '2M - 4M IQD'}</option>
-                                            <option value="4000000-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من 4 مليون د.ع' : 'Above 4M IQD'}</option>
-                                        </select>
-                                        <div className="mt-2 text-xs text-center text-gray-400">
-                                            {t.min}: {(filters.salaryMin || 0).toLocaleString()} - {t.max}: {(filters.salaryMax || 5000000).toLocaleString()}
-                                        </div>
-                                    </div>
-
-                                    <hr className="border-gray-100 dark:border-gray-700" />
-
-                                    {/* Employment Type */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.employmentType}
-                                        </label>
-                                        <div className="space-y-2">
-                                            {['full_time', 'part_time', 'contract', 'temporary'].map(type => (
-                                                <label key={type} className="flex items-center gap-2 cursor-pointer group">
-                                                    <div className="relative flex items-center">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={filters.employmentType?.includes(type as any) || false}
-                                                            onChange={(e) => {
-                                                                const current = filters.employmentType || [];
-                                                                if (e.target.checked) {
-                                                                    setFilter('employmentType', [...current, type as any]);
-                                                                } else {
-                                                                    setFilter('employmentType', current.filter((t: any) => t !== type));
-                                                                }
-                                                            }}
-                                                            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                        />
-                                                    </div>
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
-                                                        {employmentTypeLabels[type]}
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Skills Filter */}
-                                    <div>
-                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
-                                            {t.skills}
-                                        </label>
-                                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                                            {availableSkills.length > 0 ? (
-                                                availableSkills.map(skill => (
-                                                    <button
-                                                        key={skill}
-                                                        onClick={() => {
-                                                            const current = filters.skills || [];
-                                                            if (current.includes(skill)) {
-                                                                setFilter('skills', current.filter(s => s !== skill));
-                                                            } else {
-                                                                setFilter('skills', [...current, skill]);
-                                                            }
-                                                        }}
-                                                        className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
-                                                            ? 'bg-blue-500 text-white shadow-md'
-                                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                            }`}
-                                                    >
-                                                        {skill}
-                                                    </button>
-                                                ))
-                                            ) : (
-                                                <p className="text-xs text-gray-500 p-1">{t.noCandidatesFound}</p>
-                                            )}
-                                        </div>
+                                        {/* Area / Neighborhood */}
+                                        {selectedDistrict && (
+                                            <div className="animate-fade-in">
+                                                <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
+                                                <Input
+                                                    placeholder={t.area}
+                                                    value={area}
+                                                    onChange={(e) => {
+                                                        setArea(e.target.value);
+                                                        updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
+                                                    }}
+                                                    className="bg-gray-50 dark:bg-gray-800"
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
                                 <hr className="border-gray-100 dark:border-gray-700" />
 
-                                {/* Salary Range */}
+                                {/* Experience Filter (Kept as is) */}
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                        {t.minimumExperience}
+                                    </label>
+                                    <select
+                                        aria-label={t.minimumExperience}
+                                        value={filters.experienceMin || ''}
+                                        onChange={(e) => setFilter('experienceMin', e.target.value ? parseInt(e.target.value) : undefined)}
+                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
+                                    >
+                                        <option value="">{t.any}</option>
+                                        <option value="1">1 {t.yearsPlus}</option>
+                                        <option value="2">2 {t.yearsPlus}</option>
+                                        <option value="3">3 {t.yearsPlus}</option>
+                                        <option value="5">5 {t.yearsPlus}</option>
+                                        <option value="10">10 {t.yearsPlus}</option>
+                                    </select>
+                                </div>
+
+                                <hr className="border-gray-100 dark:border-gray-700" />
+
+                                {/* Salary Range - Iraqi Dinar */}
                                 <div>
                                     <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
-                                        {t.salaryRange}
+                                        {t.salaryRange} <span className="text-xs font-normal text-gray-500">({language === 'ar' ? 'د.ع' : 'IQD'})</span>
                                     </label>
                                     <select
                                         value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
@@ -1051,14 +931,18 @@ export default function ClinicSearchPage() {
                                         style={{ backgroundImage: 'none' }}
                                     >
                                         <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
-                                        <option value="0-500" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من $500' : 'Under $500'}</option>
-                                        <option value="500-1000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$500 - $1,000</option>
-                                        <option value="1000-2000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$1,000 - $2,000</option>
-                                        <option value="2000-3000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$2,000 - $3,000</option>
-                                        <option value="3000-5000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">$3,000 - $5,000</option>
-                                        <option value="5000-100000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من $5,000' : 'Above $5,000'}</option>
+                                        <option value="0-500000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من 500 ألف د.ع' : 'Under 500,000 IQD'}</option>
+                                        <option value="500000-1000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '500 ألف - 1 مليون د.ع' : '500K - 1M IQD'}</option>
+                                        <option value="1000000-2000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '1 مليون - 2 مليون د.ع' : '1M - 2M IQD'}</option>
+                                        <option value="2000000-4000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '2 مليون - 4 مليون د.ع' : '2M - 4M IQD'}</option>
+                                        <option value="4000000-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من 4 مليون د.ع' : 'Above 4M IQD'}</option>
                                     </select>
+                                    <div className="mt-2 text-xs text-center text-gray-400">
+                                        {t.min}: {(filters.salaryMin || 0).toLocaleString()} - {t.max}: {(filters.salaryMax || 5000000).toLocaleString()}
+                                    </div>
                                 </div>
+
+                                <hr className="border-gray-100 dark:border-gray-700" />
 
                                 {/* Employment Type */}
                                 <div>
@@ -1097,28 +981,33 @@ export default function ClinicSearchPage() {
                                         {t.skills}
                                     </label>
                                     <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
-                                        {(language === 'ar' ? dentalSkillsAr : dentalSkills).slice(0, 15).map(skill => (
-                                            <button
-                                                key={skill}
-                                                onClick={() => {
-                                                    const current = filters.skills || [];
-                                                    if (current.includes(skill)) {
-                                                        setFilter('skills', current.filter(s => s !== skill));
-                                                    } else {
-                                                        setFilter('skills', [...current, skill]);
-                                                    }
-                                                }}
-                                                className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
-                                                    ? 'bg-blue-500 text-white shadow-md'
-                                                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
-                                                    }`}
-                                            >
-                                                {skill}
-                                            </button>
-                                        ))}
+                                        {availableSkills.length > 0 ? (
+                                            availableSkills.map(skill => (
+                                                <button
+                                                    key={skill}
+                                                    onClick={() => {
+                                                        const current = filters.skills || [];
+                                                        if (current.includes(skill)) {
+                                                            setFilter('skills', current.filter(s => s !== skill));
+                                                        } else {
+                                                            setFilter('skills', [...current, skill]);
+                                                        }
+                                                    }}
+                                                    className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
+                                                        ? 'bg-blue-500 text-white shadow-md'
+                                                        : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                        }`}
+                                                >
+                                                    {skill}
+                                                </button>
+                                            ))
+                                        ) : (
+                                            <p className="text-xs text-gray-500 p-1">{t.noCandidatesFound}</p>
+                                        )}
                                     </div>
                                 </div>
                             </div>
+
                         </Card>
                     </div>
 
@@ -1307,148 +1196,147 @@ export default function ClinicSearchPage() {
                                                         ))}
                                                     </div>
 
-                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 md:hidden">
-                                                <div className="flex gap-2">
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="flex-1 text-xs"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setSelectedCV(match.cv.id);
-                                                        }}
-                                                    >
-                                                        {t.viewProfile}
-                                                    </Button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="flex-1 text-xs border-purple-200 text-purple-700 hover:bg-purple-50"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
-                                                            setInviteModalOpen(true);
-                                                        }}
-                                                    >
-                                                        <MessageSquare size={14} className="mr-1" />
-                                                        {language === 'ar' ? 'دعوة' : 'Invite'}
-                                                    </Button>
-                                                </div>
-                                                <div className="flex gap-2">
-                                                    {cvRequests[match.cv.userId] === 'approved' ? (
-                                                        <Button
-                                                            size="sm"
-                                                            className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                setCvViewMode('cv');
-                                                                setSelectedCV(match.cv.id);
-                                                            }}
-                                                        >
-                                                            <FileText size={14} className="mr-1" />
-                                                            {language === 'ar' ? 'عرض' : 'View'}
-                                                        </Button>
-                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
-                                                        <Button
-                                                            size="sm"
-                                                            disabled
-                                                            className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
-                                                        >
-                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            size="sm"
-                                                            className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
-                                                            loading={requestingIds.has(match.cv.userId)}
-                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
-                                                        >
-                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
-                                                        </Button>
-                                                    )}
-                                                </div>
-
-
-                                            </div>
-                                            <div className="flex items-center gap-4 hidden md:flex">
-                                                <div className="text-right">
-                                                    <p className="font-medium text-gray-900 dark:text-white">
-                                                        {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
-                                                    </p>
-                                                    <p className="text-xs text-gray-500">
-                                                        {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
-                                                    </p>
-                                                </div>
-                                                <div className="flex flex-col items-end gap-3 min-w-[120px]">
-                                                    <div className="flex items-center gap-2">
-                                                        <MatchScore score={match.score} size="sm" />
-                                                        <button
-                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                                }`}
-                                                        >
-                                                            <Heart
-                                                                size={18}
-                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                            />
-                                                        </button>
+                                                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 md:hidden">
+                                                        <div className="flex gap-2">
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="flex-1 text-xs"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setSelectedCV(match.cv.id);
+                                                                }}
+                                                            >
+                                                                {t.viewProfile}
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="flex-1 text-xs border-purple-200 text-purple-700 hover:bg-purple-50"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                                    setInviteModalOpen(true);
+                                                                }}
+                                                            >
+                                                                <MessageSquare size={14} className="mr-1" />
+                                                                {language === 'ar' ? 'دعوة' : 'Invite'}
+                                                            </Button>
+                                                        </div>
+                                                        <div className="flex gap-2">
+                                                            {cvRequests[match.cv.userId] === 'approved' ? (
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setCvViewMode('cv');
+                                                                        setSelectedCV(match.cv.id);
+                                                                    }}
+                                                                >
+                                                                    <FileText size={14} className="mr-1" />
+                                                                    {language === 'ar' ? 'عرض' : 'View'}
+                                                                </Button>
+                                                            ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                                <Button
+                                                                    size="sm"
+                                                                    disabled
+                                                                    className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                                >
+                                                                    {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                                </Button>
+                                                            ) : (
+                                                                <Button
+                                                                    size="sm"
+                                                                    className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                                    loading={requestingIds.has(match.cv.userId)}
+                                                                    onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                                >
+                                                                    {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                                </Button>
+                                                            )}
+                                                        </div>
                                                     </div>
+                                                </div>
+                                                <div className="flex items-center gap-4 hidden md:flex">
+                                                    <div className="text-right">
+                                                        <p className="font-medium text-gray-900 dark:text-white">
+                                                            {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
+                                                        </p>
+                                                        <p className="text-xs text-gray-500">
+                                                            {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-col items-end gap-3 min-w-[120px]">
+                                                        <div className="flex items-center gap-2">
+                                                            <MatchScore score={match.score} size="sm" />
+                                                            <button
+                                                                onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                                                className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                                                    ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                                    : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                                    }`}
+                                                            >
+                                                                <Heart
+                                                                    size={18}
+                                                                    fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                                                />
+                                                            </button>
+                                                        </div>
 
-                                                    {/* Invite Button - Always visible if not yourself */}
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        className="w-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 mb-2"
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
-                                                            setInviteModalOpen(true);
-                                                        }}
-                                                    >
-                                                        <MessageSquare size={14} className="mr-1" />
-                                                        {language === 'ar' ? 'دعوة للمقابلة' : 'Invite'}
-                                                    </Button>
-
-                                                    {cvRequests[match.cv.userId] === 'approved' ? (
+                                                        {/* Invite Button - Always visible if not yourself */}
                                                         <Button
                                                             size="sm"
-                                                            className="w-full text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                            variant="outline"
+                                                            className="w-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 mb-2"
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                setCvViewMode('cv');
-                                                                setSelectedCV(match.cv.id);
+                                                                setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                                setInviteModalOpen(true);
                                                             }}
                                                         >
-                                                            <FileText size={14} className="mr-1" />
-                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                            <MessageSquare size={14} className="mr-1" />
+                                                            {language === 'ar' ? 'دعوة للمقابلة' : 'Invite'}
                                                         </Button>
-                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
-                                                        <Button
-                                                            size="sm"
-                                                            disabled
-                                                            className="w-full text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
-                                                        >
-                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
-                                                            size="sm"
-                                                            className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
-                                                            loading={requestingIds.has(match.cv.userId)}
-                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
-                                                        >
-                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
-                                                        </Button>
-                                                    )}
+
+                                                        {cvRequests[match.cv.userId] === 'approved' ? (
+                                                            <Button
+                                                                size="sm"
+                                                                className="w-full text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setCvViewMode('cv');
+                                                                    setSelectedCV(match.cv.id);
+                                                                }}
+                                                            >
+                                                                <FileText size={14} className="mr-1" />
+                                                                {language === 'ar' ? 'عرض' : 'View'}
+                                                            </Button>
+                                                        ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                            <Button
+                                                                size="sm"
+                                                                disabled
+                                                                className="w-full text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                            >
+                                                                {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
+                                                                size="sm"
+                                                                className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                                loading={requestingIds.has(match.cv.userId)}
+                                                                onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                            >
+                                                                {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </Card>
                                     ))}
                                 </div>
                             )
-
                         ) : (
                             <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
                                 <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">

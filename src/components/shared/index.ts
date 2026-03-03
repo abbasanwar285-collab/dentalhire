@@ -19,3 +19,4 @@ export { default as LeafletMap } from './LeafletMap';
 export { default as Confetti } from './Confetti';
 export { default as ProfileImageUpload } from './ProfileImageUpload';
 export * from './CVRequestModal';
+export * from './InviteCandidateModal';

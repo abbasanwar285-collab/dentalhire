@@ -6,7 +6,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { Navbar, Sidebar } from '@/components/layout';
+import { Navbar, Sidebar, BottomNav } from '@/components/layout';
 import { useAuthStore } from '@/store';
 import { PageLoader, NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';

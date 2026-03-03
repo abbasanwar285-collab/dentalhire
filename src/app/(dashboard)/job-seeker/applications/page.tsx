@@ -22,7 +22,7 @@ import { Button } from '@/components/shared';
 
 export default function ApplicationsPage() {
     const { user } = useAuthStore();
-    const { userApplications, loadUserApplications, isLoading } = useJobStore();
+    const { userApplications, loadUserApplications, isLoading, updateApplicationStatus } = useJobStore();
     const { language, t } = useLanguage();
 
     useEffect(() => {
@@ -43,6 +43,10 @@ export default function ApplicationsPage() {
                 return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'rejected':
                 return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+            case 'invited':
+                return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800';
+            case 'declined':
+                return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
             default:
                 return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
         }
@@ -60,6 +64,10 @@ export default function ApplicationsPage() {
                 return <CheckCircle size={16} />;
             case 'rejected':
                 return <XCircle size={16} />;
+            case 'invited':
+                return <AlertCircle size={16} className="text-indigo-600 dark:text-indigo-400" />;
+            case 'declined':
+                return <XCircle size={16} className="text-gray-500" />;
             default:
                 return <AlertCircle size={16} />;
         }
@@ -72,6 +80,8 @@ export default function ApplicationsPage() {
             interview: { en: 'Interview', ar: 'مقابلة' },
             accepted: { en: 'Accepted', ar: 'مقبول' },
             rejected: { en: 'Rejected', ar: 'مرفوض' },
+            invited: { en: 'Invited', ar: 'دعوة وظيفة' },
+            declined: { en: 'Declined', ar: 'مرفوضة من قبلك' },
         };
         return language === 'ar' ? labels[status]?.ar || status : labels[status]?.en || status;
     };
@@ -159,13 +169,35 @@ export default function ApplicationsPage() {
                                     </div>
                                 </div>
 
-                                <div className="flex flex-col items-end gap-4 min-w-[140px]">
+                                <div className="flex flex-col items-end gap-3 min-w-[140px]">
                                     <div className={`hidden md:flex px-3 py-1 rounded-full text-xs font-medium items-center gap-1.5 ${getStatusColor(application.status)}`}>
                                         {getStatusIcon(application.status)}
                                         {getStatusLabel(application.status)}
                                     </div>
 
-                                    <Link href={`/jobs?id=${application.jobId}`} className="w-full md:w-auto">
+                                    {application.status === 'invited' && (
+                                        <div className="flex flex-col gap-2 w-full mt-2">
+                                            <Button
+                                                size="sm"
+                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                onClick={() => updateApplicationStatus(application.id, 'pending')}
+                                            >
+                                                <CheckCircle size={14} className={language === 'ar' ? 'ml-1' : 'mr-1'} />
+                                                {language === 'ar' ? 'قبول المبدئي' : 'Accept (Pending)'}
+                                            </Button>
+                                            <Button
+                                                size="sm"
+                                                variant="outline"
+                                                className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 dark:border-red-900/50 dark:hover:bg-red-900/20"
+                                                onClick={() => updateApplicationStatus(application.id, 'declined')}
+                                            >
+                                                <XCircle size={14} className={language === 'ar' ? 'ml-1' : 'mr-1'} />
+                                                {language === 'ar' ? 'رفض الدعوة' : 'Decline'}
+                                            </Button>
+                                        </div>
+                                    )}
+
+                                    <Link href={`/jobs?id=${application.jobId}`} className="w-full md:w-auto mt-auto">
                                         <Button variant="outline" className="w-full" rightIcon={language === 'ar' ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}>
                                             {language === 'ar' ? 'عرض الوظيفة' : 'View Job'}
                                         </Button>

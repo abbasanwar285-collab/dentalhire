@@ -1031,110 +1031,44 @@ export default function ClinicSearchPage() {
                                         </Card>
                                     ))}
                                 </div>
-                            ) : (
-                            <div className="space-y-3">
-                                {filteredResults.map((match) => (
-                                    <Card key={match.cv.id} hover onClick={() => setSelectedCV(match.cv.id)}>
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
-                                                {match.cv.personalInfo.photo ? (
-                                                    <img src={match.cv.personalInfo.photo} alt={match.cv.personalInfo.fullName} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    match.cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
-                                                )}
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="font-semibold text-gray-900 dark:text-white">
-                                                    {match.cv.personalInfo.fullName}
-                                                </h3>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                    {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
-                                                </p>
-                                                <div className="flex flex-wrap gap-1 mt-2">
-                                                    {match.cv.skills.slice(0, 4).map((skill: string) => (
-                                                        <SkillBadge key={skill} skill={skill} size="sm" />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 flex-wrap">
-                                                <span className="flex items-center gap-1" title={match.cv.location.preferred?.[0] || match.cv.personalInfo.city}>
-                                                    <MapPin size={14} /> <span className="truncate max-w-[150px]">{match.cv.location.preferred?.[0] || match.cv.personalInfo.city}</span>
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <Briefcase size={14} /> {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
-                                                </span>
-                                                <span className="flex items-center gap-1">
-                                                    <DollarSign size={14} /> {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع
-                                                </span>
-                                            </div>
-                                        </div>
+                            )
 
-                                        <div className="flex items-center gap-4 hidden md:flex">
-                                            <div className="text-right">
-                                                <p className="font-medium text-gray-900 dark:text-white">
-                                                    {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
-                                                </p>
-                                                <p className="text-xs text-gray-500">
-                                                    {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
-                                                </p>
-                                            </div>
-                                            <div className="flex flex-col items-end gap-2">
-                                                <MatchScore score={match.score} size="sm" />
-                                                <div className="flex gap-1">
-                                                    <button
-                                                        onClick={(e) => handleToggleFavorite(e, match.cv.id)}
-                                                        className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
-                                                            ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
-                                                            : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
-                                                            }`}
-                                                    >
-                                                        <Heart
-                                                            size={18}
-                                                            fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
-                                                        />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setInviteCandidate({ id: match.cv.id, name: match.cv.personalInfo.fullName });
-                                                        }}
-                                                        className="p-1.5 rounded-full text-blue-600 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors"
-                                                        title={t.invite}
-                                                    >
-                                                        <Send size={18} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))}
-                            </div>
-                        )
                         ) : (
-                        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
-                                <Search size={32} className="text-gray-400" />
+                            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700">
+                                <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4">
+                                    <Search size={32} className="text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t.noCandidatesFound}</h3>
+                                <p className="text-gray-500 mt-1 mb-4">{t.tryAdjusting}</p>
+                                <Button variant="outline" onClick={clearFilters}>
+                                    {t.clearFilters}
+                                </Button>
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{t.noCandidatesFound}</h3>
-                            <p className="text-gray-500 mt-1 mb-4">{t.tryAdjusting}</p>
-                            <Button variant="outline" onClick={clearFilters}>
-                                {t.clearFilters}
-                            </Button>
-                        </div>
                         )}
-                    </div>
-                </div>
+                    </div >
+                </div >
+            )}
+
+            {/* CV Details Modal - Works for all view modes */}
+            {selectedCandidate && (
+                <CVDetailsModal
+                    isOpen={!!selectedCandidate}
+                    onClose={() => setSelectedCV(null)}
+                    cv={selectedCandidate.cv}
+                />
             )}
 
             {/* Invite Modal */}
-            {inviteCandidate && (
-                <InviteCandidateModal
-                    isOpen={!!inviteCandidate}
-                    onClose={() => setInviteCandidate(null)}
-                    candidateId={inviteCandidate.id}
-                    candidateName={inviteCandidate.name}
-                />
-            )}
-        </div>
+            {
+                inviteCandidate && (
+                    <InviteCandidateModal
+                        isOpen={!!inviteCandidate}
+                        onClose={() => setInviteCandidate(null)}
+                        candidateId={inviteCandidate.id}
+                        candidateName={inviteCandidate.name}
+                    />
+                )
+            }
+        </div >
     );
 }

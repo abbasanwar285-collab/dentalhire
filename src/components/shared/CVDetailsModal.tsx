@@ -37,6 +37,7 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState<'overview' | 'experience' | 'skills'>('overview');
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [isImageExpanded, setIsImageExpanded] = useState(false);
 
     if (!cv) return null;
 
@@ -51,7 +52,7 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
             opacity: 1,
             scale: 1,
             y: 0,
-            transition: { type: "spring", duration: 0.6, bounce: 0.3 }
+            transition: { type: "spring" as const, duration: 0.6, bounce: 0.3 }
         },
         exit: { opacity: 0, scale: 0.9, y: 50 }
     };
@@ -102,6 +103,7 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                 <button
                                     onClick={onClose}
                                     className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full transition-all backdrop-blur-md border border-white/20 shadow-lg hover:rotate-90 duration-300"
+                                    aria-label="Close modal"
                                 >
                                     <X size={20} />
                                 </button>
@@ -114,17 +116,26 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                         initial={{ scale: 0, rotate: -20 }}
                                         animate={{ scale: 1, rotate: 0 }}
                                         transition={{ delay: 0.2, type: "spring" }}
-                                        className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl border-4 border-white dark:border-gray-900 bg-white dark:bg-gray-800 shadow-2xl overflow-hidden shrink-0 relative z-20"
+                                        className="w-28 h-28 sm:w-32 sm:h-32 rounded-3xl border-4 border-white dark:border-gray-900 bg-white dark:bg-gray-800 shadow-2xl overflow-hidden shrink-0 relative z-30 cursor-pointer group flex items-center justify-center"
+                                        onClick={() => setIsImageExpanded(true)}
                                     >
                                         {cv.personalInfo?.photo || cv.photo ? (
-                                            <img
-                                                src={cv.personalInfo?.photo || cv.photo}
-                                                alt={cv.personalInfo?.fullName || cv.full_name}
-                                                className="w-full h-full object-cover"
-                                            />
+                                            <>
+                                                <img
+                                                    src={cv.personalInfo?.photo || cv.photo}
+                                                    alt={cv.personalInfo?.fullName || cv.full_name}
+                                                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 relative z-10"
+                                                />
+                                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100 z-20">
+                                                    <div className="bg-white/20 backdrop-blur-md p-2 rounded-full text-white">
+                                                        <span className="sr-only">{language === 'ar' ? 'تكبير' : 'Expand'}</span>
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>
+                                                    </div>
+                                                </div>
+                                            </>
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                                                <User size={48} className="text-gray-400" />
+                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-500 to-teal-500 text-white text-3xl font-bold">
+                                                {(cv.personalInfo?.fullName || cv.full_name || 'C').split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
                                             </div>
                                         )}
                                     </motion.div>
@@ -385,6 +396,57 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                     </motion.div>
                 </div>
             )}
+
+            {/* Lightbox for Profile Image */}
+            <AnimatePresence>
+                {isImageExpanded && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4"
+                        onClick={() => setIsImageExpanded(false)}
+                    >
+                        <button
+                            onClick={() => setIsImageExpanded(false)}
+                            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-[120]"
+                        >
+                            <X size={32} />
+                        </button>
+
+                        <motion.div
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.5, opacity: 0 }}
+                            className="relative max-w-4xl max-h-[90vh] w-full h-full flex items-center justify-center rounded-2xl overflow-hidden"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="relative w-full h-full flex items-center justify-center">
+                                {cv.personalInfo?.photo || cv.photo ? (
+                                    <img
+                                        src={cv.personalInfo?.photo || cv.photo}
+                                        alt={cv.personalInfo?.fullName || cv.full_name}
+                                        className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                                    />
+                                ) : (
+                                    <div className="w-64 h-64 rounded-full bg-gray-800 flex items-center justify-center">
+                                        <User size={96} className="text-gray-500" />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Caption/Details overlay at bottom */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 text-white text-center">
+                                <h3 className="text-2xl font-bold">{cv.personalInfo?.fullName || cv.full_name}</h3>
+                                <p className="text-blue-300 font-medium">
+                                    {cv.experience?.[0]?.title || (language === 'ar' ? 'باحث عن عمل' : 'Job Seeker')}
+                                </p>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             {/* Invite Modal */}
             <InviteCandidateModal
                 isOpen={inviteModalOpen}

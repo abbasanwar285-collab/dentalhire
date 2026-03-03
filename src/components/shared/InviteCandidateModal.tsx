@@ -109,15 +109,30 @@ export const InviteCandidateModal: React.FC<InviteCandidateModalProps> = ({
                     <div className="p-6 space-y-4">
                         {success ? (
                             <div className="flex flex-col items-center justify-center py-8 text-center animate-fade-in">
-                                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
-                                    <CheckCircle2 size={32} />
-                                </div>
-                                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                                <motion.div
+                                    initial={{ scale: 0.8, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                                    className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 text-white rounded-full flex items-center justify-center mb-5 shadow-lg shadow-green-200 dark:shadow-none"
+                                >
+                                    <CheckCircle2 size={40} />
+                                </motion.div>
+                                <motion.h4
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.1 }}
+                                    className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent mb-2"
+                                >
                                     {language === 'ar' ? 'تم إرسال الدعوة بنجاح' : 'Invitation Sent Successfully'}
-                                </h4>
-                                <p className="text-gray-500 text-sm">
+                                </motion.h4>
+                                <motion.p
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: 0.2 }}
+                                    className="text-gray-500 text-sm"
+                                >
                                     {language === 'ar' ? 'سيتم إشعار المرشح قريباً' : 'The candidate will be notified shortly.'}
-                                </p>
+                                </motion.p>
                             </div>
                         ) : (
                             <>
@@ -129,17 +144,19 @@ export const InviteCandidateModal: React.FC<InviteCandidateModalProps> = ({
                                     {activeJobs.length > 0 ? (
                                         <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
                                             {activeJobs.map((job: any) => (
-                                                <div
+                                                <motion.div
                                                     key={job.id}
+                                                    whileHover={{ scale: 1.01 }}
+                                                    whileTap={{ scale: 0.99 }}
                                                     onClick={() => setSelectedJobId(job.id)}
-                                                    className={`p-3 rounded-xl border cursor-pointer transition-all flex items-center gap-3 ${selectedJobId === job.id
-                                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-500'
-                                                            : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700'
+                                                    className={`p-3 rounded-xl border cursor-pointer transition-all duration-200 flex items-center gap-3 ${selectedJobId === job.id
+                                                        ? 'border-transparent bg-indigo-50 dark:bg-indigo-900/20 ring-2 ring-indigo-500 shadow-md shadow-indigo-100 dark:shadow-none'
+                                                        : 'border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-700 hover:shadow-sm'
                                                         }`}
                                                 >
-                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${selectedJobId === job.id ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors duration-200 ${selectedJobId === job.id ? 'bg-indigo-600 text-white shadow-inner' : 'bg-gray-100 dark:bg-gray-800 text-gray-500'
                                                         }`}>
-                                                        <Briefcase size={16} />
+                                                        <Briefcase size={18} />
                                                     </div>
                                                     <div className="flex-1 min-w-0">
                                                         <p className="font-medium text-gray-900 dark:text-white text-sm truncate">{job.title}</p>
@@ -148,7 +165,7 @@ export const InviteCandidateModal: React.FC<InviteCandidateModalProps> = ({
                                                         </p>
                                                     </div>
                                                     {selectedJobId === job.id && <CheckCircle2 size={18} className="text-blue-500" />}
-                                                </div>
+                                                </motion.div>
                                             ))}
                                         </div>
                                     ) : (

@@ -53,6 +53,10 @@ export default function ClinicApplicationsPage() {
                 return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'rejected':
                 return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
+            case 'invited':
+                return 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800';
+            case 'declined':
+                return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
             default:
                 return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
         }
@@ -82,6 +86,8 @@ export default function ClinicApplicationsPage() {
             interview: { en: 'Interview', ar: 'مقابلة' },
             accepted: { en: 'Accepted', ar: 'مقبول' },
             rejected: { en: 'Rejected', ar: 'مرفوض' },
+            invited: { en: 'Invited', ar: 'مدعو للتقديم' },
+            declined: { en: 'Declined', ar: 'مرفوضة من المرشح' },
         };
         return language === 'ar' ? labels[status]?.ar || status : labels[status]?.en || status;
     };
@@ -208,6 +214,8 @@ export default function ClinicApplicationsPage() {
                                     <option value="interview">{getStatusLabel('interview')}</option>
                                     <option value="accepted">{getStatusLabel('accepted')}</option>
                                     <option value="rejected">{getStatusLabel('rejected')}</option>
+                                    <option value="invited">{getStatusLabel('invited')}</option>
+                                    <option value="declined">{getStatusLabel('declined')}</option>
                                 </select>
                                 <ChevronDown className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
                             </div>
@@ -331,6 +339,8 @@ export default function ClinicApplicationsPage() {
                                             <option value="interview" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('interview')}</option>
                                             <option value="accepted" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('accepted')}</option>
                                             <option value="rejected" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('rejected')}</option>
+                                            <option value="invited" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('invited')}</option>
+                                            <option value="declined" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('declined')}</option>
                                         </select>
                                         <ChevronDown className="absolute left-3 top-[42px] text-current pointer-events-none" size={16} />
                                     </div>

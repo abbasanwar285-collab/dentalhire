@@ -11,7 +11,7 @@ import { Button, Input } from '@/components/shared';
 import {
     Eye, EyeOff, Mail, Lock, User, ArrowRight, ArrowLeft,
     Briefcase, Building2, Users, ShoppingBag, AlertCircle,
-    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical, Phone
+    Stethoscope, UserCircle, Megaphone, Microscope, FlaskConical, Phone, CheckCircle
 } from 'lucide-react';
 import { UserType } from '@/types';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
@@ -74,6 +74,8 @@ function RegisterContent() {
         },
     });
 
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
     const onSubmit = async (data: RegisterInput) => {
         if (!selectedRole) return;
 
@@ -89,126 +91,131 @@ function RegisterContent() {
         });
 
         if (success) {
-            if (selectedRole === 'clinic') {
-                // Employer Dashboards
-                if (selectedType === 'company') router.push('/company/dashboard');
-                else if (selectedType === 'lab') router.push('/lab/dashboard');
-                else router.push('/clinic/dashboard'); // default clinic
-            } else {
-                // Job Seeker Dashboards
-                const typeToDashboard: Record<string, string> = {
-                    dentist: 'dentist',
-                    dental_assistant: 'assistant',
-                    sales_rep: 'sales',
-                    secretary: 'secretary',
-                    media: 'media',
-                    dental_technician: 'technician',
-                };
-                const dashboard = typeToDashboard[selectedType] || 'job-seeker';
-                router.push(`/${dashboard}/dashboard`);
-            }
+            setShowSuccessModal(true);
+
+            setTimeout(() => {
+                if (selectedRole === 'clinic') {
+                    // Employer Dashboards
+                    if (selectedType === 'company') router.push('/company/dashboard');
+                    else if (selectedType === 'lab') router.push('/lab/dashboard');
+                    else router.push('/clinic/dashboard'); // default clinic
+                } else {
+                    // Job Seeker Dashboards
+                    const typeToDashboard: Record<string, string> = {
+                        dentist: 'dentist',
+                        dental_assistant: 'assistant',
+                        sales_rep: 'sales',
+                        secretary: 'secretary',
+                        media: 'media',
+                        dental_technician: 'technician',
+                    };
+                    const dashboard = typeToDashboard[selectedType] || 'job-seeker';
+                    router.push(`/${dashboard}/dashboard`);
+                }
+            }, 2000);
         }
     };
 
     const translations = {
         ar: {
             title: 'إنشاء حساب جديد',
-            subtitle: 'انضم إلى DentalHire اليوم',
-            mainQuestion: 'أنا أبحث عن',
-            jobSeeker: 'عن وظيفة',
-            jobSeekerDesc: 'أطباء، مساعدين، تقنيين، مندوبين، والمزيد',
-            employer: 'عن موظفين',
-            employerDesc: 'عيادات، شركات، ومختبرات تبحث عن كوادر',
-            selectRole: 'اختر التخصص',
-            selectEmployerType: 'هل أنت',
-            // Seekers
-            dentist: 'طبيب أسنان',
-            dentistDesc: 'عام أو متخصص',
-            assistant: 'مساعد طبيب',
-            assistantDesc: 'مساعد، تعقيم، إدارة',
-            sales: 'مندوب مبيعات',
-            salesDesc: 'مبيعات لشركات طبية',
-            secretary: 'سكرتير/موظف استقبال',
-            secretaryDesc: 'إدارة مواعيد واستقبال',
-            media: 'وجه إعلاني',
-            mediaDesc: 'مودل أو مقدم محتوى',
-            technician: 'تقني أسنان',
-            technicianDesc: 'عمل في مختبرات الأسنان',
-            // Employers
-            clinic: 'عيادة أسنان',
-            clinicDesc: 'أبحث عن أطباء ومساعدين',
-            company: 'شركة تجارية',
-            companyDesc: 'أبحث عن مندوبين ومسوقين',
-            lab: 'مختبر أسنان',
-            labDesc: 'أبحث عن تقنيين وحرفيين',
-
-            continue: 'متابعة',
+            mainQuestion: 'كيف تريد استخدام المنصة؟',
+            jobSeeker: 'باحث عن عمل',
+            jobSeekerDesc: 'أبحث عن فرصة عمل في المجال الطبي',
+            employer: 'جهة توظيف',
+            employerDesc: 'أبحث عن موظفين وكوادر طبية',
+            selectRole: 'اختر المسمى الوظيفي',
+            selectEmployerType: 'اختر نوع المنشأة',
             back: 'رجوع',
-            accountDetails: 'بيانات الحساب',
+            createAccount: 'إنشاء حساب',
             firstName: 'الاسم الأول',
             lastName: 'اسم العائلة',
             email: 'البريد الإلكتروني',
             password: 'كلمة المرور',
             confirmPassword: 'تأكيد كلمة المرور',
             agreeToTerms: 'أوافق على',
-            terms: 'شروط الخدمة',
+            terms: 'الشروط والأحكام',
             and: 'و',
             privacy: 'سياسة الخصوصية',
-            createAccount: 'إنشاء الحساب',
             haveAccount: 'لديك حساب بالفعل؟',
             signIn: 'تسجيل الدخول',
+            dentist: 'طبيب أسنان',
+            dentistDesc: 'طبيب عام أو أخصائي',
+            assistant: 'مساعد طبيب',
+            assistantDesc: 'مساعد كرسي أو تعقيم',
+            technician: 'فني أسنان',
+            technicianDesc: 'فني معمل أو سيراميك',
+            secretary: 'سكرتارية/استقبال',
+            secretaryDesc: 'تنسيق مواعيد واستقبال',
+            sales: 'مسوق/مندوب',
+            salesDesc: 'تسويق منتجات طبية',
+            media: 'صانع محتوى',
+            mediaDesc: 'تصوير وإدارة حسابات',
+            clinic: 'عيادة/مركز',
+            clinicDesc: 'عيادة أسنان أو مجمع طبي',
+            company: 'شركة',
+            companyDesc: 'شركة تجهيزات أو مستلزمات',
+            lab: 'معمل أسنان',
+            labDesc: 'معمل تعويضات سنية',
+            successTitle: 'تم إنشاء الحساب بنجاح',
+            successSubtitle: 'نتمنى لك التوفيق',
         },
         en: {
             title: 'Create New Account',
-            subtitle: 'Join DentalHire Today',
-            mainQuestion: 'I am looking for',
-            jobSeeker: 'a Job',
-            jobSeekerDesc: 'Dentists, Assistants, Techs, Sales, etc.',
-            employer: 'Employees',
-            employerDesc: 'Clinics, Companies, Labs looking to hire',
-            selectRole: 'Select Role',
-            selectEmployerType: 'Are you a',
-            // Seekers
-            dentist: 'Dentist',
-            dentistDesc: 'General or Specialist',
-            assistant: 'Dental Assistant',
-            assistantDesc: 'Assisting, Sterilization, Admin',
-            sales: 'Sales Representative',
-            salesDesc: 'Medical Sales & Marketing',
-            secretary: 'Secretary / Receptionist',
-            secretaryDesc: 'Front desk management',
-            media: 'Brand Face / Media',
-            mediaDesc: 'Model or Content Creator',
-            technician: 'Dental Technician',
-            technicianDesc: 'Lab Work & Prosthetics',
-            // Employers
-            clinic: 'Dental Clinic',
-            clinicDesc: 'Hiring Dentists & Staff',
-            company: 'Medical Company',
-            companyDesc: 'Hiring Sales & Marketing',
-            lab: 'Dental Laboratory',
-            labDesc: 'Hiring Technicians',
-
-            continue: 'Continue',
+            mainQuestion: 'How would you like to use the platform?',
+            jobSeeker: 'Job Seeker',
+            jobSeekerDesc: 'Looking for job opportunities',
+            employer: 'Employer',
+            employerDesc: 'Hiring medical staff',
+            selectRole: 'Select your role',
+            selectEmployerType: 'Select facility type',
             back: 'Back',
-            accountDetails: 'Account Details',
+            createAccount: 'Create Account',
             firstName: 'First Name',
             lastName: 'Last Name',
-            email: 'Email',
+            email: 'Email Address',
             password: 'Password',
             confirmPassword: 'Confirm Password',
             agreeToTerms: 'I agree to the',
-            terms: 'Terms of Service',
+            terms: 'Terms and Conditions',
             and: 'and',
             privacy: 'Privacy Policy',
-            createAccount: 'Create Account',
             haveAccount: 'Already have an account?',
-            signIn: 'Sign in',
+            signIn: 'Sign In',
+            dentist: 'Dentist',
+            dentistDesc: 'General or Specialist',
+            assistant: 'Dental Assistant',
+            assistantDesc: 'Chairside or Sterilization',
+            technician: 'Dental Technician',
+            technicianDesc: 'Lab or Ceramic Tech',
+            secretary: 'Secretary',
+            secretaryDesc: 'Reception & Coordination',
+            sales: 'Sales Rep',
+            salesDesc: 'Medical Products Sales',
+            media: 'Content Creator',
+            mediaDesc: 'Photography & Social Media',
+            clinic: 'Clinic/Center',
+            clinicDesc: 'Dental Clinic or Center',
+            company: 'Company',
+            companyDesc: 'Medical Supply Company',
+            lab: 'Dental Lab',
+            labDesc: 'Prosthetics Lab',
+            successTitle: 'Account Created Successfully',
+            successSubtitle: 'Wishing you good luck',
         },
     };
 
-    const t = translations[language as keyof typeof translations];
+    // Safety check for translations
+    const currentTranslations = translations[language as keyof typeof translations];
+
+    // Fallback to English if current language translations are missing
+    const t = currentTranslations || translations['en'];
     const isRTL = language === 'ar';
+
+    // Show loading state if language is somehow undefined (should be caught by context, but extra safety)
+    if (!language || !t) {
+        return <div className="min-h-[50vh] flex items-center justify-center">جاري التحميل...</div>;
+    }
 
     const mainRoles = [
         {
@@ -266,12 +273,30 @@ function RegisterContent() {
 
     return (
         <div className="w-full">
+            {/* Success Modal */}
+            {showSuccessModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-gray-800 rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl scale-100 animate-in zoom-in-95 duration-300 border border-gray-100 dark:border-gray-700">
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 dark:text-green-400">
+                            <CheckCircle className="w-10 h-10" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                            {language === 'ar' ? 'تم إنشاء الحساب بنجاح' : 'Account Created Successfully'}
+                        </h3>
+                        <p className="text-lg text-gray-600 dark:text-gray-300">
+                            {language === 'ar' ? 'نتمنى لك التوفيق' : 'Wishing you good luck'}
+                        </p>
+                    </div>
+                </div>
+            )}
+
             <div className="w-full">
                 {/* Language Toggle */}
                 <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
                 {/* Main Content Area */}
-                <div className="bg-transparent pt-12 pb-24 min-h-screen">
+                {/* Main Content Area */}
+                <div className="bg-transparent pt-4 pb-8 w-full">
                     <div className="p-4 md:p-8 relative z-10">
                         {/* Error Message */}
                         {error && (
@@ -404,7 +429,7 @@ function RegisterContent() {
 
                         {/* Step 3: Account Details */}
                         {step === 3 && (
-                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 animate-in fade-in slide-in-from-right-8 duration-500">
+                            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 animate-in fade-in slide-in-from-right-8 duration-500">
                                 <div className="flex items-center justify-between mb-6">
                                     <button
                                         type="button"
@@ -427,14 +452,14 @@ function RegisterContent() {
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <Input
                                         label={t.firstName}
-                                        placeholder="John"
+                                        placeholder={language === 'ar' ? 'أحمد' : 'John'}
                                         leftIcon={<User size={18} />}
                                         error={errors.firstName?.message}
                                         {...register('firstName')}
                                     />
                                     <Input
                                         label={t.lastName}
-                                        placeholder="Doe"
+                                        placeholder={language === 'ar' ? 'العتيبي' : 'Doe'}
                                         error={errors.lastName?.message}
                                         {...register('lastName')}
                                     />
@@ -450,7 +475,7 @@ function RegisterContent() {
                                 />
 
                                 <Input
-                                    label="Phone Number"
+                                    label={language === 'ar' ? 'رقم الجوال' : 'Phone Number'}
                                     type="tel"
                                     placeholder="0501234567"
                                     leftIcon={<Phone size={18} />}
@@ -514,6 +539,7 @@ function RegisterContent() {
                         )}
                     </div>
 
+
                     {/* Footer */}
                     <div className="border-t border-gray-200 dark:border-gray-700 p-6 text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -531,7 +557,7 @@ function RegisterContent() {
 
 export default function RegisterPage() {
     return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">جاري التحميل...</div>}>
             <RegisterContent />
         </Suspense>
     );

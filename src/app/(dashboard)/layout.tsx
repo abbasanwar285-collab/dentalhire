@@ -4,9 +4,9 @@
 // DentalHire - Dashboard Layout
 // ============================================
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Navbar, Sidebar, BottomNav } from '@/components/layout';
+import { useEffect, useState, useMemo } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Navbar, Sidebar } from '@/components/layout';
 import { useAuthStore } from '@/store';
 import { PageLoader, NotificationBell } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -22,6 +22,7 @@ export default function DashboardLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const pathname = usePathname();
     const { isAuthenticated, isLoading, user } = useAuthStore();
     const { language } = useLanguage();
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -46,12 +47,28 @@ export default function DashboardLayout({
 
             try {
                 const supabase = getSupabaseClient();
-                const { data: clinicData, error } = await supabase
+
+                // Add timeout to prevent hanging indefinitely
+                const timeoutPromise = new Promise<null>((resolve) =>
+                    setTimeout(() => resolve(null), 5000)
+                );
+
+                const queryPromise = supabase
                     .from('clinics')
                     .select('name, city')
                     .eq('user_id', user.id)
                     .maybeSingle();
 
+                const result = await Promise.race([queryPromise, timeoutPromise]);
+
+                // If timeout occurred, just continue without showing onboarding
+                if (result === null) {
+                    console.warn('Employer profile check timed out, continuing without onboarding');
+                    setCheckingProfile(false);
+                    return;
+                }
+
+                const { data: clinicData, error } = result;
                 const typedData = clinicData as { name: string; city: string } | null;
 
                 // If no clinic record or missing name/city, show onboarding
@@ -78,23 +95,66 @@ export default function DashboardLayout({
         }
     }, [user, isAuthenticated, isLoading]);
 
-    useEffect(() => {
-        // Redirect to login if not authenticated
-        if (!isLoading && !isAuthenticated) {
-            router.push('/login');
-            return;
+    // Role-Based Access Control - Calculated Synchronously to prevent FOUC
+    const redirectPath = useMemo(() => {
+        if (isLoading || !user) return null;
+
+        const path = pathname;
+        // Handle root dashboard path or redirects
+        if (!path) return null;
+
+        const segment = path.split('/')[1]; // 'clinic', 'dentist', 'job-seeker', etc.
+
+        // 1. Prevent Job Seekers from accessing Employer routes
+        const employerRoutes = ['clinic', 'company', 'lab'];
+        if (user.role === 'job_seeker' && employerRoutes.includes(segment)) {
+            const map: Record<string, string> = {
+                dentist: 'dentist',
+                dental_assistant: 'assistant',
+                sales_rep: 'sales',
+                secretary: 'secretary',
+                media: 'media',
+                dental_technician: 'technician',
+            };
+            const target = map[user.userType] || 'job-seeker';
+            return `/${target}/dashboard`;
         }
 
-        // Role-Based Access Control
-        if (!isLoading && user) {
-            const path = window.location.pathname;
-            const segment = path.split('/')[1]; // 'clinic', 'dentist', 'job-seeker', etc.
+        // 2. Prevent Employers from accessing Job Seeker routes
+        const jobSeekerRoutes = ['job-seeker', 'dentist', 'assistant', 'technician', 'sales', 'secretary', 'media'];
+        if (['clinic', 'company', 'lab'].includes(user.role) && jobSeekerRoutes.includes(segment)) {
+            // Only redirect if they are trying to access a dashboard-like route
+            if (path.includes('/dashboard')) {
+                if (user.userType === 'company') return '/company/dashboard';
+                else if (user.userType === 'lab') return '/lab/dashboard';
+                else return '/clinic/dashboard';
+            }
+        }
 
-            // 1. Prevent Job Seekers from accessing Employer routes
-            const employerRoutes = ['clinic', 'company', 'lab'];
-            if (user.role === 'job_seeker' && employerRoutes.includes(segment)) {
-                // Redirect to their specific dashboard
-                const map: Record<string, string> = {
+        // 3. Prevent Employers from accessing other Employer routes
+        if (user.role === 'clinic') {
+            if (user.userType === 'company' && (segment === 'clinic' || segment === 'lab')) {
+                return '/company/dashboard';
+            } else if (user.userType === 'lab' && (segment === 'clinic' || segment === 'company')) {
+                return '/lab/dashboard';
+            } else if (user.userType === 'clinic' && (segment === 'company' || segment === 'lab')) {
+                return '/clinic/dashboard';
+            }
+        }
+
+        // 4. Force Admin to Admin Dashboard & Prevent Others from Admin
+        if (user.role === 'admin' && segment !== 'admin') {
+            return '/admin/dashboard';
+        }
+        if (user.role !== 'admin' && segment === 'admin') {
+            const map: Record<string, string> = {
+                job_seeker: 'job-seeker',
+                clinic: 'clinic',
+                company: 'company',
+                lab: 'lab'
+            };
+            if (user.role === 'job_seeker') {
+                const jsMap: Record<string, string> = {
                     dentist: 'dentist',
                     dental_assistant: 'assistant',
                     sales_rep: 'sales',
@@ -102,56 +162,43 @@ export default function DashboardLayout({
                     media: 'media',
                     dental_technician: 'technician',
                 };
-                const target = map[user.userType] || 'job-seeker';
-                router.push(`/${target}/dashboard`);
-                return;
-            }
-
-            // 2. Prevent Employers from accessing Job Seeker routes (except profile viewing which might be different URL)
-            const jobSeekerRoutes = ['job-seeker', 'dentist', 'assistant', 'technician', 'sales', 'secretary', 'media'];
-
-            if (['clinic', 'company', 'lab'].includes(user.role) && jobSeekerRoutes.includes(segment)) {
-                if (path.includes('/dashboard')) {
-                    // Redirect to their employer dashboard
-                    if (user.userType === 'company') router.push('/company/dashboard');
-                    else if (user.userType === 'lab') router.push('/lab/dashboard');
-                    else router.push('/clinic/dashboard');
-                    return;
-                }
-            }
-
-            // 3. Prevent Employers from accessing other Employer routes
-            if (user.role === 'clinic') {
-                if (user.userType === 'company' && (segment === 'clinic' || segment === 'lab')) {
-                    router.push('/company/dashboard');
-                } else if (user.userType === 'lab' && (segment === 'clinic' || segment === 'company')) {
-                    router.push('/lab/dashboard');
-                } else if (user.userType === 'clinic' && (segment === 'company' || segment === 'lab')) {
-                    router.push('/clinic/dashboard');
-                }
+                const target = jsMap[user.userType] || 'job-seeker';
+                return `/${target}/dashboard`;
+            } else {
+                const target = map[user.role] || 'login';
+                return `/${target}/dashboard`;
             }
         }
 
-        // Fetch notifications for badge
-        if (user) {
-            fetchNotifications(user.id);
+        return null;
+    }, [isLoading, user, pathname]);
+
+    // Handle authentication redirect
+    useEffect(() => {
+        if (!isLoading && !isAuthenticated) {
+            router.push('/login');
         }
-    }, [isAuthenticated, isLoading, router, user, fetchNotifications]);
+    }, [isLoading, isAuthenticated, router]);
 
-    const handleOnboardingComplete = async () => {
-        setShowOnboarding(false);
-        // Re-check session to update user profile data (name, etc.) without reloading
-        await useAuthStore.getState().checkSession();
-        setCheckingProfile(false);
-    };
+    // Handle RBAC redirect
+    useEffect(() => {
+        if (redirectPath) {
+            router.push(redirectPath);
+        }
+    }, [redirectPath, router]);
 
-    if (isLoading || checkingProfile) {
+    // Show loader during loading, profile check, or if a redirect is pending
+    if (isLoading || checkingProfile || redirectPath) {
         return <PageLoader />;
     }
 
     if (!isAuthenticated) {
         return <PageLoader />;
     }
+
+    const handleOnboardingComplete = () => {
+        setShowOnboarding(false);
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>

@@ -1,28 +1,114 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store';
 import { useNotificationStore } from '@/store/useNotificationStore';
-import { Bell, Check, Clock, Briefcase, MessageSquare, Star, Info } from 'lucide-react';
+import { Bell, Check, Clock, Briefcase, MessageSquare, Star, Info, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { PageLoader } from '@/components/shared';
+import { PageLoader, Button, useToast } from '@/components/shared';
+import { getSupabaseClient } from '@/lib/supabase';
+import { CVRequestModal } from '@/components/shared/CVRequestModal';
 
 export default function NotificationsPage() {
     const { user } = useAuthStore();
     const {
         notifications,
-        isLoading,
         fetchNotifications,
         markAsRead,
         markAllAsRead
     } = useNotificationStore();
+    const isLoading = useNotificationStore(state => state.isLoading);
     const { language } = useLanguage();
+    const { addToast } = useToast();
+    const [processingId, setProcessingId] = useState<string | null>(null);
+    const [selectedRequest, setSelectedRequest] = useState<{
+        notificationId: string;
+        requestId: string;
+        clinicName: string;
+        createdAt: string;
+    } | null>(null);
 
     useEffect(() => {
         if (user) {
             fetchNotifications(user.id);
         }
     }, [user, fetchNotifications]);
+
+    const handleRespondToCV = async (status: 'approved' | 'rejected') => {
+        if (!user || !selectedRequest) return;
+
+        setProcessingId(selectedRequest.notificationId);
+        try {
+            const supabase = getSupabaseClient();
+            // @ts-ignore
+            const { error } = await supabase.rpc('respond_to_cv_access', {
+                p_request_id: selectedRequest.requestId,
+                p_job_seeker_id: user.id,
+                p_status: status
+            });
+
+            if (error) throw error;
+
+            addToast(
+                language === 'ar'
+                    ? (status === 'approved' ? 'تمت الموافقة على الطلب' : 'تم رفض الطلب')
+                    : (status === 'approved' ? 'Request approved' : 'Request rejected'),
+                status === 'approved' ? 'success' : 'info'
+            );
+
+            // Mark notification as read if not already
+            markAsRead(selectedRequest.notificationId);
+            setSelectedRequest(null);
+
+        } catch (error: any) {
+            console.error('Error responding to CV request:', error);
+            console.log('RPC Args:', {
+                p_request_id: selectedRequest.requestId,
+                p_job_seeker_id: user.id,
+                p_status: status
+            });
+            addToast(
+                language === 'ar' ? `حدث خطأ: ${error.message || 'غير معروف'}` : `Error: ${error.message || 'Unknown'}`,
+                'error'
+            );
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    // Helper to extract clinic name from message if missing in data
+    const getClinicName = (notification: any) => {
+        if (notification.data?.clinicName) return notification.data.clinicName;
+
+        // Try to parse from message
+        const msg = notification.message || '';
+        if (language === 'ar') {
+            // Arabic: "ترغب [Name] في..." or "[Name] يرغب في..."
+            // Remove known suffixes
+            const cleaned = msg.replace(' يرغب في الاطلاع على سيرتك الذاتية الكاملة.', '')
+                .replace(' ترغب في الاطلاع على سيرتك الذاتية الكاملة.', '')
+                .replace(/^ترغب\s+/, '')
+                .replace(/^يرغب\s+/, '');
+            return cleaned.trim() || 'عيادة';
+        } else {
+            // English: "[Name] wants to..."
+            const match = msg.match(/^(.*?)\s+wants to/);
+            return match ? match[1] : 'Clinic';
+        }
+    };
+
+    const handleNotificationClick = (notification: any) => {
+        markAsRead(notification.id);
+
+        if (notification.type === 'cv_request' || notification.data?.action === 'cv_request') {
+            setSelectedRequest({
+                notificationId: notification.id,
+                requestId: notification.data?.requestId,
+                clinicName: getClinicName(notification),
+                createdAt: notification.created_at
+            });
+        }
+    };
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -82,10 +168,12 @@ export default function NotificationsPage() {
                 {notifications.length > 0 ? (
                     notifications.map((notification) => {
                         const Icon = getIcon(notification.type);
+                        const isCVRequest = notification.type === 'cv_request' || notification.data?.action === 'cv_request';
+
                         return (
                             <div
                                 key={notification.id}
-                                onClick={() => markAsRead(notification.id)}
+                                onClick={() => handleNotificationClick(notification)}
                                 className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer ${!notification.read ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
                                     }`}
                             >
@@ -102,12 +190,33 @@ export default function NotificationsPage() {
                                                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                                     {notification.message}
                                                 </p>
-                                                <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center gap-1">
-                                                    <Clock size={12} />
-                                                    {new Date(notification.created_at).toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US', {
-                                                        month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'
-                                                    })}
-                                                </p>
+
+                                                {/* Meta Info */}
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <p className="text-xs text-gray-400 dark:text-gray-500 flex items-center gap-1">
+                                                        <Clock size={12} />
+                                                        {new Date(notification.created_at).toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US', {
+                                                            month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric'
+                                                        })}
+                                                    </p>
+                                                </div>
+
+                                                {/* Explicit Button for CV Requests */}
+                                                {isCVRequest && (
+                                                    <div className="mt-3">
+                                                        <Button
+                                                            size="sm"
+                                                            variant="outline"
+                                                            className="text-blue-600 border-blue-200 hover:bg-blue-50 h-8 text-xs"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleNotificationClick(notification);
+                                                            }}
+                                                        >
+                                                            {language === 'ar' ? 'عرض الطلب' : 'View Request'}
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
                                             {!notification.read && (
                                                 <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-1"></div>
@@ -127,6 +236,16 @@ export default function NotificationsPage() {
                     </div>
                 )}
             </div>
+
+            {/* CV Access Request Modal */}
+            <CVRequestModal
+                isOpen={!!selectedRequest}
+                onClose={() => setSelectedRequest(null)}
+                clinicName={selectedRequest?.clinicName || ''}
+                requestDate={selectedRequest?.createdAt || ''}
+                onRespond={handleRespondToCV}
+                isLoading={!!processingId}
+            />
         </div>
     );
 }

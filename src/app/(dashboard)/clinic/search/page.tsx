@@ -8,8 +8,8 @@ import { useState, useMemo, useDeferredValue, useEffect } from 'react';
 import { useSearchStore, useAuthStore, useJobStore } from '@/store';
 import { dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { iraqLocations } from '@/data/iraq_locations';
-import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, InviteCandidateModal } from '@/components/shared';
-import MobileSearchFilters from '@/components/shared/MobileSearchFilters';
+import { useSearchParams } from 'next/navigation';
+import { Card, Button, Input, MatchScore, SkillBadge, RangeSlider, CVDetailsModal, useToast } from '@/components/shared';
 import {
     Search,
     Grid3X3,
@@ -25,7 +25,9 @@ import {
     User,
     Stethoscope,
     Heart,
-    Send
+    CheckCircle,
+    Award,
+    FileText
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -41,22 +43,75 @@ export default function ClinicSearchPage() {
     const supabase = getSupabaseClient();
     const { filters, setFilter, clearFilters, results, setResults, viewMode, setViewMode } = useSearchStore();
     const [showFilters, setShowFilters] = useState(true);
+
+    const searchParams = useSearchParams(); // Add this hook
+
+    // Mobile check to collapse filters by default
+    useEffect(() => {
+        if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setShowFilters(false);
+        }
+    }, []);
+
+    // Parse URL Query Params for Smart Matching
+    useEffect(() => {
+        const role = searchParams.get('role');
+        const minSalary = searchParams.get('minSalary');
+        const maxSalary = searchParams.get('maxSalary');
+        const location = searchParams.get('location');
+
+        if (role || minSalary || maxSalary || location) {
+            // We have params, let's update filters
+            // We use a timeout to ensure state matches (optional but safer)
+            setTimeout(() => {
+                setFilter({
+                    role: role || undefined,
+                    salaryMin: minSalary ? parseInt(minSalary) : undefined,
+                    salaryMax: maxSalary ? parseInt(maxSalary) : undefined,
+                    location: location || undefined
+                });
+            }, 100);
+        }
+    }, [searchParams, setFilter]);
+
     const [selectedCV, setSelectedCV] = useState<string | null>(null);
-    const [inviteCandidate, setInviteCandidate] = useState<{ id: string, name: string } | null>(null);
+    const [cvViewMode, setCvViewMode] = useState<'profile' | 'cv'>('profile');
     const [mapView, setMapView] = useState(false);
     const { language } = useLanguage();
     const [isLoading, setIsLoading] = useState(true);
 
     // Auth & Job Store for Favorites
     const { user } = useAuthStore();
-    const { favorites, toggleFavorite, loadFavorites } = useJobStore();
+    const { favorites, toggleFavorite, loadFavorites, jobs, loadClinicJobs } = useJobStore();
+    const { addToast } = useToast();
 
-    // Load favorites on mount
+    // Invite Modal State
+    const [inviteModalOpen, setInviteModalOpen] = useState(false);
+    const [candidateToInvite, setCandidateToInvite] = useState<{ id: string, name: string } | null>(null);
+    const [selectedJobId, setSelectedJobId] = useState<string>('');
+
+    // Load favorites and jobs on mount
     useEffect(() => {
-        if (user?.id) {
+        if (user) {
             loadFavorites(user.id);
+            // We assume the user has a clinic properly linked, 
+            // but we might need the clinic ID (which isn't directly in user).
+            // Jobs store usually handles this or we need to fetch clinic first.
+            // For now, let's try to load if we can, or rely on the store having them if visited jobs page.
+            // Actually, we should fetch clinic ID here if we want to be sure. 
+            // But let's check if the store has a way. 
+            // Looking at jobs page, it fetches clinic first.
+            // To be safe, we'll just use what's in store or try a safe fetch if empty.
+            const fetchClinicAndJobs = async () => {
+                const supabase = getSupabaseClient();
+                const { data } = await supabase.rpc('get_my_clinic');
+                if (data && data.length > 0) {
+                    loadClinicJobs(data[0].id);
+                }
+            };
+            fetchClinicAndJobs();
         }
-    }, [user?.id, loadFavorites]);
+    }, [user, loadFavorites, loadClinicJobs]);
 
     const handleToggleFavorite = async (e: React.MouseEvent, cvId: string) => {
         e.stopPropagation(); // Prevent card click
@@ -69,31 +124,123 @@ export default function ClinicSearchPage() {
     const [selectedGov, setSelectedGov] = useState<string>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string>('');
     const [area, setArea] = useState<string>('');
+    const [cvRequests, setCvRequests] = useState<Record<string, string>>({}); // candidateId -> status
+    const [requestingIds, setRequestingIds] = useState<Set<string>>(new Set());
 
-    // Fetch initial data
+    // Fetch CV Requests
+    useEffect(() => {
+        const fetchRequests = async () => {
+            if (!user) return;
+            const supabase = getSupabaseClient();
+            const { data, error } = await supabase
+                .from('cv_access_requests')
+                .select('job_seeker_id, status')
+                .eq('employer_id', user.id);
+
+            if (data) {
+                const requestsMap: Record<string, string> = {};
+                data.forEach((r: any) => {
+                    requestsMap[r.job_seeker_id] = r.status;
+                });
+                setCvRequests(requestsMap);
+            }
+        };
+
+        fetchRequests();
+    }, [user]);
+
+    const handleRequestCV = async (e: React.MouseEvent, cvId: string, candidateId: string) => {
+        e.stopPropagation();
+        if (!user) return;
+
+        setRequestingIds(prev => new Set(prev).add(candidateId));
+
+        try {
+            const supabase = getSupabaseClient();
+            // @ts-ignore
+            const { error } = await supabase.rpc('request_cv_access', {
+                p_employer_id: user.id,
+                p_job_seeker_id: candidateId
+            });
+
+            if (error) throw error;
+
+            setCvRequests(prev => ({ ...prev, [candidateId]: 'pending' }));
+            addToast(language === 'ar' ? 'تم إرسال الطلب بنجاح' : 'Request sent successfully', 'success');
+        } catch (error) {
+            console.error(error);
+            addToast(language === 'ar' ? 'حدث خطأ في طلب السيرة الذاتية' : 'Error requesting CV', 'error');
+        } finally {
+            setRequestingIds(prev => {
+                const next = new Set(prev);
+                next.delete(candidateId);
+                return next;
+            });
+        }
+    };
+
+
+    // Fetch CVs with server-side filtering
     useEffect(() => {
         const fetchCVs = async () => {
             setIsLoading(true);
             try {
-                // Join with users table to get user_type
-                const { data, error } = await supabase
+                let query = supabase
                     .from('cvs')
-                    .select('*, users(user_type)');
+                    .select('*, users!inner(user_type, verified)'); // Inner join to filter by user_type
+
+                // 1. Role Filter (Server-side)
+                if (filters.role) {
+                    query = query.eq('users.user_type', filters.role);
+                }
+
+                // 2. Location Filter (Server-side ILIKE)
+                if (filters.location) {
+                    // Search in city OR preferred locations
+                    // Note: This simple OR check might need an RPC for complex array searching, 
+                    // but for now we'll check the 'city' column which is the primary indexed location.
+                    // For array searching 'location_preferred', we'd need: .contains('location_preferred', [filters.location])
+                    // But standard text search is often better.
+                    query = query.ilike('city', `%${filters.location}%`);
+                }
+
+                // 3. Experience Filter (Server-side)
+                // Note: 'experience' is a JSONB column. Exact querying depends on structure.
+                // For 'Min Years', it's hard to do in SQL without a generated column or RPC.
+                // We will keep Experience filtering CLIENT-SIDE for now as it requires parsing JSON array length.
+
+                // 4. Salary Filter (Server-side)
+                if (filters.salaryMin !== undefined) {
+                    query = query.gte('salary_expected', filters.salaryMin);
+                }
+                if (filters.salaryMax !== undefined) {
+                    query = query.lte('salary_expected', filters.salaryMax);
+                }
+
+                // 5. Employment Type (Server-side)
+                if (filters.employmentType && filters.employmentType.length > 0) {
+                    // availability_type is string text
+                    query = query.in('availability_type', filters.employmentType);
+                }
+
+                const { data, error } = await query;
 
                 if (error) {
                     console.error('Error fetching CVs:', error);
+                    addToast('Error fetching candidates', 'error');
                 }
 
                 if (data) {
-                    // Map the raw DB CVs (flat structure) to MatchResult structure (nested)
-                    const mappedResults = data.map((cv: any) => ({
+                    // Map results
+                    let mappedResults = data.map((cv: any) => ({
                         cv: {
                             id: cv.id,
                             userId: cv.user_id,
-                            userType: cv.users?.user_type, // Map user_type from joined users table
+                            userType: cv.users?.user_type,
                             personalInfo: {
                                 fullName: cv.full_name,
                                 email: cv.email,
+                                verified: cv.users?.verified,
                                 phone: cv.phone,
                                 city: cv.city,
                                 bio: cv.bio,
@@ -123,7 +270,7 @@ export default function ClinicSearchPage() {
                             createdAt: cv.created_at,
                             updatedAt: cv.updated_at,
                         },
-                        score: cv.matchScore || Math.floor(Math.random() * 30) + 70, // Mock score if missing
+                        score: cv.matchScore || Math.floor(Math.random() * 30) + 70,
                         matchDetails: {
                             location: 0,
                             salary: 0,
@@ -139,9 +286,38 @@ export default function ClinicSearchPage() {
                             availability: 0
                         }
                     }));
+
+                    // --- Client-side Refinement (where Server-side is limited) ---
+
+                    // Filter by Text Query (Name, Skills, Title)
+                    if (filters.query) {
+                        const q = filters.query.toLowerCase();
+                        mappedResults = mappedResults.filter((m: any) =>
+                            m.cv.personalInfo.fullName.toLowerCase().includes(q) ||
+                            m.cv.skills.some((s: string) => s.toLowerCase().includes(q)) ||
+                            m.cv.experience.some((e: any) => e.title.toLowerCase().includes(q))
+                        );
+                    }
+
+                    // Filter by Experience (Calculated)
+                    if (filters.experienceMin !== undefined) {
+                        mappedResults = mappedResults.filter((m: any) => {
+                            // Approximation: just array length or reuse the helper if imported
+                            return (m.cv.experience?.length || 0) >= filters.experienceMin!;
+                        });
+                    }
+
+                    // Filter by Skills (Client side check for array overlap)
+                    if (filters.skills && filters.skills.length > 0) {
+                        mappedResults = mappedResults.filter((m: any) =>
+                            filters.skills!.some(skill =>
+                                m.cv.skills.some((s: string) => s.toLowerCase().includes(skill.toLowerCase()))
+                            )
+                        );
+                    }
+
                     setResults(mappedResults);
                 } else {
-                    // If no data, ensure results are empty
                     setResults([]);
                 }
             } catch (error) {
@@ -151,8 +327,14 @@ export default function ClinicSearchPage() {
             }
         };
 
-        fetchCVs();
-    }, [setResults, supabase]);
+        // Debounce fetching if needed, but for now we fetch on filter change
+        const timeoutId = setTimeout(() => {
+            fetchCVs();
+        }, 300); // Small debounce to prevent rapid firing on typing
+
+        return () => clearTimeout(timeoutId);
+
+    }, [filters, supabase, setResults, addToast]); // Re-run when filters change
 
     // Handle initial location parsing if needed (simple check)
     useEffect(() => {
@@ -242,161 +424,22 @@ export default function ClinicSearchPage() {
     // Default clinic location (Baghdad)
     const clinicLocation = { lat: 33.3128, lng: 44.3615 };
 
-    // Filter and sort results
-    const filteredResults = useMemo(() => {
-        let currentResults = [...results];
-
-        if (filters.query) {
-            const query = filters.query.toLowerCase();
-            currentResults = currentResults.filter(m =>
-                m.cv.personalInfo.fullName.toLowerCase().includes(query) ||
-                m.cv.skills.some((s: string) => s.toLowerCase().includes(query)) ||
-                m.cv.experience.some((e: any) => e.title.toLowerCase().includes(query))
-            );
-        }
-
-        if (filters.role) {
-            // Check against userType or experience title
-            currentResults = currentResults.filter(m => {
-                const roleMatch = (m.cv as any).userType === filters.role; // Use userType from joined users table
-                const titleMatch = m.cv.experience.some((e: any) =>
-                    e.title.toLowerCase().includes(filters.role!.replace('_', ' ').toLowerCase())
-                );
-                return roleMatch || titleMatch;
+    // Derive available skills from actual candidates
+    const availableSkills = useMemo(() => {
+        const skillsSet = new Set<string>();
+        results.forEach(m => {
+            m.cv.skills?.forEach(s => {
+                if (s && s.trim()) skillsSet.add(s.trim());
             });
-        }
+        });
+        return Array.from(skillsSet).sort();
+    }, [results]);
 
-        if (filters.location) {
-            const locFilter = filters.location.toLowerCase();
-            const isGovernorate = Object.keys(iraqLocations).some(k => k.toLowerCase() === locFilter);
-
-            let possibleMatches = [locFilter];
-            let parentGovernorate = '';
-
-            if (isGovernorate) {
-                // Find casing content key
-                const govKey = Object.keys(iraqLocations).find(k => k.toLowerCase() === locFilter);
-                if (govKey) {
-                    parentGovernorate = govKey.toLowerCase();
-                    const govAr = (iraqLocations as any)[govKey].ar;
-                    const districts = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.en.toLowerCase()) || [];
-                    const districtsAr = (iraqLocations as any)[govKey]?.districts.map((d: any) => d.ar) || [];
-
-                    possibleMatches = [locFilter, govAr, ...districts, ...districtsAr];
-
-                    // Add stripped Arabic versions (e.g. remove "قضاء ", "ناحية ", "مركز ")
-                    if (govAr.startsWith('محافظة ')) possibleMatches.push(govAr.replace('محافظة ', ''));
-                    districtsAr.forEach((d: string) => {
-                        const stripped = d.replace(/^(قضاء|ناحية|مركز)\s+/, '');
-                        if (stripped !== d) possibleMatches.push(stripped);
-                    });
-                }
-            } else {
-                // Check if it matches a district significantly
-                for (const [govName, gov] of Object.entries(iraqLocations)) {
-                    const foundDist = (gov as any).districts.find((d: any) => d.en.toLowerCase() === locFilter);
-                    if (foundDist) {
-                        parentGovernorate = govName.toLowerCase();
-                        possibleMatches.push(foundDist.ar);
-                        // Strip prefix
-                        const stripped = foundDist.ar.replace(/^(قضاء|ناحية|مركز)\s+/, '');
-                        if (stripped !== foundDist.ar) possibleMatches.push(stripped);
-
-                        // Also add the governorate name to prevent cross-governorate matches
-                        possibleMatches.push(govName.toLowerCase());
-                        possibleMatches.push((gov as any).ar);
-                        break;
-                    }
-                }
-            }
-
-            currentResults = currentResults.filter(m => {
-                const cityLower = m.cv.personalInfo.city?.toLowerCase() || '';
-                const preferredLower = m.cv.location.preferred.map((l: string) => l.toLowerCase());
-
-                // Helper function for more precise matching (Fixed for Arabic)
-                const matchesLocation = (text: string, pattern: string): boolean => {
-                    if (!text || !pattern) return false;
-
-                    // Exact match
-                    if (text === pattern) return true;
-
-                    // Regex check with custom boundaries (works for Arabic unlike \b)
-                    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                    // Matches start OR separator + pattern + end OR separator
-                    const regex = new RegExp(`(^|[\\s.,;:\\-،])(${escapedPattern})($|[\\s.,;:\\-،])`, 'i');
-
-                    if (regex.test(text)) {
-                        // If searching for a governorate, ensure it's not a district of another governorate
-                        if (isGovernorate && parentGovernorate) {
-                            // Check if the text contains markers of being in a different governorate
-                            const otherGovernorates = Object.entries(iraqLocations)
-                                .filter(([key]) => key.toLowerCase() !== parentGovernorate)
-                                .map(([_, val]) => [(val as any).ar, ...Object.keys(iraqLocations).filter(k => k.toLowerCase() !== parentGovernorate)])
-                                .flat();
-
-                            // If text contains another governorate name, it's not a match
-                            const containsOtherGov = otherGovernorates.some(otherGov =>
-                                // Simple includes check for exclusion is usually safer/enough
-                                text.includes(String(otherGov).toLowerCase())
-                            );
-
-                            if (containsOtherGov) return false;
-                        }
-                        return true;
-                    }
-
-                    return false;
-                };
-
-                // Check city field
-                const cityMatches = possibleMatches.some(pm => matchesLocation(cityLower, pm?.toLowerCase() || ''));
-
-                // Check preferred locations
-                const preferredMatches = preferredLower.some(pl =>
-                    possibleMatches.some(pm => matchesLocation(pl, pm?.toLowerCase() || ''))
-                );
-
-                return cityMatches || preferredMatches;
-            });
-        }
-
-        if (filters.skills && filters.skills.length > 0) {
-            currentResults = currentResults.filter(m =>
-                filters.skills!.some(skill =>
-                    m.cv.skills.some((s: string) => s.toLowerCase().includes(skill.toLowerCase()))
-                )
-            );
-        }
-
-        if (filters.experienceMin !== undefined) {
-            currentResults = currentResults.filter(m => {
-                const years = m.cv.experience.length;
-                return years >= filters.experienceMin!;
-            });
-        }
-
-        if (filters.salaryMin !== undefined) {
-            currentResults = currentResults.filter(m => m.cv.salary.expected >= filters.salaryMin!);
-        }
-
-        if (filters.salaryMax !== undefined) {
-            currentResults = currentResults.filter(m => m.cv.salary.expected <= filters.salaryMax!);
-        }
-
-        if (filters.employmentType && filters.employmentType.length > 0) {
-            currentResults = currentResults.filter(m =>
-                filters.employmentType!.some(t => m.cv.availability?.type === t)
-            );
-        }
-
-        return currentResults.sort((a, b) => b.score - a.score);
-    }, [results, filters]);
-
-    // Use deferred value for loading detection
+    // Use deferred value for loading detection UI
     const deferredFilters = useDeferredValue(filters);
     const isSearching = filters !== deferredFilters;
 
+    const filteredResults = results; // Results are now already filtered by the server/client logic above
     const selectedCandidate = selectedCV ? filteredResults.find(m => m.cv.id === selectedCV) : null;
 
     // Helper to format role label
@@ -688,7 +731,30 @@ export default function ClinicSearchPage() {
                                     title: m.cv.personalInfo.fullName,
                                     content: (
                                         <div className="space-y-2">
-                                            <p className="text-xs text-gray-500">{m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}</p>
+                                            <div className="flex items-center justify-between gap-2">
+                                                <h4 className="font-semibold text-sm">{m.cv.personalInfo.fullName}</h4>
+                                                {m.cv.personalInfo.verified && (
+                                                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-600 text-[10px] font-medium border border-blue-100">
+                                                        <CheckCircle size={10} />
+                                                        {language === 'ar' ? 'موثق' : 'Verified'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-gray-500">
+                                                {m.cv.experience[0]?.title || getRoleLabel((m.cv as any).userType)}
+                                                {m.cv.certifications && m.cv.certifications.length > 0 && (
+                                                    <span className="block text-[10px] text-gray-500 mt-0.5 line-clamp-1">
+                                                        <Award size={10} className="inline-block mr-1 align-text-top" />
+                                                        {m.cv.certifications.map(c => c.name).join(language === 'ar' ? '، ' : ', ')}
+                                                    </span>
+                                                )}
+                                                {m.cv.experience && m.cv.experience.length > 0 && (
+                                                    <span className="block text-[10px] text-gray-400 mt-0.5 line-clamp-2">
+                                                        {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                        {m.cv.experience.map(e => e.company).join(language === 'ar' ? '، ' : ', ')}
+                                                    </span>
+                                                )}
+                                            </p>
                                             <div className="flex items-center justify-between">
                                                 <MatchScore score={m.score} size="sm" />
                                                 <span className="text-xs font-medium">{(m.cv.salary.expected / 1000).toFixed(0)} ألف د.ع</span>
@@ -704,13 +770,6 @@ export default function ClinicSearchPage() {
                         </div>
                     </Card>
 
-                    {selectedCandidate && (
-                        <CVDetailsModal
-                            isOpen={!!selectedCandidate}
-                            onClose={() => setSelectedCV(null)}
-                            cv={selectedCandidate.cv}
-                        />
-                    )}
                 </div>
             ) : (
                 <div className="flex flex-col md:flex-row gap-6">
@@ -813,21 +872,164 @@ export default function ClinicSearchPage() {
                                             </div>
                                         )}
 
-                                        {/* Area / Neighborhood */}
-                                        {selectedDistrict && (
-                                            <div className="animate-fade-in">
-                                                <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
-                                                <Input
-                                                    placeholder={t.area}
-                                                    value={area}
-                                                    onChange={(e) => {
-                                                        setArea(e.target.value);
-                                                        updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
-                                                    }}
-                                                    className="bg-gray-50 dark:bg-gray-800"
-                                                />
-                                            </div>
-                                        )}
+                                            {/* District */}
+                                            {selectedGov && (
+                                                <div className="animate-fade-in">
+                                                    <label className="text-xs text-gray-500 mb-1 block">{t.district}</label>
+                                                    <select
+                                                        aria-label={t.district}
+                                                        value={selectedDistrict}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setSelectedDistrict(val);
+                                                            setArea('');
+                                                            updateLocationFilter(selectedGov, val, '');
+                                                        }}
+                                                        className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                                        style={{ backgroundImage: 'none' }}
+                                                    >
+                                                        <option value="" className="text-gray-500">{t.select}</option>
+                                                        {(iraqLocations as any)[selectedGov]?.districts.map((d: any) => (
+                                                            <option key={d.en} value={d.en} className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">
+                                                                {language === 'ar' ? d.ar : d.en}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
+                                            )}
+
+                                            {/* Area / Neighborhood */}
+                                            {selectedDistrict && (
+                                                <div className="animate-fade-in">
+                                                    <label className="text-xs text-gray-500 mb-1 block">{t.area}</label>
+                                                    <Input
+                                                        placeholder={t.area}
+                                                        value={area}
+                                                        onChange={(e) => {
+                                                            setArea(e.target.value);
+                                                            updateLocationFilter(selectedGov, selectedDistrict, e.target.value);
+                                                        }}
+                                                        className="bg-gray-50 dark:bg-gray-800"
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-gray-100 dark:border-gray-700" />
+
+                                    {/* Experience Filter (Kept as is) */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                            {t.minimumExperience}
+                                        </label>
+                                        <select
+                                            aria-label={t.minimumExperience}
+                                            value={filters.experienceMin || ''}
+                                            onChange={(e) => setFilter('experienceMin', e.target.value ? parseInt(e.target.value) : undefined)}
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white"
+                                        >
+                                            <option value="">{t.any}</option>
+                                            <option value="1">1 {t.yearsPlus}</option>
+                                            <option value="2">2 {t.yearsPlus}</option>
+                                            <option value="3">3 {t.yearsPlus}</option>
+                                            <option value="5">5 {t.yearsPlus}</option>
+                                            <option value="10">10 {t.yearsPlus}</option>
+                                        </select>
+                                    </div>
+
+                                    <hr className="border-gray-100 dark:border-gray-700" />
+
+                                    {/* Salary Range - Iraqi Dinar */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-3">
+                                            {t.salaryRange} <span className="text-xs font-normal text-gray-500">({language === 'ar' ? 'د.ع' : 'IQD'})</span>
+                                        </label>
+                                        <select
+                                            value={`${filters.salaryMin || 0}-${filters.salaryMax || 100000000}`}
+                                            onChange={(e) => {
+                                                const [min, max] = e.target.value.split('-').map(Number);
+                                                setFilter('salaryMin', min);
+                                                setFilter('salaryMax', max);
+                                            }}
+                                            className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 appearance-none"
+                                            style={{ backgroundImage: 'none' }}
+                                        >
+                                            <option value="0-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{t.anyRange}</option>
+                                            <option value="0-500000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أقل من 500 ألف د.ع' : 'Under 500,000 IQD'}</option>
+                                            <option value="500000-1000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '500 ألف - 1 مليون د.ع' : '500K - 1M IQD'}</option>
+                                            <option value="1000000-2000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '1 مليون - 2 مليون د.ع' : '1M - 2M IQD'}</option>
+                                            <option value="2000000-4000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? '2 مليون - 4 مليون د.ع' : '2M - 4M IQD'}</option>
+                                            <option value="4000000-100000000" className="text-gray-900 dark:text-white bg-white dark:bg-gray-800">{language === 'ar' ? 'أكثر من 4 مليون د.ع' : 'Above 4M IQD'}</option>
+                                        </select>
+                                        <div className="mt-2 text-xs text-center text-gray-400">
+                                            {t.min}: {(filters.salaryMin || 0).toLocaleString()} - {t.max}: {(filters.salaryMax || 5000000).toLocaleString()}
+                                        </div>
+                                    </div>
+
+                                    <hr className="border-gray-100 dark:border-gray-700" />
+
+                                    {/* Employment Type */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                            {t.employmentType}
+                                        </label>
+                                        <div className="space-y-2">
+                                            {['full_time', 'part_time', 'contract', 'temporary'].map(type => (
+                                                <label key={type} className="flex items-center gap-2 cursor-pointer group">
+                                                    <div className="relative flex items-center">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={filters.employmentType?.includes(type as any) || false}
+                                                            onChange={(e) => {
+                                                                const current = filters.employmentType || [];
+                                                                if (e.target.checked) {
+                                                                    setFilter('employmentType', [...current, type as any]);
+                                                                } else {
+                                                                    setFilter('employmentType', current.filter((t: any) => t !== type));
+                                                                }
+                                                            }}
+                                                            className="peer h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                    </div>
+                                                    <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-blue-600 transition-colors">
+                                                        {employmentTypeLabels[type]}
+                                                    </span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Skills Filter */}
+                                    <div>
+                                        <label className="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                            {t.skills}
+                                        </label>
+                                        <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto p-1 custom-scrollbar">
+                                            {availableSkills.length > 0 ? (
+                                                availableSkills.map(skill => (
+                                                    <button
+                                                        key={skill}
+                                                        onClick={() => {
+                                                            const current = filters.skills || [];
+                                                            if (current.includes(skill)) {
+                                                                setFilter('skills', current.filter(s => s !== skill));
+                                                            } else {
+                                                                setFilter('skills', [...current, skill]);
+                                                            }
+                                                        }}
+                                                        className={`px-2 py-1 rounded-full text-xs transition-all ${filters.skills?.includes(skill)
+                                                            ? 'bg-blue-500 text-white shadow-md'
+                                                            : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                                                            }`}
+                                                    >
+                                                        {skill}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <p className="text-xs text-gray-500 p-1">{t.noCandidatesFound}</p>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -957,17 +1159,46 @@ export default function ClinicSearchPage() {
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div className="mb-4">
-                                                <h3 className="font-bold text-gray-900 dark:text-white truncate">
-                                                    {match.cv.personalInfo.fullName || t.dentalProfessional}
+                                            <div className="flex items-center justify-between gap-2 w-full">
+                                                <h3 className="font-semibold text-gray-900 dark:text-white truncate">
+                                                    {match.cv?.personalInfo?.fullName || 'Unknown Candidate'}
                                                 </h3>
-                                                <p className="text-sm text-blue-600 dark:text-blue-400 font-medium truncate">
-                                                    {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
+                                                {match.cv?.personalInfo?.verified && (
+                                                    <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                                        <CheckCircle size={12} />
+                                                        {language === 'ar' ? 'موثق' : 'Verified'}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                                                {match.cv?.experience?.[0]?.title || getRoleLabel((match.cv as any).userType)}
+                                            </p>
+                                            {match.cv?.certifications && match.cv.certifications.length > 0 && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-1" title={match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}>
+                                                    <Award size={12} className="inline-block mr-1 text-gray-400" />
+                                                    {match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}
                                                 </p>
-                                                <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
-                                                    <MapPin size={12} />
-                                                    <span className="truncate">{match.cv.personalInfo.city || t.location}</span>
+                                            )}
+                                            {match.cv?.experience && match.cv.experience.length > 0 && (
+                                                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1 line-clamp-2" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
+                                                    {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                    <span className="font-medium text-gray-700 dark:text-gray-300">
+                                                        {match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}
+                                                    </span>
+                                                </p>
+                                            )}
+                                            <div className="flex flex-col gap-1.5 mt-2 text-xs text-gray-500">
+                                                <span className="flex items-center gap-1.5 truncate" title={match.cv?.location?.preferred?.[0] || match.cv?.personalInfo?.city || ''}>
+                                                    <MapPin size={12} className="flex-shrink-0" />
+                                                    {match.cv?.location?.preferred?.[0] || match.cv?.personalInfo?.city || 'Iraq'}
+                                                </span>
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="flex items-center gap-1.5">
+                                                        <Briefcase size={12} /> {getExperienceLabel(match.cv.experience)}
+                                                    </span>
+                                                    <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+                                                        <DollarSign size={12} /> {(match.cv?.salary?.expected / 1000).toFixed(0)}k
+                                                    </span>
                                                 </div>
                                             </div>
 
@@ -984,9 +1215,49 @@ export default function ClinicSearchPage() {
                                                 )}
                                             </div>
 
-                                            <div className="flex items-center justify-between text-xs text-gray-500 border-t border-gray-100 dark:border-gray-700 pt-3 mt-auto">
-                                                <span>{getExperienceLabel(match.cv.experience)}</span>
-                                                <span>{(match.cv.salary.expected / 1000).toFixed(0)}k {match.cv.salary.currency || 'IQD'}</span>
+                                            <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700 flex gap-2">
+                                                <Button
+                                                    size="sm"
+                                                    variant="outline"
+                                                    className="flex-1 text-xs"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedCV(match.cv.id);
+                                                    }}
+                                                >
+                                                    {t.viewProfile}
+                                                </Button>
+                                                {cvRequests[match.cv.userId] === 'approved' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCvViewMode('cv');
+                                                            setSelectedCV(match.cv.id);
+                                                        }}
+                                                    >
+                                                        <FileText size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'عرض السيرة' : 'View CV'}
+                                                    </Button>
+                                                ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                    <Button
+                                                        size="sm"
+                                                        disabled
+                                                        className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                    >
+                                                        {language === 'ar' ? 'تم الطلب' : 'Request Sent'}
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        size="sm"
+                                                        className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                        loading={requestingIds.has(match.cv.userId)}
+                                                        onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                    >
+                                                        {language === 'ar' ? 'طلب CV' : 'Request CV'}
+                                                    </Button>
+                                                )}
                                             </div>
                                         </Card>
                                     ))}
@@ -1004,28 +1275,173 @@ export default function ClinicSearchPage() {
                                                     )}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="flex justify-between items-start">
-                                                        <div>
-                                                            <h3 className="font-bold text-gray-900 dark:text-white truncate">
-                                                                {match.cv.personalInfo.fullName || t.dentalProfessional}
-                                                            </h3>
-                                                            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                                                                {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)}
-                                                            </p>
-                                                        </div>
-                                                        <MatchScore score={match.score} size="sm" />
+                                                    <div className="flex items-center justify-between gap-2">
+                                                        <h3 className="font-semibold text-gray-900 dark:text-white">
+                                                            {match.cv.personalInfo.fullName}
+                                                        </h3>
+                                                        {match.cv.personalInfo.verified && (
+                                                            <span className="flex-shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-medium border border-blue-100 dark:border-blue-800">
+                                                                <CheckCircle size={12} />
+                                                                {language === 'ar' ? 'موثق' : 'Verified'}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                        {match.cv.experience[0]?.title || getRoleLabel((match.cv as any).userType)} • {match.cv.location.preferred?.[0] || match.cv.personalInfo.city} • {getExperienceLabel(match.cv.experience)}
+                                                        {match.cv.certifications && match.cv.certifications.length > 0 && (
+                                                            <span className="block mt-1 text-xs text-gray-500 line-clamp-1" title={match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}>
+                                                                <Award size={12} className="inline-block mr-1 text-gray-400" />
+                                                                {match.cv.certifications.map((c: any) => c.name).join(language === 'ar' ? '، ' : ', ')}
+                                                            </span>
+                                                        )}
+                                                        {match.cv.experience && match.cv.experience.length > 0 && (
+                                                            <span className="block mt-1 text-xs text-gray-500 line-clamp-1" title={match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}>
+                                                                {language === 'ar' ? 'عمل سابقاً في: ' : 'Previously at: '}
+                                                                <span className="font-medium">{match.cv.experience.map((e: any) => e.company).join(language === 'ar' ? '، ' : ', ')}</span>
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                        {match.cv.skills.slice(0, 4).map((skill: string) => (
+                                                            <SkillBadge key={skill} skill={skill} size="sm" />
+                                                        ))}
                                                     </div>
 
-                                                    <div className="flex gap-4 text-sm text-gray-500 mt-2">
-                                                        <div className="flex items-center gap-1">
-                                                            <Briefcase size={14} />
-                                                            <span>{getExperienceLabel(match.cv.experience)}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <MapPin size={14} />
-                                                            <span>{match.cv.personalInfo.city || t.location}</span>
-                                                        </div>
+                                            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex flex-col gap-2 md:hidden">
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="flex-1 text-xs"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedCV(match.cv.id);
+                                                        }}
+                                                    >
+                                                        {t.viewProfile}
+                                                    </Button>
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="flex-1 text-xs border-purple-200 text-purple-700 hover:bg-purple-50"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                            setInviteModalOpen(true);
+                                                        }}
+                                                    >
+                                                        <MessageSquare size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'دعوة' : 'Invite'}
+                                                    </Button>
+                                                </div>
+                                                <div className="flex gap-2">
+                                                    {cvRequests[match.cv.userId] === 'approved' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            className="flex-1 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCvViewMode('cv');
+                                                                setSelectedCV(match.cv.id);
+                                                            }}
+                                                        >
+                                                            <FileText size={14} className="mr-1" />
+                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                        </Button>
+                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            disabled
+                                                            className="flex-1 text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                        >
+                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            className="flex-1 text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                            loading={requestingIds.has(match.cv.userId)}
+                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                        >
+                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                        </Button>
+                                                    )}
+                                                </div>
+
+
+                                            </div>
+                                            <div className="flex items-center gap-4 hidden md:flex">
+                                                <div className="text-right">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
+                                                        {(match.cv.salary.expected / 1000).toFixed(0)} ألف د.ع/شهر
+                                                    </p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {employmentTypeLabels[match.cv.availability.type] || match.cv.availability.type.replace('_', ' ')}
+                                                    </p>
+                                                </div>
+                                                <div className="flex flex-col items-end gap-3 min-w-[120px]">
+                                                    <div className="flex items-center gap-2">
+                                                        <MatchScore score={match.score} size="sm" />
+                                                        <button
+                                                            onClick={(e) => handleToggleFavorite(e, match.cv.id)}
+                                                            className={`p-1.5 rounded-full transition-colors ${favorites.includes(match.cv.id)
+                                                                ? 'text-red-500 bg-red-50 dark:bg-red-900/20'
+                                                                : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                                                }`}
+                                                        >
+                                                            <Heart
+                                                                size={18}
+                                                                fill={favorites.includes(match.cv.id) ? "currentColor" : "none"}
+                                                            />
+                                                        </button>
                                                     </div>
+
+                                                    {/* Invite Button - Always visible if not yourself */}
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        className="w-full text-xs border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/50 mb-2"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setCandidateToInvite({ id: match.cv.id, name: match.cv.personalInfo.fullName });
+                                                            setInviteModalOpen(true);
+                                                        }}
+                                                    >
+                                                        <MessageSquare size={14} className="mr-1" />
+                                                        {language === 'ar' ? 'دعوة للمقابلة' : 'Invite'}
+                                                    </Button>
+
+                                                    {cvRequests[match.cv.userId] === 'approved' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setCvViewMode('cv');
+                                                                setSelectedCV(match.cv.id);
+                                                            }}
+                                                        >
+                                                            <FileText size={14} className="mr-1" />
+                                                            {language === 'ar' ? 'عرض' : 'View'}
+                                                        </Button>
+                                                    ) : cvRequests[match.cv.userId] === 'pending' ? (
+                                                        <Button
+                                                            size="sm"
+                                                            disabled
+                                                            className="w-full text-xs bg-yellow-100 text-yellow-700 border-yellow-200"
+                                                        >
+                                                            {language === 'ar' ? 'تم الطلب' : 'Sent'}
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="sm"
+                                                            className="w-full text-xs bg-blue-600 hover:bg-blue-700 text-white"
+                                                            loading={requestingIds.has(match.cv.userId)}
+                                                            onClick={(e) => handleRequestCV(e, match.cv.id, match.cv.userId)}
+                                                        >
+                                                            {language === 'ar' ? 'طلب CV' : 'Request'}
+                                                        </Button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </Card>
@@ -1044,31 +1460,83 @@ export default function ClinicSearchPage() {
                                     {t.clearFilters}
                                 </Button>
                             </div>
-                        )}
-                    </div >
-                </div >
-            )}
-
-            {/* CV Details Modal - Works for all view modes */}
-            {selectedCandidate && (
-                <CVDetailsModal
-                    isOpen={!!selectedCandidate}
-                    onClose={() => setSelectedCV(null)}
-                    cv={selectedCandidate.cv}
-                />
+                        )
+                        }
+                    </div>
+                </div>
             )}
 
             {/* Invite Modal */}
-            {
-                inviteCandidate && (
-                    <InviteCandidateModal
-                        isOpen={!!inviteCandidate}
-                        onClose={() => setInviteCandidate(null)}
-                        candidateId={inviteCandidate.id}
-                        candidateName={inviteCandidate.name}
-                    />
-                )
-            }
-        </div >
+            {inviteModalOpen && candidateToInvite && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in">
+                    <Card className="w-full max-w-md">
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {language === 'ar' ? `دعوة ${candidateToInvite.name}` : `Invite ${candidateToInvite.name}`}
+                            </h3>
+                            <button onClick={() => setInviteModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                                {language === 'ar'
+                                    ? 'اختر الوظيفة التي تود دعوة المرشح للتقدم لها:'
+                                    : 'Select the job you would like to invite this candidate to apply for:'}
+                            </p>
+
+                            <select
+                                value={selectedJobId}
+                                onChange={(e) => setSelectedJobId(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800"
+                            >
+                                <option value="">{language === 'ar' ? 'اختر وظيفة...' : 'Select a job...'}</option>
+                                {jobs.filter(j => j.status === 'active').map(job => (
+                                    <option key={job.id} value={job.id}>
+                                        {job.title}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <div className="flex justify-end gap-2 mt-6">
+                                <Button variant="ghost" onClick={() => setInviteModalOpen(false)}>
+                                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                </Button>
+                                <Button
+                                    disabled={!selectedJobId}
+                                    onClick={() => {
+                                        addToast(
+                                            language === 'ar'
+                                                ? `تم إرسال الدعوة بنجاح لـ ${candidateToInvite.name}`
+                                                : `Invitation sent successfully to ${candidateToInvite.name}`,
+                                            'success'
+                                        );
+                                        setInviteModalOpen(false);
+                                        setSelectedJobId('');
+                                    }}
+                                >
+                                    {language === 'ar' ? 'إرسال الدعوة' : 'Send Invite'}
+                                </Button>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {/* CV Details Modal */}
+            {selectedCandidate && (
+                <CVDetailsModal
+                    isOpen={!!selectedCandidate}
+                    onClose={() => {
+                        setSelectedCV(null);
+                        setCvViewMode('profile');
+                    }}
+                    cv={selectedCandidate.cv}
+                    isApproved={selectedCandidate.cv.userId ? cvRequests[selectedCandidate.cv.userId] === 'approved' : false}
+                    viewMode={cvViewMode}
+                />
+            )}
+        </div>
     );
 }

@@ -13,6 +13,36 @@ export type Json =
 export interface Database {
     public: {
         Tables: {
+            announcements: {
+                Row: {
+                    id: string
+                    title: string
+                    content: string
+                    target_role: string
+                    is_active: boolean
+                    created_by: string
+                    created_at: string
+                    updated_at: string
+                }
+                Insert: {
+                    id?: string
+                    title: string
+                    content: string
+                    target_role: string
+                    is_active?: boolean
+                    created_by: string
+                    created_at?: string
+                    updated_at?: string
+                }
+                Update: {
+                    title?: string
+                    content?: string
+                    target_role?: string
+                    is_active?: boolean
+                    created_by?: string
+                    updated_at?: string
+                }
+            }
             users: {
                 Row: {
                     id: string
@@ -23,6 +53,7 @@ export interface Database {
                     first_name: string
                     last_name: string
                     phone: string | null
+                    city: string | null
                     avatar: string | null
                     verified: boolean
                     created_at: string
@@ -37,6 +68,7 @@ export interface Database {
                     first_name: string
                     last_name: string
                     phone?: string | null
+                    city?: string | null
                     avatar?: string | null
                     verified?: boolean
                     created_at?: string
@@ -50,6 +82,7 @@ export interface Database {
                     first_name?: string
                     last_name?: string
                     phone?: string | null
+                    city?: string | null
                     avatar?: string | null
                     verified?: boolean
                     updated_at?: string

@@ -3,30 +3,98 @@
 import { useAuthStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
 import { Button, useToast } from '@/components/shared';
-import { Lock, Building2, CreditCard, Shield } from 'lucide-react';
+import { Lock, Building2, CreditCard, Shield, CheckCircle, MapPin, Globe, FileText, Phone } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useState, useEffect } from 'react';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function ClinicSettingsPage() {
     const { user, updateProfile } = useAuthStore();
     const { language } = useLanguage();
     const { addToast } = useToast();
     const [isSaving, setIsSaving] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isChangingPassword, setIsChangingPassword] = useState(false);
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    // Local state for fields
+    // Local state for User fields
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
 
-    // Initialize state from user data
+    // Local state for Clinic fields
+    const [clinicName, setClinicName] = useState('');
+    const [description, setDescription] = useState('');
+    const [website, setWebsite] = useState('');
+    const [city, setCity] = useState('');
+    const [address, setAddress] = useState('');
+    const [phone, setPhone] = useState('');
+
+    // Debounced values
+    const debouncedFirstName = useDebounce(firstName, 1000);
+    const debouncedLastName = useDebounce(lastName, 1000);
+    const debouncedClinicName = useDebounce(clinicName, 1000);
+    const debouncedDescription = useDebounce(description, 1000);
+    const debouncedWebsite = useDebounce(website, 1000);
+    const debouncedCity = useDebounce(city, 1000);
+    const debouncedAddress = useDebounce(address, 1000);
+    const debouncedPhone = useDebounce(phone, 1000);
+
+    // Initial Load Tracking
+    const [initialLoad, setInitialLoad] = useState(true);
+
+    // Fetch Clinic Data
     useEffect(() => {
-        if (user?.profile) {
+        const fetchClinicData = async () => {
+            if (!user) return;
+            const supabase = getSupabaseClient();
+            try {
+                // Fetch the clinic/company associated with this user
+                const { data, error } = await supabase
+                    .from('clinics')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
+
+                if (data) {
+                    setClinicName(data.name || '');
+                    setDescription(data.description || '');
+                    setWebsite(data.website || '');
+                    setCity(data.city || '');
+                    setAddress(data.address || '');
+                    setPhone(data.phone || user.profile.phone || '');
+                }
+            } catch (err) {
+                console.error('Error fetching clinic data:', err);
+            } finally {
+                setInitialLoad(false);
+            }
+        };
+
+        if (user) {
             setFirstName(user.profile.firstName || '');
             setLastName(user.profile.lastName || '');
+            fetchClinicData();
         }
     }, [user]);
+
+    // Auto-save effect
+    useEffect(() => {
+        if (initialLoad) return; // Don't auto-save on initial load
+
+        // Check if values differ from what might be in DB/Store (Simplified check)
+        // ideally we compare against 'original' state, but for auto-save trigger:
+        handleSave(true);
+    }, [
+        debouncedFirstName,
+        debouncedLastName,
+        debouncedClinicName,
+        debouncedDescription,
+        debouncedWebsite,
+        debouncedCity,
+        debouncedAddress,
+        debouncedPhone
+    ]);
 
     const handlePasswordChange = async () => {
         if (!newPassword || !confirmPassword) {
@@ -62,22 +130,68 @@ export default function ClinicSettingsPage() {
         }
     };
 
-    const handleSave = async () => {
-        if (!user) return;
-        setIsSaving(true);
+    const handleSave = async (isAutoSave = false) => {
+        if (!user || initialLoad) return;
+
+        if (isAutoSave) {
+            setSaveStatus('saving');
+        } else {
+            setIsSaving(true);
+        }
 
         try {
+            const supabase = getSupabaseClient();
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (!session?.access_token) {
+                throw new Error('No active session');
+            }
+
+            // 1. Update User Profile via API
             await updateProfile({
                 firstName,
-                lastName
+                lastName,
+                phone
             });
 
-            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨', 'success');
+            // 2. Update Clinic Details via API (bypasses RLS)
+            const response = await fetch('/api/clinic/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    name: clinicName,
+                    description: description,
+                    website: website,
+                    city: city,
+                    address: address,
+                    phone: phone
+                })
+            });
+
+            const result = await response.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to update clinic');
+            }
+
+            if (isAutoSave) {
+                setSaveStatus('saved');
+                setTimeout(() => setSaveStatus('idle'), 2000);
+            } else {
+                addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح ✨' : 'Changes saved successfully ✨', 'success');
+            }
         } catch (error) {
             console.error('Save error:', error);
-            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            if (!isAutoSave) {
+                addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            }
         } finally {
-            setIsSaving(false);
+            if (!isAutoSave) {
+                setIsSaving(false);
+            }
         }
     };
 
@@ -100,8 +214,14 @@ export default function ClinicSettingsPage() {
             title: 'الإعدادات',
             subtitle: `إدارة معلومات ${typeLabel} وتفضيلات الحساب`,
             infoTitle: `معلومات ${typeLabel}`,
-            nameLabel: `اسم ${typeLabel} (الاسم الأول)`,
-            lastNameLabel: '(اسم العائلة / اللقب)',
+            nameLabel: `اسم المسؤول (الاسم الأول)`,
+            lastNameLabel: '(اسم العائلة)',
+            entityNameLabel: `اسم ${typeLabel}`,
+            descLabel: 'نبذة / وصف',
+            cityLabel: 'المدينة',
+            addressLabel: 'العنوان',
+            websiteLabel: 'الموقع الإلكتروني',
+            phoneLabel: 'رقم الهاتف',
             save: 'حفظ التغييرات',
             subTitle: 'الاشتراك والفوترة',
             planName: 'الخطة المجانية',
@@ -109,15 +229,20 @@ export default function ClinicSettingsPage() {
             manageSub: 'الخطة الحالية',
             secTitle: 'الأمان',
             passLabel: 'كلمة المرور',
-            passDetails: 'تم التغيير آخر مرة قبل 6 أشهر',
             changePass: 'تغيير كلمة المرور'
         },
         en: {
             title: 'Settings',
             subtitle: `Manage ${typeLabel.toLowerCase()} information and account preferences`,
             infoTitle: `${typeLabel} Information`,
-            nameLabel: `${typeLabel} Name (First Name)`,
-            lastNameLabel: '(Last Name / Suffix)',
+            nameLabel: `Admin Name (First Name)`,
+            lastNameLabel: '(Last Name)',
+            entityNameLabel: `${typeLabel} Name`,
+            descLabel: 'Description / Bio',
+            cityLabel: 'City',
+            addressLabel: 'Address',
+            websiteLabel: 'Website',
+            phoneLabel: 'Phone Number',
             save: 'Save Changes',
             subTitle: 'Subscription & Billing',
             planName: 'Standard Plan',
@@ -125,7 +250,6 @@ export default function ClinicSettingsPage() {
             manageSub: 'Current Plan',
             secTitle: 'Security',
             passLabel: 'Password',
-            passDetails: 'Last changed 6 months ago',
             changePass: 'Change Password'
         }
     };
@@ -153,6 +277,83 @@ export default function ClinicSettingsPage() {
                         </div>
                     </div>
                     <div className="p-6 space-y-4">
+                        {/* Entity Name & Description */}
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    {text.entityNameLabel}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={clinicName}
+                                    onChange={(e) => setClinicName(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                                    {text.descLabel}
+                                </label>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    rows={3}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Contact & Location */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                    <MapPin size={14} /> {text.cityLabel}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                    <MapPin size={14} /> {text.addressLabel}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                    <Phone size={14} /> {text.phoneLabel}
+                                </label>
+                                <input
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1 flex items-center gap-2">
+                                    <Globe size={14} /> {text.websiteLabel}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={website}
+                                    onChange={(e) => setWebsite(e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                />
+                            </div>
+                        </div>
+
+                        <hr className="border-gray-100 dark:border-gray-700" />
+
+                        {/* Admin Name */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
@@ -160,7 +361,6 @@ export default function ClinicSettingsPage() {
                                 </label>
                                 <input
                                     type="text"
-                                    aria-label="First Name"
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
@@ -172,17 +372,30 @@ export default function ClinicSettingsPage() {
                                 </label>
                                 <input
                                     type="text"
-                                    aria-label="Last Name"
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                 />
                             </div>
                         </div>
-                        <div className="pt-2">
-                            <Button onClick={handleSave} disabled={isSaving}>
+
+                        {/* Action Buttons */}
+                        <div className="pt-2 flex items-center gap-3">
+                            <Button onClick={() => handleSave(false)} disabled={isSaving}>
                                 {isSaving ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...') : text.save}
                             </Button>
+
+                            {saveStatus === 'saving' && (
+                                <span className="text-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                                    {language === 'ar' ? 'جاري الحفظ تلقائياً...' : 'Auto-saving...'}
+                                </span>
+                            )}
+                            {saveStatus === 'saved' && (
+                                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle size={14} />
+                                    {language === 'ar' ? 'تم الحفظ' : 'Saved'}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>

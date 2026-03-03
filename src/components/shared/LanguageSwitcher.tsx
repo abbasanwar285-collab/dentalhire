@@ -19,13 +19,13 @@ export default function LanguageSwitcher({ className }: LanguageSwitcherProps) {
         <button
             onClick={toggleLanguage}
             className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 bg-white dark:bg-gray-800 transition-all shadow-sm hover:shadow-md group",
+                "flex items-center gap-2 px-2 py-1.5 md:px-3 md:py-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-500 hover:text-blue-600 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm transition-all shadow-sm hover:shadow-md group",
                 className
             )}
             aria-label="Toggle language"
         >
-            <Globe size={20} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span className="font-medium text-sm">
+            <Globe size={18} className="md:w-5 md:h-5 group-hover:rotate-12 transition-transform duration-300" />
+            <span className="font-medium text-xs md:text-sm">
                 {language === 'en' ? 'العربية' : 'English'}
             </span>
         </button>

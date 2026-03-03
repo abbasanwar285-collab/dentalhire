@@ -12,7 +12,9 @@ import {
   Users,
   Megaphone,
   FileText,
-  ArrowRight
+
+  ArrowRight,
+  FlaskConical
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
@@ -21,7 +23,7 @@ export default function HomePage() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { isAuthenticated, user } = useAuthStore();
-  const [step, setStep] = useState<'initial' | 'role_selection'>('initial');
+  const [step, setStep] = useState<'initial' | 'role_selection' | 'employer_role_selection'>('initial');
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -50,7 +52,12 @@ export default function HomePage() {
 
     // Redirect logic
     if (role === 'clinic') {
-      router.push('/register?role=clinic');
+      if (!subRole) {
+        setStep('employer_role_selection');
+        return;
+      }
+      // Redirect with specific type
+      router.push(`/register?role=clinic&userType=${subRole}`);
     } else {
       const typeMap: Record<string, string> = {
         dentist: 'dentist',
@@ -102,6 +109,36 @@ export default function HomePage() {
     }
   ];
 
+  const employerRoles = [
+    {
+      id: 'clinic',
+      titleAr: 'عيادة أسنان',
+      titleEn: 'Dental Clinic',
+      icon: <Stethoscope className="w-10 h-10" />,
+      color: 'bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400',
+      descAr: 'ترخيص العيادة مطلوب',
+      descEn: 'Clinic License Required'
+    },
+    {
+      id: 'company',
+      titleAr: 'شركة',
+      titleEn: 'Company',
+      icon: <Building2 className="w-10 h-10" />,
+      color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+      descAr: 'سجل تجاري مطلوب',
+      descEn: 'Commercial CR Required'
+    },
+    {
+      id: 'lab',
+      titleAr: 'مختبر',
+      titleEn: 'Laboratory',
+      icon: <FlaskConical className="w-10 h-10" />,
+      color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+      descAr: 'ترخيص مختبر مطلوب',
+      descEn: 'Lab License Required'
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col justify-center items-center p-4 relative overflow-hidden" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       {/* Background Effects */}
@@ -110,9 +147,9 @@ export default function HomePage() {
       </div>
 
       {/* Brand Header */}
-      <div className="absolute top-8 left-0 right-0 text-center z-10">
-        <div className="inline-flex items-center gap-3 mb-2">
-          <span className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
+      <div className="absolute top-4 md:top-8 left-0 right-0 text-center z-10">
+        <div className="inline-flex items-center gap-3 mb-2 px-4 py-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-sm">
+          <span className="text-2xl md:text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500 tracking-tight">
             Hire Me
           </span>
         </div>
@@ -120,15 +157,15 @@ export default function HomePage() {
 
       <LanguageSwitcher className="fixed top-6 end-6 z-50" />
 
-      <div className="w-full max-w-4xl relative z-10">
+      <div className="w-full max-w-4xl relative z-10 pt-20 md:pt-0">
         {step === 'initial' ? (
           <div className="space-y-12 animate-fade-in">
             <div className="text-center space-y-4">
-              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight">
+              <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white tracking-tight px-4">
                 {language === 'ar' ? 'مرحباً بك في مستقبل التوظيف' : 'Welcome to the Future of Hiring'}
               </h1>
-              <p className="text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto">
-                {language === 'ar' ? 'من صتك الرائدة للربط بين محترفي طب الأسنان والعيادات المرموقة' : 'The premier platform connecting dental professionals with top-tier clinics'}
+              <p className="text-lg md:text-xl text-gray-500 dark:text-gray-400 max-w-2xl mx-auto px-6">
+                {language === 'ar' ? 'منصتك الرائدة للربط بين محترفي طب الأسنان والعيادات المرموقة' : 'The premier platform connecting dental professionals with top-tier clinics'}
               </p>
             </div>
 
@@ -171,6 +208,47 @@ export default function HomePage() {
                 </p>
 
                 <div className="absolute inset-0 rounded-3xl ring-4 ring-teal-500/0 group-hover:ring-teal-500/10 transition-all duration-500" />
+              </button>
+            </div>
+          </div>
+
+        ) : step === 'employer_role_selection' ? (
+          <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-3xl p-8 md:p-12 shadow-2xl animate-fade-in border border-gray-100 dark:border-gray-700">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                {language === 'ar' ? 'من أنت؟' : 'Who are you?'}
+              </h2>
+              <p className="text-lg text-gray-500 dark:text-gray-400">
+                {language === 'ar' ? 'اختر نوع المنشأة' : 'Choose your facility type'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {employerRoles.map((role) => (
+                <button
+                  key={role.id}
+                  onClick={() => handleRoleSelect('clinic', role.id)}
+                  className="flex flex-col items-center text-center p-8 rounded-2xl border-2 border-transparent bg-gray-50 dark:bg-gray-700/30 hover:bg-white dark:hover:bg-gray-700 hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-xl transition-all duration-300 group transform hover:-translate-y-1"
+                >
+                  <div className={cn("w-20 h-20 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110", role.color)}>
+                    {role.icon}
+                  </div>
+                  <h4 className="font-bold text-xl text-gray-900 dark:text-white mb-2">
+                    {language === 'ar' ? role.titleAr : role.titleEn}
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {language === 'ar' ? role.descAr : role.descEn}
+                  </p>
+                </button>
+              ))}
+            </div>
+
+            <div className="mt-12 pt-6 border-t border-gray-100 dark:border-gray-700 text-center">
+              <button
+                onClick={() => setStep('initial')}
+                className="text-gray-500 hover:text-gray-900 dark:hover:text-white font-medium transition-colors px-6 py-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700/50"
+              >
+                {language === 'ar' ? 'العودة للخلف' : 'Go Back'}
               </button>
             </div>
           </div>

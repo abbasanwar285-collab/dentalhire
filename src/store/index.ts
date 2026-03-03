@@ -8,3 +8,4 @@ export { useSearchStore } from './useSearchStore';
 export { useMessageStore } from './useMessageStore';
 export { useJobStore } from './useJobStore';
 export * from './useJobCreationStore';
+export { useNotificationStore } from './useNotificationStore';

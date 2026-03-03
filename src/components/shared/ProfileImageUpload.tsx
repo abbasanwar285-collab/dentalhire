@@ -101,7 +101,6 @@ export default function ProfileImageUpload({
                 </div>
             </div>
 
-            {/* Hidden Input */}
             <input
                 type="file"
                 ref={fileInputRef}
@@ -109,6 +108,7 @@ export default function ProfileImageUpload({
                 accept="image/*"
                 onChange={handleFileChange}
                 disabled={isUploading}
+                aria-label={language === 'ar' ? 'تحميل صورة الملف الشخصي' : 'Upload Profile Picture'}
             />
 
 

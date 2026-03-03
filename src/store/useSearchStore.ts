@@ -16,9 +16,6 @@ interface SearchState {
     page: number;
     pageSize: number;
 
-    // Favorites
-    favorites: string[];
-
     // View mode
     viewMode: 'grid' | 'list';
 
@@ -33,10 +30,6 @@ interface SearchState {
     setResults: (results: MatchResult[]) => void;
     setLoading: (loading: boolean) => void;
     setPage: (page: number) => void;
-
-    addFavorite: (cvId: string) => void;
-    removeFavorite: (cvId: string) => void;
-    toggleFavorite: (cvId: string) => void;
 
     setViewMode: (mode: 'grid' | 'list') => void;
     setSortBy: (sort: 'match' | 'experience' | 'salary' | 'recent') => void;
@@ -65,7 +58,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
     totalResults: 0,
     page: 1,
     pageSize: 12,
-    favorites: [],
     viewMode: 'grid',
     sortBy: 'match',
 
@@ -95,26 +87,6 @@ export const useSearchStore = create<SearchState>((set, get) => ({
 
     setPage: (page) => set({ page }),
 
-    // Favorites actions
-    addFavorite: (cvId) => set((state) => ({
-        favorites: state.favorites.includes(cvId)
-            ? state.favorites
-            : [...state.favorites, cvId]
-    })),
-
-    removeFavorite: (cvId) => set((state) => ({
-        favorites: state.favorites.filter((id) => id !== cvId)
-    })),
-
-    toggleFavorite: (cvId) => {
-        const { favorites } = get();
-        if (favorites.includes(cvId)) {
-            set({ favorites: favorites.filter((id) => id !== cvId) });
-        } else {
-            set({ favorites: [...favorites, cvId] });
-        }
-    },
-
     // View actions
     setViewMode: (mode) => set({ viewMode: mode }),
     setSortBy: (sort) => set({ sortBy: sort }),
@@ -123,4 +95,3 @@ export const useSearchStore = create<SearchState>((set, get) => ({
 // Selector hooks for optimized rerenders
 export const useSearchFilters = () => useSearchStore((state) => state.filters);
 export const useSearchResults = () => useSearchStore((state) => state.results);
-export const useFavorites = () => useSearchStore((state) => state.favorites);

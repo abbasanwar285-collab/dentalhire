@@ -58,7 +58,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 .from('jobs') as any)
                 .select(`
           *,
-          clinics!inner(name, logo)
+          clinics!inner(name, logo, user_id)
         `)
                 .eq('status', 'active')
                 .order('created_at', { ascending: false });
@@ -72,6 +72,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 const jobs: Job[] = data.map((job: any) => ({
                     id: job.id,
                     clinicId: job.clinic_id,
+                    clinicUserId: job.clinics?.user_id,
                     clinicName: job.clinics?.name || 'Unknown Clinic',
                     clinicLogo: job.clinics?.logo,
                     title: job.title,
@@ -121,7 +122,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 .from('jobs') as any)
                 .select(`
           *,
-          clinics!inner(name, logo)
+          clinics!inner(name, logo, user_id)
         `)
                 .eq('clinic_id', clinicId)
                 .order('created_at', { ascending: false });
@@ -164,6 +165,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
                 const jobs: Job[] = data.map((job: any) => ({
                     id: job.id,
                     clinicId: job.clinic_id,
+                    clinicUserId: job.clinics?.user_id,
                     clinicName: job.clinics?.name || 'Unknown Clinic',
                     clinicLogo: job.clinics?.logo,
                     title: job.title,
@@ -203,7 +205,7 @@ export const useJobStore = create<JobState>()((set, get) => ({
             .from('jobs') as any)
             .select(`
           *,
-          clinics!inner(name, logo)
+          clinics!inner(name, logo, user_id)
         `)
             .eq('status', 'active')
             .order('created_at', { ascending: false });

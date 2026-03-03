@@ -57,7 +57,7 @@ interface StepConfig {
 }
 
 export default function CVWizard() {
-    const { currentStep, setStep, nextStep, prevStep, isStepValid, isStepCompleted, getCompletionPercentage, saveCV, loadCV } = useCVStore();
+    const { currentStep, setStep, nextStep, prevStep, isStepValid, isStepCompleted, getCompletionPercentage, saveCV, loadCV, isDirty, isLoading } = useCVStore();
     const { user } = useAuthStore();
     const { t, language } = useLanguage();
     const { addToast } = useToast();
@@ -207,7 +207,31 @@ export default function CVWizard() {
         }
     };
 
+    // Auto-save wrapper for navigation
+    const handleNavigation = async (action: () => void) => {
+        if (isDirty && user?.id) {
+            // We don't await here to make UI snappy, or we show loading?
+            // "Problem": If we don't await, the user might switch page before save completes?
+            // But within the wizard, state is persisted in local storage too.
+            // The issue is DB sync.
+            // Let's await to be safe and ensure DB is updated.
+            await saveCV(user.id);
+        }
+        action();
+    };
+
     const canProceed = isStepValid(currentStep) || !steps[currentStep].required;
+
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-500 dark:text-gray-400">{t('common.loading') || 'Loading...'}</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -278,9 +302,11 @@ export default function CVWizard() {
                                         <button
                                             key={step.id}
                                             onClick={() => {
-                                                setStep(step.id);
-                                                setIsMobileStepOpen(true);
-                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                handleNavigation(() => {
+                                                    setStep(step.id);
+                                                    setIsMobileStepOpen(true);
+                                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                });
                                             }}
                                             className={cn(
                                                 'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-start transition-all',
@@ -396,7 +422,7 @@ export default function CVWizard() {
                             )}>
                                 <Button
                                     variant="ghost"
-                                    onClick={prevStep}
+                                    onClick={() => handleNavigation(prevStep)}
                                     disabled={currentStep === 0}
                                     leftIcon={<ChevronLeft size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
                                 >
@@ -405,7 +431,7 @@ export default function CVWizard() {
 
                                 <div className="flex items-center gap-3">
                                     {!steps[currentStep].required && (
-                                        <Button variant="ghost" onClick={nextStep}>
+                                        <Button variant="ghost" onClick={() => handleNavigation(nextStep)}>
                                             {t('cv.skip')}
                                         </Button>
                                     )}
@@ -419,8 +445,9 @@ export default function CVWizard() {
                                         </Button>
                                     ) : (
                                         <Button
-                                            onClick={nextStep}
+                                            onClick={() => handleNavigation(nextStep)}
                                             disabled={!canProceed}
+                                            loading={isSaving}
                                             rightIcon={<ChevronRight size={18} className={language === 'ar' ? 'rotate-180' : ''} />}
                                         >
                                             {t('cv.continue')}

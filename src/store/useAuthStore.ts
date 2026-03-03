@@ -146,10 +146,19 @@ export const useAuthStore = create<AuthState>()(
                 set({ isLoading: true, error: null });
                 try {
                     const supabase = getSupabaseClient();
+
+                    const getRedirectUrl = () => {
+                        if (typeof window === 'undefined') return undefined;
+                        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                        return isLocal
+                            ? `${window.location.origin}/auth/callback`
+                            : 'https://dentalhire.vercel.app/auth/callback';
+                    };
+
                     const { error } = await supabase.auth.signInWithOAuth({
                         provider,
                         options: {
-                            redirectTo: typeof window !== 'undefined' ? `${window.location.origin}/auth/callback` : undefined,
+                            redirectTo: getRedirectUrl(),
                         },
                     });
 
@@ -190,33 +199,69 @@ export const useAuthStore = create<AuthState>()(
                     if (authError) {
                         // Handle rate limiting error
                         let errorMessage = authError.message; // Show raw error for debugging
-                        /*
-                        let errorMessage = 'auth.registration_failed';
+
+                        // Improve error mapping
                         if (authError.message.includes('security purposes')) {
                             errorMessage = 'auth.rate_limit';
                         } else if (authError.message.includes('already registered')) {
                             errorMessage = 'auth.email_exists';
+                        } else if (authError.message.includes('invalid input syntax')) {
+                            errorMessage = 'auth.registration_failed'; // Generic fall back for DB enum errors
                         }
-                        */
+
                         set({ error: errorMessage, isLoading: false });
                         return false;
                     }
 
                     if (authData.user) {
-                        // Create user profile in users table
-                        const { error: profileError } = await supabase
-                            .from('users')
-                            .upsert({
-                                auth_id: authData.user.id,
-                                email: data.email,
-                                role: data.role,
-                                user_type: data.userType,
+                        // Polling for profile creation (Trigger latency fix)
+                        // Try 5 times with increasing delays: 500ms, 1000ms, 1500ms, 2000ms, 2500ms
+                        let profileData = null;
+                        const maxRetries = 5;
+
+                        for (let i = 0; i < maxRetries; i++) {
+                            // Wait before check (increasing delay)
+                            const delay = (i + 1) * 500;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+
+                            console.log(`[Auth] Checking profile attempt ${i + 1}/${maxRetries}`);
+
+                            const { data, error } = await supabase
+                                .from('users')
+                                .select('*')
+                                .eq('auth_id', authData.user.id)
+                                .single();
+
+                            if (data && !error) {
+                                profileData = data;
+                                break;
+                            }
+                        }
+
+                        if (!profileData) {
+                            console.error('Failed to fetch created profile after retries');
+                            // Fallback: If trigger completely failed, we might need manual insert here
+                            // But for now, returning error is safer than inconsistent state
+                            set({ error: 'auth.registration_failed_profile', isLoading: false });
+                            return false;
+                        }
+
+                        // 2. IMMEDIATE UPDATE: Fill in the missing details
+                        const { error: updateError } = await (supabase
+                            .from('users') as any) // Type assertion if needed
+                            .update({
                                 first_name: data.firstName,
                                 last_name: data.lastName,
-                            } as any);
+                                role: data.role,
+                                user_type: data.userType,
+                                phone: data.phone,
+                                verified: false // Explicitly set verified false
+                            })
+                            .eq('id', profileData.id);
 
-                        if (profileError) {
-                            console.error('Error creating profile:', profileError);
+                        if (updateError) {
+                            console.error('Failed to update profile details:', updateError);
+                            // We continue, but warn. The user exists but has empty name.
                         }
 
                         const user: User = {
@@ -227,7 +272,10 @@ export const useAuthStore = create<AuthState>()(
                             profile: {
                                 firstName: data.firstName,
                                 lastName: data.lastName,
+                                phone: data.phone,
                                 verified: false,
+                                avatar: undefined,
+                                city: undefined
                             },
                             createdAt: new Date(),
                             updatedAt: new Date(),
@@ -282,51 +330,80 @@ export const useAuthStore = create<AuthState>()(
                 const { user } = get();
                 if (!user) return;
 
-                set({ isLoading: true });
-
                 try {
                     const supabase = getSupabaseClient();
 
-                    const result = await (supabase
-                        .from('users') as any)
-                        .update({
-                            first_name: updates.firstName,
-                            last_name: updates.lastName,
-                            phone: updates.phone,
-                            avatar: updates.avatar,
-                            city: updates.city,
-                        })
-                        .eq('id', user.id);
-
-                    const { error } = result;
-
-                    if (error) {
-                        set({ error: error.message, isLoading: false });
-                        return;
+                    // Get the current session token
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (!session?.access_token) {
+                        console.error('No active session for profile update');
+                        throw new Error('No active session');
                     }
 
-                    set({
-                        user: {
-                            ...user,
-                            profile: { ...user.profile, ...updates },
-                            updatedAt: new Date(),
+                    // Call API route instead of direct DB/RPC (to bypass RLS)
+                    const response = await fetch('/api/profile/update', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${session.access_token}`
                         },
-                        isLoading: false,
+                        body: JSON.stringify({
+                            firstName: updates.firstName,
+                            lastName: updates.lastName,
+                            city: updates.city,
+                            phone: updates.phone,
+                            avatar: updates.avatar
+                        })
                     });
+
+                    const result = await response.json();
+                    console.log('Profile update API response:', result);
+
+                    if (!result.success) {
+                        console.error('Profile update failed:', result.error);
+                        throw new Error(result.error || 'Update failed');
+                    }
+
+                    const updatedData = result.data;
+
+                    // Update store with the ACTUAL returned data from DB
+                    if (updatedData) {
+                        set((state) => ({
+                            user: state.user ? {
+                                ...state.user,
+                                profile: {
+                                    ...state.user.profile,
+                                    firstName: updatedData.first_name,
+                                    lastName: updatedData.last_name,
+                                    phone: updatedData.phone,
+                                    avatar: updatedData.avatar || state.user.profile.avatar,
+                                    city: updatedData.city,
+                                },
+                                updatedAt: new Date(updatedData.updated_at),
+                            } : null,
+                        }));
+                        console.log('Store updated with new profile data');
+                    }
                 } catch (error) {
-                    set({
-                        error: 'An error occurred updating profile',
-                        isLoading: false,
-                    });
+                    console.error('Exception updating profile:', error);
+                    throw error; // Re-throw so the component can handle it
                 }
             },
+
+
 
             checkSession: async () => {
                 set({ isLoading: true });
 
                 try {
                     const supabase = getSupabaseClient();
-                    const { data: { session } } = await supabase.auth.getSession();
+                    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+                    if (sessionError) {
+                        console.error('Session error:', sessionError);
+                        set({ isLoading: false, isAuthenticated: false, user: null });
+                        return;
+                    }
 
                     if (session?.user) {
                         const { data: userData, error } = await supabase
@@ -334,6 +411,12 @@ export const useAuthStore = create<AuthState>()(
                             .select('*')
                             .eq('auth_id', session.user.id)
                             .single() as { data: any; error: any };
+
+                        // Handle database error - BUT DON'T LOGOUT immediately if it's just a fetch error
+                        if (error && error.code !== 'PGRST116') {
+                            console.error('Error fetching user data in checkSession:', error);
+                            // Fallback to basic session user instead of logging out
+                        }
 
                         if (userData) {
                             const user: User = {
@@ -358,13 +441,42 @@ export const useAuthStore = create<AuthState>()(
                                 isAuthenticated: true,
                                 isLoading: false,
                             });
-                            return;
+                        } else {
+                            // User data not found in database (PGRST116)
+                            // Fallback: Create a temporary user object from Auth metadata
+                            // This prevents "Access Denied" loops if the DB row is missing
+                            console.warn('User data missing in public.users, using fallback for:', session.user.id);
+
+                            const meta = session.user.user_metadata || {};
+                            const user: User = {
+                                id: session.user.id, // Auth ID (Temporary)
+                                email: session.user.email!,
+                                role: (meta.role as UserRole) || 'job_seeker',
+                                userType: (meta.user_type as UserType) || 'dental_assistant',
+                                profile: {
+                                    firstName: meta.first_name || '',
+                                    lastName: meta.last_name || '',
+                                    phone: meta.phone || '',
+                                    verified: false,
+                                },
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                            };
+
+                            set({
+                                user,
+                                isAuthenticated: true,
+                                isLoading: false,
+                            });
                         }
+                        return;
                     }
 
-                    set({ isLoading: false });
+                    // No session exists
+                    set({ isLoading: false, isAuthenticated: false, user: null });
                 } catch (error) {
-                    set({ isLoading: false });
+                    console.error('Exception in checkSession:', error);
+                    set({ isLoading: false, isAuthenticated: false, user: null });
                 }
             },
 

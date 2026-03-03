@@ -124,9 +124,10 @@ export default function CompanyProfilePage() {
     };
 
     const handleImageUpload = async (url: string) => {
+        if (!user?.id) return;
         await updateProfile({ avatar: url });
         // Also update clinic logo
-        await supabase.from('clinics').update({ logo: url }).eq('user_id', user.id);
+        await (supabase.from('clinics') as any).update({ logo: url }).eq('user_id', user.id);
     };
 
     const cities = [
@@ -175,9 +176,11 @@ export default function CompanyProfilePage() {
                             {text.companyName}
                         </label>
                         <Input
+                            placeholder={text.companyName}
                             value={companyData.name}
                             onChange={(e) => setCompanyData({ ...companyData, name: e.target.value })}
                             leftIcon={<Building2 size={18} />}
+                            aria-label={text.companyName}
                         />
                     </div>
 
@@ -212,9 +215,11 @@ export default function CompanyProfilePage() {
                             {text.address}
                         </label>
                         <Input
+                            placeholder={text.address}
                             value={companyData.address}
                             onChange={(e) => setCompanyData({ ...companyData, address: e.target.value })}
                             leftIcon={<MapPin size={18} />}
+                            aria-label={text.address}
                         />
                     </div>
 
@@ -224,10 +229,12 @@ export default function CompanyProfilePage() {
                             {text.email}
                         </label>
                         <Input
+                            placeholder={text.email}
                             type="email"
                             value={companyData.email}
                             onChange={(e) => setCompanyData({ ...companyData, email: e.target.value })}
                             leftIcon={<Mail size={18} />}
+                            aria-label={text.email}
                         />
                     </div>
 
@@ -237,9 +244,11 @@ export default function CompanyProfilePage() {
                             {text.phone}
                         </label>
                         <Input
+                            placeholder={text.phone}
                             value={companyData.phone}
                             onChange={(e) => setCompanyData({ ...companyData, phone: e.target.value })}
                             leftIcon={<Phone size={18} />}
+                            aria-label={text.phone}
                         />
                     </div>
 

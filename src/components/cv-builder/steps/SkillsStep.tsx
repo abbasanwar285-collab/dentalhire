@@ -4,12 +4,12 @@
 // DentalHire - Skills Step
 // ============================================
 
-import { useState } from 'react';
-import { useCVStore } from '@/store';
+import { useState, useMemo } from 'react';
+import { useCVStore, useAuthStore } from '@/store';
 import { Input } from '@/components/shared';
 import { SkillBadge } from '@/components/shared';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { dentalSkills, dentalSkillsAr, salesSkills, salesSkillsAr } from '@/data/mockData';
+import { SKILLS_BY_ROLE, SKILLS_BY_ROLE_AR, dentalSkills, dentalSkillsAr } from '@/data/mockData';
 import { Search, Plus, Sparkles } from 'lucide-react';
 
 export default function SkillsStep() {
@@ -18,9 +18,21 @@ export default function SkillsStep() {
     const [searchTerm, setSearchTerm] = useState('');
     const [customSkill, setCustomSkill] = useState('');
 
-    const allSuggestions = language === 'ar'
-        ? [...new Set([...dentalSkillsAr, ...salesSkillsAr])]
-        : [...new Set([...dentalSkills, ...salesSkills])];
+    const { user } = useAuthStore();
+    const userType = user?.userType || 'dental_assistant';
+
+    // Get suggestions based on role
+    const suggestions = useMemo(() => {
+        const roleKey = userType;
+        if (language === 'ar') {
+            return SKILLS_BY_ROLE_AR[roleKey] || dentalSkillsAr;
+        }
+        return SKILLS_BY_ROLE[roleKey] || dentalSkills;
+    }, [userType, language]);
+
+    const allSuggestions = useMemo(() => {
+        return [...new Set(suggestions)];
+    }, [suggestions]);
 
     const filteredSuggestions = allSuggestions.filter(
         (skill) =>
@@ -35,32 +47,10 @@ export default function SkillsStep() {
         }
     };
 
-    const popularSkillsEn = [
-        'Patient Care',
-        'Dental X-rays',
-        'Sterilization',
-        'Dental Charting',
-        'CPR Certified',
-        'Infection Control',
-        'Patient Education',
-        'Dental Software (Dentrix)',
-    ];
-
-    const popularSkillsAr = [
-        'العناية بالمرضى',
-        'أشعة الأسنان',
-        'التعقيم',
-        'رسم خريطة الأسنان',
-        'الإنعاش القلبي الرئوي',
-        'مكافحة العدوى',
-        'تثقيف المرضى',
-        'برامج الأسنان (Dentrix)',
-        'التصوير والنشر',
-        'تحضير العازل المطاطي',
-        'إدارة صفحات العيادة',
-    ];
-
-    const popularSkills = language === 'ar' ? popularSkillsAr : popularSkillsEn;
+    // Use the first 8-10 skills of the specific role as "Popular"
+    const popularSkills = useMemo(() => {
+        return suggestions.slice(0, 10);
+    }, [suggestions]);
 
     const remaining = 3 - skills.length;
 

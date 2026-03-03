@@ -9,10 +9,12 @@ import { useNotificationStore } from '@/store/useNotificationStore';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { formatDate } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button, useToast } from '@/components/shared';
 
 export function NotificationBell() {
     const { user } = useAuthStore();
     const router = useRouter();
+    const { addToast } = useToast();
     const {
         notifications,
         unreadCount,
@@ -24,6 +26,40 @@ export function NotificationBell() {
     const { language } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
+
+    const handleRespondToCV = async (e: React.MouseEvent, notificationId: string, requestId: string, status: 'approved' | 'rejected') => {
+        e.stopPropagation();
+        if (!user || processingId) return;
+
+        setProcessingId(notificationId);
+        try {
+            const supabase = getSupabaseClient();
+            // @ts-ignore
+            const { error } = await supabase.rpc('respond_to_cv_access', {
+                p_request_id: requestId,
+                p_job_seeker_id: user.id,
+                p_status: status
+            });
+
+            if (error) throw error;
+
+            addToast(
+                status === 'approved'
+                    ? (language === 'ar' ? 'تمت الموافقة على الطلب' : 'Request approved')
+                    : (language === 'ar' ? 'تم رفض الطلب' : 'Request rejected'),
+                status === 'approved' ? 'success' : 'info'
+            );
+
+            // Mark as read after action
+            markAsRead(notificationId);
+        } catch (error) {
+            console.error(error);
+            addToast(language === 'ar' ? 'حدث خطأ' : 'An error occurred', 'error');
+        } finally {
+            setProcessingId(null);
+        }
+    };
 
     useEffect(() => {
         let unsubscribe: (() => void) | undefined;
@@ -160,6 +196,30 @@ export function NotificationBell() {
                                                     <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
                                                         {notification.message}
                                                     </p>
+
+                                                    {/* CV Request Actions */}
+                                                    {notification.data?.action === 'cv_request' && !notification.read && (
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <Button
+                                                                size="sm"
+                                                                className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
+                                                                onClick={(e) => handleRespondToCV(e, notification.id, notification.data.requestId, 'approved')}
+                                                                loading={processingId === notification.id}
+                                                            >
+                                                                {language === 'ar' ? 'موافقة' : 'Approve'}
+                                                            </Button>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="outline"
+                                                                className="h-7 text-xs text-red-600 border-red-200 hover:bg-red-50"
+                                                                onClick={(e) => handleRespondToCV(e, notification.id, notification.data.requestId, 'rejected')}
+                                                                disabled={processingId === notification.id}
+                                                            >
+                                                                {language === 'ar' ? 'رفض' : 'Decline'}
+                                                            </Button>
+                                                        </div>
+                                                    )}
+
                                                     <p className="text-xs text-gray-400 dark:text-gray-500 pt-1">
                                                         {new Date(notification.created_at).toLocaleDateString(language === 'ar' ? 'ar-IQ' : 'en-US', {
                                                             month: 'short',

@@ -4,8 +4,10 @@
 // DentalHire - Salary Step
 // ============================================
 
-import { useCVStore } from '@/store';
+import { useMemo } from 'react';
+import { useCVStore, useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SALARY_RANGES_BY_ROLE } from '@/data/mockData';
 import { TrendingUp } from 'lucide-react';
 
 export default function SalaryStep() {
@@ -15,15 +17,40 @@ export default function SalaryStep() {
     // Only Iraqi Dinar currency
     const currency = { code: 'IQD', symbol: 'د.ع', name: language === 'ar' ? 'دينار عراقي' : 'Iraqi Dinar' };
 
-    // Salary ranges: 200K-300K for entry, then +50K for each level
-    const salaryRanges = [
-        { min: 200000, max: 300000, label: language === 'ar' ? '200 - 300 ألف' : '200K - 300K', level: language === 'ar' ? 'مبتدئ' : 'Entry Level' },
-        { min: 300000, max: 350000, label: language === 'ar' ? '300 - 350 ألف' : '300K - 350K', level: language === 'ar' ? 'مبتدئ متقدم' : 'Junior' },
-        { min: 350000, max: 400000, label: language === 'ar' ? '350 - 400 ألف' : '350K - 400K', level: language === 'ar' ? 'متوسط' : 'Mid-Level' },
-        { min: 400000, max: 450000, label: language === 'ar' ? '400 - 450 ألف' : '400K - 450K', level: language === 'ar' ? 'متقدم' : 'Senior' },
-        { min: 450000, max: 500000, label: language === 'ar' ? '450 - 500 ألف' : '450K - 500K', level: language === 'ar' ? 'قيادي' : 'Lead/Manager' },
-        { min: 500000, max: 600000, label: language === 'ar' ? '500+ ألف' : '500K+', level: language === 'ar' ? 'مدير تنفيذي' : 'Director/Executive' },
-    ];
+    const { user } = useAuthStore();
+    const userType = user?.userType || 'dental_assistant';
+
+    // Get salary ranges based on role
+    const salaryRanges = useMemo(() => {
+        const ranges = SALARY_RANGES_BY_ROLE[userType] || SALARY_RANGES_BY_ROLE['dental_assistant'];
+        return ranges.map((range: any) => ({
+            min: range.min,
+            max: range.max,
+            label: language === 'ar' ? range.labelAr : range.labelEn,
+            level: language === 'ar' ? range.levelAr : range.levelEn
+        }));
+    }, [userType, language]);
+
+    // Dynamic Market Insight
+    const marketInsight = useMemo(() => {
+        if (language === 'ar') {
+            switch (userType) {
+                case 'dentist': return 'أطباء الأسنان في العراق تتراوح رواتبهم بين 750 ألف إلى 4 مليون دينار، وتعتمد بشكل كبير على النسبة والخبرة.';
+                case 'dental_technician': return 'فنيو الأسنان يحققون دخلاً جيداً يعتمد غالباً على عدد القطع المنجزة (Piecework) أو راتب ثابت مرتفع.';
+                case 'sales_rep': return 'نظام العمولات يلعب دوراً كبيراً في دخل مندوبي المبيعات، حيث يمكن أن يتضاعف الراتب الأساسي.';
+                case 'media': return 'رواتب صناع المحتوى تعتمد على جودة الإنتاج وحجم المسؤوليات (تصوير، مونتاج، إدارة).';
+                default: return 'مساعدو طب الأسنان في العراق يكسبون عادة بين 250,000 - 750,000 دينار عراقي شهرياً، حسب الخبرة والشهادات.';
+            }
+        } else {
+            switch (userType) {
+                case 'dentist': return 'Dentists in Iraq earn between 750K to 4M IQD, heavily depending on commission/share and experience.';
+                case 'dental_technician': return 'Dental Technicians often earn based on piecework or a high fixed salary.';
+                case 'sales_rep': return 'Commissions play a major role in Sales Rep income, potentially doubling the base salary.';
+                case 'media': return 'Content creators salary depends on production quality and responsibilities (filming, editing, managing).';
+                default: return 'Dental assistants in Iraq typically earn between 250K - 750K IQD monthly, depending on experience and certifications.';
+            }
+        }
+    }, [userType, language]);
 
     const formatSalary = (value: number) => {
         return new Intl.NumberFormat(language === 'ar' ? 'ar-IQ' : 'en-IQ', {
@@ -137,9 +164,7 @@ export default function SalaryStep() {
                             {language === 'ar' ? 'رؤية السوق' : 'Market Insight'}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                            {language === 'ar'
-                                ? 'مساعدو طب الأسنان في العراق يكسبون عادة بين 200,000 - 500,000 دينار عراقي شهرياً، حسب الخبرة والشهادات.'
-                                : 'Dental assistants in Iraq typically earn between 200K - 500K IQD monthly, depending on experience and certifications.'}
+                            {marketInsight}
                         </p>
                     </div>
                 </div>

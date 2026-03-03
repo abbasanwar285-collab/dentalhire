@@ -14,8 +14,8 @@ import { User, Mail, Phone, Calendar, MapPin, FileText } from 'lucide-react';
 import { iraqLocations } from '@/data/iraq_locations';
 
 export default function PersonalInfoStep() {
-    const { personalInfo, updatePersonalInfo } = useCVStore();
-    const { user } = useAuthStore();
+    const { personalInfo, updatePersonalInfo, isLoading } = useCVStore();
+    const { user, updateProfile } = useAuthStore();
     const { t, language } = useLanguage();
     const [isUploading, setIsUploading] = useState(false);
 
@@ -55,6 +55,9 @@ export default function PersonalInfoStep() {
 
             // 2. Persist to Database immediately if user is logged in
             if (user?.id) {
+                // Update User Profile (header avatar)
+                await updateProfile({ avatar: publicUrl });
+
                 // First try to find existing CV
                 const { data: existingCV } = await supabase
                     .from('cvs')
@@ -91,17 +94,17 @@ export default function PersonalInfoStep() {
 
     // Set defaults for Iraq
     useEffect(() => {
+        if (isLoading) return;
+
         if (!personalInfo.phone) {
             updatePersonalInfo({ phone: '+964 ' });
         }
-        if (!personalInfo.nationality) {
-            updatePersonalInfo({ nationality: language === 'ar' ? 'عراقي' : 'Iraqi' });
-        }
+
         // Default City from Profile
         if (!personalInfo.city && user?.profile?.city) {
             updatePersonalInfo({ city: user.profile.city });
         }
-    }, [language, personalInfo.phone, personalInfo.nationality, personalInfo.city, user?.profile?.city, updatePersonalInfo]);
+    }, [language, personalInfo.phone, personalInfo.nationality, personalInfo.city, user?.profile?.city, updatePersonalInfo, isLoading]);
 
     const handleChange = (field: string, value: string) => {
         updatePersonalInfo({ [field]: value });
@@ -194,20 +197,7 @@ export default function PersonalInfoStep() {
                     </select>
                 </div>
 
-                <Input
-                    label={t('cv.personal.nationality')}
-                    placeholder={t('cv.personal.nationality.placeholder')}
-                    value={personalInfo.nationality || ''}
-                    onChange={(e) => handleChange('nationality', e.target.value)}
-                />
 
-                <Input
-                    label={t('cv.personal.address')}
-                    placeholder={t('cv.personal.address.placeholder')}
-                    value={personalInfo.address || ''}
-                    onChange={(e) => handleChange('address', e.target.value)}
-                    leftIcon={<MapPin size={18} />}
-                />
             </div>
 
             <div>

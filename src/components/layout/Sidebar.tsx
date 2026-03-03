@@ -27,7 +27,9 @@ import {
     Briefcase,
     LogOut,
     HelpCircle,
-    X
+    X,
+    Bell,
+    Trash2
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -47,6 +49,8 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
     const { user, logout } = useAuthStore();
     const { t, language } = useLanguage();
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     // Close sidebar on route change (mobile)
     useEffect(() => {
@@ -73,7 +77,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
         // e.g. /dentist/dashboard -> dentist
         const segments = pathname.split('/');
-        const validRoles = ['dentist', 'assistant', 'dental_assistant', 'sales', 'sales_rep', 'secretary', 'media', 'technician', 'dental_technician', 'clinic', 'company', 'lab'];
+        const validRoles = ['admin', 'dentist', 'assistant', 'dental_assistant', 'sales', 'sales_rep', 'secretary', 'media', 'technician', 'dental_technician', 'clinic', 'company', 'lab'];
 
         // Check first few segments for role (handling potential locale prefix)
         const foundRole = segments.find(s => validRoles.includes(s));
@@ -103,8 +107,29 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
 
     // Define links based on user role or context
     const getLinks = (): SidebarLink[] => {
-        // If we are in a specific role context, show links for that role
+        const adminLinks = [
+            { href: '/admin/dashboard', label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
+            { href: '/admin/users', label: t('sidebar.manageusers'), icon: <Users size={20} /> },
+            { href: '/admin/jobs', label: 'إدارة الوظائف', icon: <Briefcase size={20} /> },
+            { href: '/admin/manage-cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
+            { href: '/admin/clinics', label: t('sidebar.manageclinics'), icon: <Building2 size={20} /> },
+            { href: '/admin/announcements', label: 'اشعار المستخدمين', icon: <Bell size={20} /> },
+            { href: '/admin/analytics', label: t('sidebar.analytics'), icon: <BarChart3 size={20} /> },
+            { href: '/admin/moderation', label: t('sidebar.moderation'), icon: <Shield size={20} /> },
+            { href: '/admin/settings', label: t('sidebar.settings'), icon: <Settings size={20} /> },
+        ];
 
+        // Failsafe: Check pathname directly for admin
+        if (pathname?.includes('/admin')) {
+            return adminLinks;
+        }
+
+        // If explicitly in admin context, return admin links
+        if (currentContext === 'admin') {
+            return adminLinks;
+        }
+
+        // If we are in a specific role context, show links for that role
         if (currentContext) {
             const isEmployer = ['clinic', 'company', 'lab'].includes(currentContext as string);
 
@@ -187,8 +212,9 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
             admin: [
                 { href: '/admin/dashboard', label: t('sidebar.dashboard'), icon: <LayoutDashboard size={20} /> },
                 { href: '/admin/users', label: t('sidebar.manageusers'), icon: <Users size={20} /> },
-                { href: '/admin/cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
+                { href: '/admin/manage-cvs', label: t('sidebar.managecvs'), icon: <FileText size={20} /> },
                 { href: '/admin/clinics', label: t('sidebar.manageclinics'), icon: <Building2 size={20} /> },
+                { href: '/admin/announcements', label: 'اشعار المستخدمين', icon: <Bell size={20} /> },
                 { href: '/admin/analytics', label: t('sidebar.analytics'), icon: <BarChart3 size={20} /> },
                 { href: '/admin/moderation', label: t('sidebar.moderation'), icon: <Shield size={20} /> },
                 { href: '/admin/settings', label: t('sidebar.settings'), icon: <Settings size={20} /> },
@@ -349,7 +375,7 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                     </nav>
 
                     {/* Bottom Section */}
-                    <div className="border-t border-gray-200 dark:border-gray-800 p-3">
+                    <div className="border-t border-gray-200 dark:border-gray-800 p-3 pb-24 md:pb-3">
                         <Link
                             href="/help"
                             className={cn(
@@ -370,7 +396,108 @@ export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
                             <LogOut size={20} />
                             {!isCollapsed && <span>{t('sidebar.signout')}</span>}
                         </button>
+
+                        {/* Delete Account Button */}
+                        <button
+                            onClick={() => setShowDeleteConfirm(true)}
+                            className={cn(
+                                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-700 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors w-full mt-1 border border-red-200 dark:border-red-800',
+                                isCollapsed && 'justify-center px-2'
+                            )}
+                        >
+                            <Trash2 size={20} />
+                            {!isCollapsed && <span>{language === 'ar' ? 'حذف الحساب' : 'Delete Account'}</span>}
+                        </button>
                     </div>
+
+                    {/* Delete Account Confirmation Modal */}
+                    {showDeleteConfirm && (
+                        <div className="fixed inset-0 bg-black/50 z-[200] flex items-center justify-center p-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full shadow-2xl" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                                <div className="text-center mb-6">
+                                    <div className="w-16 h-16 mx-auto bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-4">
+                                        <Trash2 size={32} className="text-red-600" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                                        {language === 'ar' ? 'تأكيد حذف الحساب' : 'Confirm Account Deletion'}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-300">
+                                        {language === 'ar'
+                                            ? 'هل أنت متأكد من حذف حسابك نهائياً؟ هذا الإجراء لا يمكن التراجع عنه وسيتم حذف جميع بياناتك.'
+                                            : 'Are you sure you want to permanently delete your account? This action cannot be undone and all your data will be deleted.'}
+                                    </p>
+                                </div>
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        disabled={isDeleting}
+                                        className="flex-1 px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-medium"
+                                    >
+                                        {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            setIsDeleting(true);
+                                            try {
+                                                // Get the current session token - refresh first to ensure valid token
+                                                const { getSupabaseClient } = await import('@/lib/supabase');
+                                                const supabase = getSupabaseClient();
+
+                                                // First refresh the session to ensure we have a valid token
+                                                const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+
+                                                let accessToken = refreshData?.session?.access_token;
+
+                                                // If refresh failed, try to get existing session
+                                                if (!accessToken) {
+                                                    const { data: { session } } = await supabase.auth.getSession();
+                                                    accessToken = session?.access_token;
+                                                }
+
+                                                // If still no token, show error
+                                                if (!accessToken) {
+                                                    alert(language === 'ar'
+                                                        ? 'انتهت جلسة الدخول. يرجى تسجيل الدخول مرة أخرى ثم المحاولة مجددًا.'
+                                                        : 'Session expired. Please log in again and try.');
+                                                    setIsDeleting(false);
+                                                    setShowDeleteConfirm(false);
+                                                    logout();
+                                                    return;
+                                                }
+
+                                                const response = await fetch('/api/account/delete', {
+                                                    method: 'DELETE',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'Authorization': `Bearer ${accessToken}`
+                                                    }
+                                                });
+                                                const result = await response.json();
+                                                if (result.success) {
+                                                    logout();
+                                                    window.location.href = '/';
+                                                } else {
+                                                    alert(result.error || 'Failed to delete account');
+                                                }
+                                            } catch (error) {
+                                                console.error('Delete error:', error);
+                                                alert(language === 'ar' ? 'حدث خطأ أثناء حذف الحساب' : 'Error deleting account');
+                                            } finally {
+                                                setIsDeleting(false);
+                                                setShowDeleteConfirm(false);
+                                            }
+                                        }}
+                                        disabled={isDeleting}
+                                        className="flex-1 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors font-medium disabled:opacity-50"
+                                    >
+                                        {isDeleting
+                                            ? (language === 'ar' ? 'جاري الحذف...' : 'Deleting...')
+                                            : (language === 'ar' ? 'حذف نهائياً' : 'Delete Forever')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </aside>
         </>

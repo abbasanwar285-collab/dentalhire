@@ -65,7 +65,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 {loading ? (
                     <>
                         <LoadingSpinner size="sm" />
-                        <span>Loading...</span>
+                        <span>جاري التحميل...</span>
                     </>
                 ) : (
                     <>

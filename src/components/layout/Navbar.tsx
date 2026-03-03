@@ -1,7 +1,7 @@
 'use client';
 
 // ============================================
-// DentalHire - Navbar Component
+// Hire Me - Navbar Component
 // ============================================
 
 import { useState, useEffect } from 'react';

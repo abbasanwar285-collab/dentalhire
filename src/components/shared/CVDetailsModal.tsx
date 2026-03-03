@@ -14,10 +14,10 @@ import {
     DollarSign,
     Globe,
     Clock,
-    Download,
     Share2,
+    CheckCircle,
     CheckCircle2,
-    Send
+    FileText
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,12 +27,16 @@ interface CVDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
     cv: any;
+    isApproved?: boolean;
+    viewMode?: 'profile' | 'cv';
 }
 
 export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     isOpen,
     onClose,
-    cv
+    cv,
+    isApproved = false,
+    viewMode = 'profile'
 }) => {
     const { language } = useLanguage();
     const [activeTab, setActiveTab] = useState<'overview' | 'experience' | 'skills'>('overview');
@@ -41,6 +45,366 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
 
     if (!cv) return null;
 
+    // ... variants ...
+
+    // Helper to mask contact info
+    const getContactInfo = (value: string | undefined, type: 'email' | 'phone') => {
+        if (isApproved) return value || (language === 'ar' ? 'غير متوفر' : 'N/A');
+        if (!value) return (language === 'ar' ? 'غير متوفر' : 'N/A');
+        return type === 'email' ? `${value.substring(0, 3)}***@***.***` : `${value.substring(0, 4)}****`;
+    };
+
+    // ... render ...
+
+    // In render:
+    // Email (Line 195)
+    // Phone (Line 204)
+    // Contact Button (Line 164)
+
+
+    const formatCurrency = (amount: number, currency: string) => {
+        return new Intl.NumberFormat(language === 'ar' ? 'ar-IQ' : 'en-US', {
+            style: 'currency',
+            currency: currency || 'IQD',
+            maximumFractionDigits: 0
+        }).format(amount);
+    };
+
+    // --- Professional CV View ---
+    if (viewMode === 'cv') {
+        return (
+            <AnimatePresence>
+                {isOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" style={{ direction: language === 'ar' ? 'rtl' : 'ltr' }}>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 bg-gray-900/70 backdrop-blur-sm"
+                            onClick={onClose}
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                            className="relative bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-xl shadow-2xl flex flex-col custom-scrollbar"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            {/* Close Button */}
+                            <button
+                                onClick={onClose}
+                                className="absolute top-4 right-4 p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors z-10 print:hidden"
+                            >
+                                <X size={20} />
+                            </button>
+
+                            {/* Header Section */}
+                            <div className="bg-gray-50 p-8 border-b border-gray-200">
+                                <div className="flex flex-col sm:flex-row gap-6 items-start">
+                                    {/* Photo */}
+                                    <div className="w-32 h-32 rounded-xl bg-gray-200 overflow-hidden shadow-md shrink-0 border-4 border-white">
+                                        {cv.personalInfo?.photo || cv.photo ? (
+                                            <img
+                                                src={cv.personalInfo?.photo || cv.photo}
+                                                alt={cv.personalInfo?.fullName}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                <User size={48} />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Main Info */}
+                                    <div className="flex-1 space-y-3">
+                                        <div>
+                                            <h1 className="text-3xl font-bold text-gray-900">
+                                                {cv.personalInfo?.fullName || cv.full_name}
+                                            </h1>
+                                            <p className="text-xl text-blue-600 font-medium mt-1">
+                                                {cv.experience?.[0]?.title || (language === 'ar' ? 'باحث عن عمل' : 'Job Seeker')}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                                            {/* Location */}
+                                            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                                <MapPin size={16} className="text-gray-400" />
+                                                <span>{cv.personalInfo?.city || cv.city}</span>
+                                            </div>
+
+                                            {/* Experience */}
+                                            <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-gray-200 shadow-sm">
+                                                <Briefcase size={16} className="text-gray-400" />
+                                                <span>
+                                                    {cv.experience ?
+                                                        (language === 'ar' ? `${cv.experience.length} خبرات سابقة` : `${cv.experience.length} Previous Roles`)
+                                                        : (language === 'ar' ? 'حديث التخرج' : 'Fresh Graduate')}
+                                                </span>
+                                            </div>
+
+                                            {/* Verified Badge */}
+                                            {(cv.personalInfo?.verified || cv.verified) && (
+                                                <div className="flex items-center gap-2 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-100 text-blue-700">
+                                                    <CheckCircle size={16} />
+                                                    <span>{language === 'ar' ? 'تم التحقق' : 'Verified'}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="p-8 space-y-8">
+                                {/* Bio */}
+                                {(cv.personalInfo?.bio || cv.bio) && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-3 border-b pb-2 flex items-center gap-2">
+                                            <User size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'نبذة عني' : 'About Me'}
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed text-base">
+                                            {cv.personalInfo?.bio || cv.bio}
+                                        </p>
+                                    </section>
+                                )}
+
+                                {/* Contact Grid (Only if Approved) */}
+                                {isApproved && (
+                                    <section className="bg-blue-50/50 rounded-xl p-6 border border-blue-100">
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                            <Phone size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'معلومات التواصل' : 'Contact Information'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الهاتف' : 'Phone'}</p>
+                                                <p className="font-medium text-gray-900" dir="ltr">{cv.personalInfo?.phone || cv.phone}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</p>
+                                                <p className="font-medium text-gray-900">{cv.personalInfo?.email || cv.email}</p>
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الراتب المتوقع' : 'Expected Salary'}</p>
+                                                <p className="font-medium text-gray-900 text-green-600">
+                                                    {cv.salary?.expected ? formatCurrency(cv.salary.expected, cv.salary.currency) : (language === 'ar' ? 'قابل للتفاوض' : 'Negotiable')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Experience */}
+                                {cv.experience && cv.experience.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Briefcase size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'الخبرة العملية' : 'Work Experience'}
+                                        </h3>
+                                        <div className="space-y-6">
+                                            {cv.experience.map((exp: any, idx: number) => (
+                                                <div key={idx} className="relative ps-6 border-s-2 border-gray-100">
+                                                    <div className="absolute -start-[7px] top-1.5 w-3 h-3 rounded-full bg-blue-600 ring-4 ring-white" />
+                                                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-1">
+                                                        <h4 className="text-lg font-bold text-gray-900">{exp.title}</h4>
+                                                        <span className="text-sm text-gray-500 font-mono">
+                                                            {exp.startDate} - {exp.current ? (language === 'ar' ? 'الحاضر' : 'Present') : exp.endDate}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-blue-600 font-medium mb-2">{exp.company} • {exp.location}</p>
+                                                    {exp.description && (
+                                                        <p className="text-gray-600 text-sm">{exp.description}</p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Skills */}
+                                {cv.skills && cv.skills.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Award size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'المهارات' : 'Skills'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {cv.skills.map((skill: string, idx: number) => (
+                                                <span key={idx} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium border border-gray-200">
+                                                    {skill}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Education */}
+                                {cv.certifications && cv.certifications.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <GraduationCap size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'التعليم والشهادات' : 'Education'}
+                                        </h3>
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            {cv.certifications.map((cert: any, idx: number) => (
+                                                <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                                    <h4 className="font-bold text-gray-900">{cert.title || cert.name}</h4>
+                                                    <p className="text-sm text-gray-600 mt-1">{cert.issuer || cert.institution}</p>
+                                                    <p className="text-xs text-blue-600 font-bold mt-2">{cert.date || cert.year}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Languages */}
+                                {cv.languages && cv.languages.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Globe size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'اللغات' : 'Languages'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {cv.languages.map((lang: any, idx: number) => (
+                                                <div key={idx} className="bg-gray-50 px-4 py-2 rounded-lg border border-gray-100 flex items-center gap-2">
+                                                    <span className="font-medium text-gray-900">{lang.name || lang.language || lang}</span>
+                                                    {lang.level && (
+                                                        <span className="text-xs text-gray-500 bg-gray-200 px-2 py-0.5 rounded">
+                                                            {lang.level}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Availability & Salary Info */}
+                                <section className="bg-gradient-to-r from-blue-50 to-green-50 rounded-xl p-6 border border-blue-100">
+                                    <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                        <Clock size={20} className="text-blue-600" />
+                                        {language === 'ar' ? 'التوفر والراتب' : 'Availability & Salary'}
+                                    </h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'نوع العمل' : 'Employment Type'}</p>
+                                            <p className="font-medium text-gray-900">
+                                                {cv.availability?.type === 'full_time' ? (language === 'ar' ? 'دوام كامل' : 'Full-time') :
+                                                    cv.availability?.type === 'part_time' ? (language === 'ar' ? 'دوام جزئي' : 'Part-time') :
+                                                        cv.availability?.type === 'contract' ? (language === 'ar' ? 'عقد' : 'Contract') :
+                                                            cv.availability?.type || (language === 'ar' ? 'مرن' : 'Flexible')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'تاريخ البدء' : 'Start Date'}</p>
+                                            <p className="font-medium text-gray-900">
+                                                {cv.availability?.startDate || (language === 'ar' ? 'فوري' : 'Immediate')}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide">{language === 'ar' ? 'الراتب المتوقع' : 'Expected Salary'}</p>
+                                            <p className="font-bold text-green-600 text-lg">
+                                                {cv.salary?.expected ? formatCurrency(cv.salary.expected, cv.salary.currency) : (language === 'ar' ? 'قابل للتفاوض' : 'Negotiable')}
+                                            </p>
+                                            {cv.salary?.negotiable && (
+                                                <span className="text-xs text-gray-500">{language === 'ar' ? 'قابل للتفاوض' : 'Negotiable'}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </section>
+
+                                {/* Preferred Locations */}
+                                {cv.location?.preferred && cv.location.preferred.length > 0 && (
+                                    <section>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <MapPin size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'المواقع المفضلة' : 'Preferred Locations'}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {cv.location.preferred.map((loc: string, idx: number) => (
+                                                <span key={idx} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium border border-blue-100">
+                                                    {loc}
+                                                </span>
+                                            ))}
+                                            {cv.location?.willingToRelocate && (
+                                                <span className="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-sm font-medium border border-green-100">
+                                                    {language === 'ar' ? 'مستعد للانتقال' : 'Willing to Relocate'}
+                                                </span>
+                                            )}
+                                            {cv.location?.remoteWork && (
+                                                <span className="px-3 py-1.5 bg-purple-50 text-purple-700 rounded-lg text-sm font-medium border border-purple-100">
+                                                    {language === 'ar' ? 'العمل عن بعد' : 'Remote Work'}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Work Samples / Documents - Only show portfolio and resume, hide private docs */}
+                                {cv.documents && cv.documents.filter((d: any) => d.type === 'portfolio' || d.type === 'resume').length > 0 && isApproved && (
+                                    <section className="print:break-inside-avoid">
+                                        <h3 className="text-lg font-bold text-gray-900 mb-4 border-b pb-2 flex items-center gap-2">
+                                            <Share2 size={20} className="text-blue-600" />
+                                            {language === 'ar' ? 'نماذج الأعمال والسيرة الذاتية' : 'Portfolio & Resume'}
+                                        </h3>
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                            {/* Render Images (only from portfolio type) */}
+                                            {cv.documents
+                                                .filter((d: any) => (d.type === 'portfolio' || d.type === 'resume') && (d.type?.startsWith('image') || d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i)))
+                                                .map((doc: any, idx: number) => (
+                                                    <div key={idx} className="group relative aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 cursor-pointer" onClick={() => window.open(doc.url, '_blank')}>
+                                                        <img src={doc.url} alt={doc.name || 'Work Sample'} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white font-medium">
+                                                            {language === 'ar' ? 'عرض الصورة' : 'View Image'}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                            {/* Render PDFs/Docs (only portfolio and resume) */}
+                                            {cv.documents
+                                                .filter((d: any) => (d.type === 'portfolio' || d.type === 'resume') && !d.url?.match(/\.(jpg|jpeg|png|gif|webp)$/i))
+                                                .map((doc: any, idx: number) => (
+                                                    <a
+                                                        key={idx}
+                                                        href={doc.url}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 border border-blue-100 rounded-xl transition-colors group text-center gap-3"
+                                                    >
+                                                        <div className="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center text-blue-600 transition-colors">
+                                                            <FileText size={24} />
+                                                        </div>
+                                                        <span className="text-sm font-medium text-blue-900 line-clamp-2">
+                                                            {doc.type === 'resume'
+                                                                ? (language === 'ar' ? 'السيرة الذاتية' : 'Resume/CV')
+                                                                : (doc.name || (language === 'ar' ? 'نموذج عمل' : 'Work Sample'))}
+                                                        </span>
+                                                    </a>
+                                                ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
+
+                            {/* Footer Actions */}
+                            <div className="p-6 border-t border-gray-200 bg-gray-50 flex justify-between items-center rounded-b-xl print:hidden">
+                                <Button variant="outline" onClick={onClose}>
+                                    {language === 'ar' ? 'إغلاق' : 'Close'}
+                                </Button>
+                                <Button onClick={() => window.print()}>
+                                    {language === 'ar' ? 'طباعة / حفظ PDF' : 'Print / Save PDF'}
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
+        );
+    }
+
+    // --- Standard View Implementation ---
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: { opacity: 1 }
@@ -60,14 +424,6 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
     const itemVariants = {
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 }
-    };
-
-    const formatCurrency = (amount: number, currency: string) => {
-        return new Intl.NumberFormat(language === 'ar' ? 'ar-IQ' : 'en-US', {
-            style: 'currency',
-            currency: currency || 'IQD',
-            maximumFractionDigits: 0
-        }).format(amount);
     };
 
     return (
@@ -148,6 +504,12 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                             className="text-3xl font-bold text-white mb-2 shadow-sm"
                                         >
                                             {cv.personalInfo?.fullName || cv.full_name || (language === 'ar' ? 'مرشح' : 'Candidate')}
+                                            {(cv.personalInfo?.verified || cv.verified) && (
+                                                <div className="inline-flex items-center gap-1 ms-3 px-3 py-1 rounded-full bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-base font-medium text-white">
+                                                    <CheckCircle size={16} className="text-blue-200" />
+                                                    {language === 'ar' ? 'موثق' : 'Verified'}
+                                                </div>
+                                            )}
                                         </motion.h2>
                                         <motion.div
                                             initial={{ opacity: 0, y: 20 }}
@@ -166,22 +528,21 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                         </motion.div>
                                     </div>
 
-                                    {/* Action Buttons */}
                                     <div className="flex gap-3 pb-2">
-                                        <Button
-                                            onClick={() => setInviteModalOpen(true)}
-                                            className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/30 backdrop-blur-sm"
-                                        >
-                                            <Send size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
-                                            {language === 'ar' ? 'دعوة للتقديم' : 'Invite to Apply'}
-                                        </Button>
-                                        <Button
-                                            onClick={() => window.open(`mailto:${cv.personalInfo?.email || cv.email}`, '_blank')}
-                                            className="bg-white/90 hover:bg-white text-blue-700 border-none shadow-lg backdrop-blur-sm"
-                                        >
-                                            <Mail size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
-                                            {language === 'ar' ? 'تواصل' : 'Contact'}
-                                        </Button>
+                                        {isApproved ? (
+                                            <Button
+                                                onClick={() => window.open(`mailto:${cv.personalInfo?.email || cv.email}`, '_blank')}
+                                                className="bg-white/90 hover:bg-white text-blue-700 border-none shadow-lg backdrop-blur-sm"
+                                            >
+                                                <Mail size={18} className="mr-2" />
+                                                {language === 'ar' ? 'تواصل' : 'Contact'}
+                                            </Button>
+                                        ) : (
+                                            <div className="px-4 py-2 bg-white/20 backdrop-blur-md rounded-xl text-white text-sm border border-white/20 flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
+                                                {language === 'ar' ? 'يجب طلب السيرة الذاتية للتواصل' : 'Request CV to Contact'}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -206,7 +567,9 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                                 </div>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-xs text-gray-400">{language === 'ar' ? 'البريد الإلكتروني' : 'Email'}</p>
-                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate" title={cv.personalInfo?.email || cv.email}>{cv.personalInfo?.email || cv.email}</p>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200 truncate" title={isApproved ? (cv.personalInfo?.email || cv.email) : ''}>
+                                                        {isApproved ? (cv.personalInfo?.email || cv.email) : (cv.personalInfo?.email || cv.email)?.replace(/(.{3})(.*)(@.*)/, "$1***$3")}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">
@@ -215,7 +578,9 @@ export const CVDetailsModal: React.FC<CVDetailsModalProps> = ({
                                                 </div>
                                                 <div>
                                                     <p className="text-xs text-gray-400">{language === 'ar' ? 'الهاتف' : 'Phone'}</p>
-                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200" dir="ltr">{cv.personalInfo?.phone || cv.phone}</p>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-200" dir="ltr">
+                                                        {isApproved ? (cv.personalInfo?.phone || cv.phone) : (cv.personalInfo?.phone || cv.phone)?.substring(0, 4) + '****'}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-3">

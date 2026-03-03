@@ -3,10 +3,11 @@
 import { useAuthStore } from '@/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button, useToast } from '@/components/shared';
-import { Bell, Lock, User, Shield, MapPin, Save } from 'lucide-react';
+import { Bell, Lock, User, Shield, MapPin, Save, CheckCircle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { iraqLocations } from '@/data/iraq_locations';
 import { getSupabaseClient } from '@/lib/supabase';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export default function SettingsPage() {
     const { user, updateProfile } = useAuthStore();
@@ -28,7 +29,29 @@ export default function SettingsPage() {
 
     // Loading States
     const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
     const [isSavingPassword, setIsSavingPassword] = useState(false);
+
+    // Debounced values for auto-save
+    const debouncedFirstName = useDebounce(firstName, 1000);
+    const debouncedLastName = useDebounce(lastName, 1000);
+    const debouncedCity = useDebounce(city, 1000);
+
+    // Effect for Auto-Save
+    useEffect(() => {
+        // Skip initial render or empty values if needed (though empty might be valid updates)
+        if (!user) return;
+
+        // Check if values actually changed from user profile
+        const hasChanges =
+            debouncedFirstName !== user.profile.firstName ||
+            debouncedLastName !== user.profile.lastName ||
+            debouncedCity !== user.profile.city;
+
+        if (hasChanges) {
+            handleSaveProfile(true);
+        }
+    }, [debouncedFirstName, debouncedLastName, debouncedCity]);
 
     // Initialize state from user data
     useEffect(() => {
@@ -51,9 +74,14 @@ export default function SettingsPage() {
         loadSettings();
     }, []);
 
-    const handleSaveProfile = async () => {
+    const handleSaveProfile = async (isAutoSave = false) => {
         if (!user) return;
-        setIsSavingProfile(true);
+
+        if (isAutoSave) {
+            setSaveStatus('saving');
+        } else {
+            setIsSavingProfile(true);
+        }
 
         try {
             // 1. Update User Profile (Store + DB)
@@ -71,19 +99,33 @@ export default function SettingsPage() {
                 .eq('user_id', user.id)
                 .single();
 
-            if (cv) {
+            const cvData = cv as any;
+
+            if (cvData) {
                 await (supabase
                     .from('cvs') as any)
                     .update({ city: city })
-                    .eq('id', cv.id);
+                    .eq('id', cvData.id);
             }
 
-            addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully', 'success');
+            if (isAutoSave) {
+                setSaveStatus('saved');
+                // Reset status after 2 seconds
+                setTimeout(() => setSaveStatus('idle'), 2000);
+            } else {
+                addToast(language === 'ar' ? 'تم حفظ التغييرات بنجاح' : 'Changes saved successfully', 'success');
+            }
         } catch (error) {
             console.error('Error saving profile:', error);
-            addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            if (isAutoSave) {
+                setSaveStatus('idle');
+            } else {
+                addToast(language === 'ar' ? 'حدث خطأ أثناء الحفظ' : 'Error saving changes', 'error');
+            }
         } finally {
-            setIsSavingProfile(false);
+            if (!isAutoSave) {
+                setIsSavingProfile(false);
+            }
         }
     };
 
@@ -229,9 +271,9 @@ export default function SettingsPage() {
                             </div>
                         </div>
 
-                        <div className="pt-2">
+                        <div className="pt-2 flex items-center gap-3">
                             <Button
-                                onClick={handleSaveProfile}
+                                onClick={() => handleSaveProfile(false)}
                                 disabled={isSavingProfile}
                                 leftIcon={isSavingProfile ? undefined : <Save size={18} />}
                             >
@@ -239,6 +281,18 @@ export default function SettingsPage() {
                                     ? (language === 'ar' ? 'جاري الحفظ...' : 'Saving...')
                                     : (language === 'ar' ? 'حفظ التغييرات' : 'Save Changes')}
                             </Button>
+
+                            {saveStatus === 'saving' && (
+                                <span className="text-sm text-blue-600 dark:text-blue-400 animate-pulse">
+                                    {language === 'ar' ? 'جاري الحفظ تلقائياً...' : 'Auto-saving...'}
+                                </span>
+                            )}
+                            {saveStatus === 'saved' && (
+                                <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
+                                    <CheckCircle size={14} />
+                                    {language === 'ar' ? 'تم الحفظ' : 'Saved'}
+                                </span>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -271,6 +325,7 @@ export default function SettingsPage() {
                                     checked={emailNotifications}
                                     onChange={(e) => handleToggleNotifications(e.target.checked)}
                                     className="sr-only peer"
+                                    aria-label={language === 'ar' ? 'تبديل إشعارات البريد الإلكتروني' : 'Toggle Email Notifications'}
                                 />
                                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                             </label>

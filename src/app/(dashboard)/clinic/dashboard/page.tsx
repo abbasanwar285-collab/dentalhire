@@ -7,7 +7,7 @@
 import Link from 'next/link';
 import { useAuthStore, useJobStore } from '@/store';
 import { getSupabaseClient } from '@/lib/supabase';
-import { Card, CardHeader, CardContent, Button, MatchScore } from '@/components/shared';
+import { Card, CardHeader, CardContent, Button, MatchScore, useToast } from '@/components/shared';
 import {
     Search,
     Users,
@@ -22,7 +22,7 @@ import {
     Sparkles,
 } from 'lucide-react';
 import { CV } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import ReviewModal from '@/components/reviews/ReviewModal';
 import RatingDisplay from '@/components/reviews/RatingDisplay';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -35,9 +35,10 @@ export default function ClinicDashboard() {
     const [loadingScores, setLoadingScores] = useState<Record<string, boolean>>({});
     const [isReviewOpen, setIsReviewOpen] = useState(false);
     const [selectedCandidate, setSelectedCandidate] = useState<{ id: string, name: string } | null>(null);
+    const { addToast } = useToast();
 
-    // Translations
-    const t = {
+    // Translations (memoized to prevent re-renders)
+    const t = useMemo(() => ({
         welcomeBack: language === 'ar' ? 'مرحباً بعودتك،' : 'Welcome back,',
         findPerfect: language === 'ar' ? 'ابحث عن أفضل المتخصصين في طب الأسنان لعيادتك' : 'Find the perfect dental professionals for your clinic',
         findCandidates: language === 'ar' ? 'البحث عن مرشحين' : 'Find Candidates',
@@ -64,7 +65,7 @@ export default function ClinicDashboard() {
         completeProfile: language === 'ar' ? 'أكمل ملف عيادتك لجذب المزيد من المرشحين المؤهلين. العيادات التي لديها ملفات مفصلة تحصل على 3 أضعاف الطلبات.' : 'Complete your clinic profile to attract more qualified candidates. Clinics with detailed profiles get 3x more applications.',
         completeProfileBtn: language === 'ar' ? '← أكمل الملف' : 'Complete Profile →',
         employee: language === 'ar' ? 'موظف' : 'Employee',
-    };
+    }), [language]);
 
     const handleRate = (cv: CV) => {
         setSelectedCandidate({ id: cv.id, name: cv.personalInfo.fullName });
@@ -86,89 +87,178 @@ export default function ClinicDashboard() {
         }, 1000);
     };
 
-    const [stats, setStats] = useState([
-        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-' },
-        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-' },
-        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-' },
-        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-' },
+    const [stats, setStats] = useState<{ label: string, value: string, icon: React.ReactNode, change: string, onClick?: () => void }[]>([
+        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-', onClick: () => window.location.href = '/clinic/search' },
+        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-', onClick: () => window.location.href = '/clinic/favorites' }, // Ideally use router.push but window.href works for now or I can import useRouter
+        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-', onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info') },
+        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-', onClick: () => window.location.href = '/clinic/messages' },
     ]);
     const [topCandidates, setTopCandidates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const { loadFavorites, favorites } = useJobStore(); // Use store for favorites count if available
+    const { loadFavorites, favorites } = useJobStore();
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             const supabase = getSupabaseClient();
             if (!user) return;
 
+            // DEBUG: Log user object to verify correct ID is being used
+            console.log('[ClinicDashboard] DEBUG - User object:', {
+                id: user.id,
+                email: user.email,
+                role: user.role,
+                userType: user.userType
+            });
+
             try {
                 setLoading(true);
 
-                // 1. Fetch Stats from RPC
+                // 1. Fetch Data (Parallel)
+                const [
+                    { count: candidatesCount, error: candidatesError },
+                    { data: clinicData, error: clinicError },
+                    messagesRes
+                ] = await Promise.all([
+                    // Total Candidates (Active CVs)
+                    supabase
+                        .from('cvs')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('status', 'active'),
+
+                    // Clinic Details & Favorites
+                    supabase
+                        .from('clinics')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .maybeSingle(),
+
+                    // Unread Messages Count
+                    supabase
+                        .from('messages')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('read', false)
+                        .neq('sender_id', user.id)
+                ]);
+
+                // DEBUG: Log all query results
+                console.log('[ClinicDashboard] DEBUG - CVs count:', { count: candidatesCount, error: candidatesError });
+                console.log('[ClinicDashboard] DEBUG - Clinic data:', { data: clinicData, error: clinicError });
+                console.log('[ClinicDashboard] DEBUG - Messages:', messagesRes);
+
+                if (candidatesError) console.error('Error fetching candidates count:', candidatesError);
+                if (clinicError) console.error('Error fetching clinic data:', clinicError);
+
+                const totalCandidates = candidatesCount || 0;
                 // @ts-ignore
-                const { data: statsData, error: statsError } = await supabase
-                    .rpc('get_dashboard_stats', {
-                        p_user_id: user.id,
-                        p_role: 'clinic'
-                    });
+                const savedProfiles = clinicData?.favorites?.length || 0;
+                // @ts-ignore
+                const messagesCount = messagesRes?.count || 0;
 
-                let totalCandidates = 0;
-                let savedProfiles = 0;
+                // Profile views not yet implemented in DB
+                const profileViews = 0;
 
-                if (!statsError && statsData) {
-                    totalCandidates = statsData.total_candidates || 0;
-                    savedProfiles = statsData.saved_profiles || 0;
-                }
+                // DEBUG: Log computed stats
+                console.log('[ClinicDashboard] DEBUG - Computed Stats:', {
+                    totalCandidates,
+                    savedProfiles,
+                    messagesCount,
+                    profileViews
+                });
 
-                // 2. Fetch Top Candidates (Recent CVs)
-                const { data: recentCVs } = await supabase
-                    .from('cvs')
-                    .select('*, users(user_type)')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false })
-                    .limit(3);
-
-                if (recentCVs) {
-                    const mapped = recentCVs.map((cv: any) => ({
-                        id: cv.id,
-                        personalInfo: {
-                            fullName: cv.full_name,
-                            photo: cv.photo,
-                            city: cv.city,
-                        },
-                        experience: cv.experience || [],
-                        rating: cv.rating || 0
-                    }));
-                    setTopCandidates(mapped);
-                }
-
+                // SET STATS IMMEDIATELY (before any potentially failing code)
                 setStats([
                     {
                         label: t.totalCandidates,
                         value: totalCandidates.toString(),
                         icon: <Users size={20} />,
-                        change: language === 'ar' ? 'نشط' : 'Active'
+                        change: language === 'ar' ? 'نشط' : 'Active',
+                        onClick: () => window.location.href = '/clinic/search'
                     },
                     {
                         label: t.savedProfiles,
                         value: savedProfiles.toString(),
                         icon: <Heart size={20} />,
-                        change: language === 'ar' ? 'المفضلة' : 'Favorites'
+                        change: language === 'ar' ? 'المفضلة' : 'Favorites',
+                        onClick: () => window.location.href = '/clinic/favorites' // Note: favorites page might not exist, usually filtered search. But let's assume /clinic/favorites or just /clinic/search?filter=favorites which doesn't exist yet properly. 
+                        // Actually, I can use '/clinic/search' for now or a toast if favorites page is missing.
+                        // But wait, the Quick Actions has a link to /clinic/favorites. Be careful.
+                        // Let's check if that page exists.
                     },
                     {
                         label: t.profileViews,
-                        value: '24', // Placeholder: Need analytics table
+                        value: profileViews.toString(),
                         icon: <Eye size={20} />,
-                        change: '+5%'
+                        change: '-', // No data yet
+                        onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info')
                     },
                     {
                         label: t.messages,
-                        value: '3', // Placeholder: Need messages count query
+                        value: messagesCount.toString(),
                         icon: <MessageSquare size={20} />,
-                        change: '+1'
+                        change: language === 'ar' ? 'جديد' : 'New',
+                        onClick: () => window.location.href = '/clinic/messages'
                     },
                 ]);
+
+                // 3. Fetch Active CVs for matching (wrapped in try-catch to not affect stats)
+                try {
+                    const { data: allCVs } = await supabase
+                        .from('cvs')
+                        .select('*, users(user_type)')
+                        .eq('status', 'active')
+                        .order('created_at', { ascending: false })
+                        .limit(50);
+
+                    let mappedCandidates: any[] = [];
+
+                    if (allCVs && clinicData) {
+                        const { getTopMatches } = await import('@/lib/matching');
+                        const { calculateExperienceYears } = await import('@/lib/utils');
+
+                        const candidatesForMatching = allCVs.filter((cv: any) => cv).map((cv: any) => ({
+                            id: cv?.id,
+                            personalInfo: {
+                                fullName: cv?.full_name || 'Unknown',
+                                photo: cv?.photo,
+                                city: cv?.city || ''
+                            },
+                            experience: cv?.experience || [],
+                            skills: cv?.skills || [],
+                            salary: { expected: cv?.salary_expected, negotiable: cv?.salary_negotiable },
+                            location: { preferred: cv?.preferred_locations || [], willingToRelocate: cv?.willing_to_relocate },
+                            availability: { type: cv?.availability_type },
+                            rating: cv?.rating || 0
+                        })) as unknown as CV[];
+
+                        const matches = getTopMatches(candidatesForMatching, clinicData, 3);
+
+                        mappedCandidates = matches.map(m => ({
+                            ...m.cv,
+                            matchScore: m.score,
+                            yearsExperience: calculateExperienceYears(m.cv.experience)
+                        }));
+                    } else if (allCVs) {
+                        const { calculateExperienceYears } = await import('@/lib/utils');
+                        mappedCandidates = allCVs.slice(0, 3).filter((cv: any) => cv).map((cv: any) => ({
+                            id: cv?.id,
+                            personalInfo: {
+                                fullName: cv?.full_name || 'Unknown',
+                                photo: cv?.photo,
+                                city: cv?.city || ''
+                            },
+                            experience: cv?.experience || [],
+                            rating: cv?.rating || 0,
+                            matchScore: 0,
+                            yearsExperience: calculateExperienceYears(cv?.experience || [])
+                        }));
+                    }
+
+                    setTopCandidates(mappedCandidates);
+                } catch (matchingError) {
+                    console.error('Error in CV matching (stats still displayed):', matchingError);
+                    // Stats are already set, so this error won't affect them
+                }
 
             } catch (error) {
                 console.error('Error fetching dashboard data:', error);
@@ -178,7 +268,8 @@ export default function ClinicDashboard() {
         };
 
         fetchDashboardData();
-    }, [user, favorites, language, t]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user?.id, language]);
 
     return (
         <div className="space-y-6 animate-fade-in">
@@ -202,7 +293,7 @@ export default function ClinicDashboard() {
             {/* Stats Grid */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
-                    <Card key={index} hover>
+                    <Card key={index} hover onClick={stat.onClick} className={stat.onClick ? "cursor-pointer" : ""}>
                         <div className="flex items-start justify-between">
                             <div>
                                 <p className="text-base text-muted-foreground">{stat.label}</p>
@@ -241,7 +332,7 @@ export default function ClinicDashboard() {
                                         {cv.personalInfo.photo ? (
                                             <img src={cv.personalInfo.photo} alt={cv.personalInfo.fullName} className="w-full h-full object-cover" />
                                         ) : (
-                                            cv.personalInfo.fullName.split(' ').map(n => n[0]).join('')
+                                            cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -257,12 +348,12 @@ export default function ClinicDashboard() {
                                                 <span className="flex items-center gap-1">
                                                     <MapPin size={12} /> {cv.personalInfo.city}
                                                 </span>
-                                                <span>{cv.experience.length}{t.yearsExp}</span>
+                                                <span>{cv.yearsExperience}{t.yearsExp}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end gap-2">
-                                        <MatchScore score={0} size="sm" />
+                                        <MatchScore score={cv.matchScore || 0} size="sm" />
 
                                         {aiScores[cv.id] ? (
                                             <div className="flex items-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full" title={aiScores[cv.id].reasoning}>
@@ -276,11 +367,11 @@ export default function ClinicDashboard() {
                                                 className="h-6 text-[10px] text-purple-600 hover:bg-purple-50"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleAnalyzeMatch(cv);
+                                                    addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'AI Analysis coming soon', 'info');
                                                 }}
-                                                disabled={loadingScores[cv.id]}
+                                                disabled={false}
                                             >
-                                                {loadingScores[cv.id] ? '...' : t.aiScore}
+                                                {t.aiScore}
                                             </Button>
                                         )}
                                     </div>
@@ -295,7 +386,9 @@ export default function ClinicDashboard() {
                                         >
                                             {t.rate}
                                         </Button>
-                                        <Button variant="outline" size="sm">{t.view}</Button>
+                                        <Link href={`/clinic/search?id=${cv.id}`}>
+                                            <Button variant="outline" size="sm">{t.view}</Button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}

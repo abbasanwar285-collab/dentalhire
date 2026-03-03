@@ -229,22 +229,43 @@ export const useCVStore = create<CVState>()(
 
             loadCV: async (userId: string) => {
                 const state = get();
-                if (state.isDirty) {
-                    console.log('Skipping CV load due to unsaved changes');
+                // Only skip if we have a loaded CV and unsaved changes.
+                // If cvId is null, it means we are initializing (e.g. new device/fresh load),
+                // so we should overwrite potential defaults/local storage garbage with DB data.
+                if (state.isDirty && state.cvId) {
+                    console.log('Skipping CV load due to unsaved changes on existing CV');
                     return;
                 }
 
                 set({ isLoading: true });
                 try {
                     const supabase = getSupabaseClient();
-                    const { data, error } = await supabase
+                    // Fetch up to 5 most recent CVs to find the best candidate
+                    // This handles cases where a duplicate empty CV might have been created accidentally
+                    const { data: cvs, error } = await supabase
                         .from('cvs')
                         .select('*')
                         .eq('user_id', userId)
-                        .single() as { data: any, error: any };
+                        .order('updated_at', { ascending: false })
+                        .limit(5);
 
-                    if (error && error.code !== 'PGRST116') {
+                    if (error) {
                         console.error('Error loading CV:', error);
+                    }
+
+                    // Smart selection: specific logic to find "Real" data if duplicates exist
+                    let data: any = null;
+                    if (cvs && cvs.length > 0) {
+                        // 1. Try to find a CV with experience or skills content
+                        data = cvs.find((c: any) =>
+                            (c.experience && c.experience.length > 0) ||
+                            (c.skills && c.skills.length > 0)
+                        );
+
+                        // 2. If no content found, just take the most recent one
+                        if (!data) {
+                            data = cvs[0];
+                        }
                     }
 
                     if (data) {
@@ -278,7 +299,7 @@ export const useCVStore = create<CVState>()(
                                 startDate: data.availability_start_date,
                                 schedule: data.availability_schedule || defaultSchedule,
                             },
-                            documents: data.documents as Document[] || [],
+                            documents: (data.documents as Document[] || []).filter(d => !d.url?.startsWith('blob:')),
                         });
                     }
                 } catch (error) {
@@ -319,12 +340,32 @@ export const useCVStore = create<CVState>()(
                         status: 'active',
                     };
 
-                    if (state.cvId) {
+                    let targetCvId = state.cvId;
+
+                    // Double check if CV exists in DB if we don't have an ID
+                    // This prevents duplicate CVs if state was lost but DB has data
+                    if (!targetCvId) {
+                        const { data: existingCV } = await supabase
+                            .from('cvs')
+                            .select('id')
+                            .eq('user_id', userId)
+                            .order('updated_at', { ascending: false })
+                            .limit(1)
+                            .maybeSingle() as { data: { id: string } | null, error: any };
+
+                        if (existingCV) {
+                            targetCvId = existingCV.id;
+                            // Update state with found ID
+                            set({ cvId: targetCvId });
+                        }
+                    }
+
+                    if (targetCvId) {
                         // Update existing CV
                         const { error } = await (supabase
                             .from('cvs') as any)
                             .update(cvData)
-                            .eq('id', state.cvId);
+                            .eq('id', targetCvId);
 
                         if (error) {
                             console.error('Error updating CV:', error);
@@ -351,14 +392,18 @@ export const useCVStore = create<CVState>()(
                     // Mark as clean after save
                     set({ isDirty: false });
 
-                    // Sync city to User Profile
-                    if (state.personalInfo.city) {
+                    // Sync city, phone, and photo to User Profile
+                    if (state.personalInfo.city || state.personalInfo.phone || state.personalInfo.photo) {
                         // We use the imported auth store to update profile
                         // This ensures local state and DB are updated
                         const { useAuthStore } = await import('./useAuthStore');
-                        useAuthStore.getState().updateProfile({
-                            city: state.personalInfo.city
-                        });
+
+                        const updates: any = {};
+                        if (state.personalInfo.city) updates.city = state.personalInfo.city;
+                        if (state.personalInfo.phone) updates.phone = state.personalInfo.phone;
+                        if (state.personalInfo.photo) updates.avatar = state.personalInfo.photo;
+
+                        useAuthStore.getState().updateProfile(updates);
                     }
 
                     return true;

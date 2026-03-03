@@ -61,6 +61,7 @@ export interface PersonalInfo {
     city: string;
     photo?: string;
     bio?: string;
+    verified?: boolean;
 }
 
 export interface Experience {
@@ -268,6 +269,7 @@ export interface CVWizardState {
 export interface Job {
     id: string;
     clinicId: string;
+    clinicUserId?: string;
     clinicName: string;
     clinicLogo?: string;
     title: string;

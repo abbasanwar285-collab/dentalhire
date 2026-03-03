@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useJobStore } from '@/store';
 import { useAuthStore } from '@/store';
+import { useMessageStore } from '@/store/useMessageStore';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useRouter } from 'next/navigation';
 import { formatDate } from '@/lib/utils';
 import {
     Briefcase,
@@ -21,7 +23,8 @@ import {
     ChevronDown,
     X,
     Award,
-    Globe
+    Globe,
+    MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/shared';
 import { getSupabaseClient } from '@/lib/supabase';
@@ -29,6 +32,8 @@ import { getSupabaseClient } from '@/lib/supabase';
 export default function ClinicApplicationsPage() {
     const { user } = useAuthStore();
     const { clinicApplications, loadClinicApplications, updateApplicationStatus, isLoading } = useJobStore();
+    const { createConversation, setActiveConversation } = useMessageStore();
+    const router = useRouter();
     const { language, t } = useLanguage();
     const [selectedJob, setSelectedJob] = useState<string>('all');
     const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -132,6 +137,28 @@ export default function ClinicApplicationsPage() {
         }
     };
 
+    const handleMessageApplicant = async (application: any) => {
+        if (!user || !application.cv) return;
+
+        try {
+            const conversationId = await createConversation(
+                [user.id, application.cv.userId],
+                {
+                    [user.id]: application.job?.clinicName || user.email,
+                    [application.cv.userId]: application.cv.fullName
+                }
+            );
+
+            if (conversationId) {
+                setActiveConversation(conversationId);
+                router.push('/messages');
+            }
+        } catch (error) {
+            console.error('Error creating conversation:', error);
+            alert(language === 'ar' ? 'فشل بدء المحادثة' : 'Failed to start conversation');
+        }
+    };
+
     // Get unique jobs for filter
     const uniqueJobs = Array.from(
         new Map(clinicApplications.map(app => [app.job?.id, app.job])).values()
@@ -185,6 +212,7 @@ export default function ClinicApplicationsPage() {
                                     value={selectedJob}
                                     onChange={(e) => setSelectedJob(e.target.value)}
                                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    aria-label={language === 'ar' ? 'تصفية حسب الوظيفة' : 'Filter by Job'}
                                 >
                                     <option value="all">{language === 'ar' ? 'جميع الوظائف' : 'All Jobs'}</option>
                                     {uniqueJobs.map((job) => (
@@ -207,6 +235,7 @@ export default function ClinicApplicationsPage() {
                                     value={selectedStatus}
                                     onChange={(e) => setSelectedStatus(e.target.value)}
                                     className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg appearance-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 dark:text-white"
+                                    aria-label={language === 'ar' ? 'تصفية حسب الحالة' : 'Filter by Status'}
                                 >
                                     <option value="all">{language === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
                                     <option value="pending">{getStatusLabel('pending')}</option>
@@ -333,6 +362,7 @@ export default function ClinicApplicationsPage() {
                                             style={{
                                                 backgroundImage: 'none'
                                             }}
+                                            aria-label={language === 'ar' ? 'تحديث حالة الطلب' : 'Update Application Status'}
                                         >
                                             <option value="pending" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('pending')}</option>
                                             <option value="reviewed" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-2">{getStatusLabel('reviewed')}</option>
@@ -355,6 +385,15 @@ export default function ClinicApplicationsPage() {
                                     >
                                         <User size={16} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
                                         {language === 'ar' ? 'عرض السيرة الذاتية' : 'View CV'}
+                                    </Button>
+
+                                    <Button
+                                        variant="outline"
+                                        className="w-full"
+                                        onClick={() => handleMessageApplicant(application)}
+                                    >
+                                        <MessageCircle size={16} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
+                                        {language === 'ar' ? 'مراسلة' : 'Message'}
                                     </Button>
 
                                     <Button
@@ -499,6 +538,24 @@ export default function ClinicApplicationsPage() {
                                 >
                                     <Mail size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
                                     {language === 'ar' ? 'إرسال بريد إلكتروني' : 'Send Email'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        // We need application object here. 
+                                        // But we only have selectedCV.
+                                        // We need to pass application to modal, or find it.
+                                        // Simpler: find application matching this CV? 
+                                        // Or just pass entire application to selectedCV state?
+                                        // For now, let's disable this button in modal or fix state.
+                                        // Re-finding application:
+                                        const app = clinicApplications.find(a => a.cv?.id === selectedCV.id);
+                                        if (app) handleMessageApplicant(app);
+                                    }}
+                                >
+                                    <MessageCircle size={18} className={language === 'ar' ? 'ml-2' : 'mr-2'} />
+                                    {language === 'ar' ? 'مراسلة' : 'Message'}
                                 </Button>
                                 <Button
                                     variant="outline"

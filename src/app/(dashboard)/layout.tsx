@@ -239,16 +239,13 @@ export default function DashboardLayout({
                 </div>
             </header>
 
-            <main className="md:ps-64 pt-16 md:pt-28 min-h-screen transition-all duration-300">
+            <main className="md:ps-64 pt-20 md:pt-28 min-h-screen transition-all duration-300">
                 <div className="px-4 md:px-6 pb-24 md:pb-6">
                     {children}
                 </div>
             </main>
 
-            {/* Mobile Bottom Navigation */}
-            <div className="md:hidden">
-                <BottomNav />
-            </div>
+            {/* Mobile Bottom Navigation is handled globally in root layout.tsx */}
 
             {/* Employer Onboarding Modal */}
             <EmployerOnboardingModal

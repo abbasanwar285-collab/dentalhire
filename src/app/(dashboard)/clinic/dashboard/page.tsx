@@ -26,6 +26,7 @@ import { useState, useEffect, useMemo } from 'react';
 import ReviewModal from '@/components/reviews/ReviewModal';
 import RatingDisplay from '@/components/reviews/RatingDisplay';
 import { useLanguage } from '@/contexts/LanguageContext';
+import MobileStatsCarousel from '@/components/dashboard/widgets/MobileStatsCarousel';
 
 export default function ClinicDashboard() {
     const { user } = useAuthStore();
@@ -87,11 +88,11 @@ export default function ClinicDashboard() {
         }, 1000);
     };
 
-    const [stats, setStats] = useState<{ label: string, value: string, icon: React.ReactNode, change: string, onClick?: () => void }[]>([
-        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-', onClick: () => window.location.href = '/clinic/search' },
-        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-', onClick: () => window.location.href = '/clinic/favorites' }, // Ideally use router.push but window.href works for now or I can import useRouter
-        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-', onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info') },
-        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-', onClick: () => window.location.href = '/clinic/messages' },
+    const [stats, setStats] = useState<any[]>([
+        { label: t.totalCandidates, value: '0', icon: <Users size={20} />, change: '-', changeType: 'positive', color: 'blue', onClick: () => window.location.href = '/clinic/search' },
+        { label: t.savedProfiles, value: '0', icon: <Heart size={20} />, change: '-', changeType: 'positive', color: 'red', onClick: () => window.location.href = '/clinic/favorites' }, // Ideally use router.push but window.href works for now or I can import useRouter
+        { label: t.profileViews, value: '0', icon: <Eye size={20} />, change: '-', changeType: 'positive', color: 'purple', onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info') },
+        { label: t.messages, value: '0', icon: <MessageSquare size={20} />, change: '-', changeType: 'positive', color: 'green', onClick: () => window.location.href = '/clinic/messages' },
     ]);
     const [topCandidates, setTopCandidates] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -173,6 +174,8 @@ export default function ClinicDashboard() {
                         value: totalCandidates.toString(),
                         icon: <Users size={20} />,
                         change: language === 'ar' ? 'نشط' : 'Active',
+                        changeType: 'positive',
+                        color: 'blue',
                         onClick: () => window.location.href = '/clinic/search'
                     },
                     {
@@ -180,6 +183,8 @@ export default function ClinicDashboard() {
                         value: savedProfiles.toString(),
                         icon: <Heart size={20} />,
                         change: language === 'ar' ? 'المفضلة' : 'Favorites',
+                        changeType: 'positive',
+                        color: 'red',
                         onClick: () => window.location.href = '/clinic/favorites' // Note: favorites page might not exist, usually filtered search. But let's assume /clinic/favorites or just /clinic/search?filter=favorites which doesn't exist yet properly. 
                         // Actually, I can use '/clinic/search' for now or a toast if favorites page is missing.
                         // But wait, the Quick Actions has a link to /clinic/favorites. Be careful.
@@ -190,6 +195,8 @@ export default function ClinicDashboard() {
                         value: profileViews.toString(),
                         icon: <Eye size={20} />,
                         change: '-', // No data yet
+                        changeType: 'positive',
+                        color: 'purple',
                         onClick: () => addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'Analytics coming soon', 'info')
                     },
                     {
@@ -197,6 +204,8 @@ export default function ClinicDashboard() {
                         value: messagesCount.toString(),
                         icon: <MessageSquare size={20} />,
                         change: language === 'ar' ? 'جديد' : 'New',
+                        changeType: 'positive',
+                        color: 'green',
                         onClick: () => window.location.href = '/clinic/messages'
                     },
                 ]);
@@ -290,26 +299,31 @@ export default function ClinicDashboard() {
                 </Link>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Desktop Stats Grid */}
+            <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
                     <Card key={index} hover onClick={stat.onClick} className={stat.onClick ? "cursor-pointer" : ""}>
                         <div className="flex items-start justify-between">
                             <div>
-                                <p className="text-base text-muted-foreground">{stat.label}</p>
-                                <p className="text-3xl font-bold text-gray-900 dark:text-white mt-1">
-                                    {stat.value}
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                                    {loading ? '...' : stat.value}
                                 </p>
                                 <p className="text-xs text-green-600 dark:text-green-400 mt-1">
                                     {stat.change} {t.thisWeek}
                                 </p>
                             </div>
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100 text-${stat.color}-600 dark:bg-${stat.color}-900/30 dark:text-${stat.color}-400`}>
                                 {stat.icon}
                             </div>
                         </div>
                     </Card>
                 ))}
+            </div>
+
+            {/* Mobile Stats Carousel */}
+            <div className="md:hidden pt-2">
+                <MobileStatsCarousel stats={stats as any} />
             </div>
 
             <div className="grid lg:grid-cols-3 gap-6">
@@ -327,68 +341,74 @@ export default function ClinicDashboard() {
                     <CardContent>
                         <div className="space-y-4">
                             {topCandidates.map((cv) => (
-                                <div key={cv.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:shadow-md transition-all cursor-pointer">
-                                    <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg">
-                                        {cv.personalInfo.photo ? (
-                                            <img src={cv.personalInfo.photo} alt={cv.personalInfo.fullName} className="w-full h-full object-cover" />
-                                        ) : (
-                                            cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-semibold text-gray-900 dark:text-white">
-                                            {cv.personalInfo.fullName}
-                                        </h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                                            <Briefcase size={14} /> {cv.experience[0]?.title || t.jobSeeker}
-                                        </p>
-                                        <div className="flex items-center gap-2 mt-1">
-                                            {cv.rating && <RatingDisplay rating={cv.rating} size="sm" showCount={false} />}
-                                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                <span className="flex items-center gap-1">
-                                                    <MapPin size={12} /> {cv.personalInfo.city}
-                                                </span>
-                                                <span>{cv.yearsExperience}{t.yearsExp}</span>
+                                <div key={cv.id} className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl hover:shadow-md transition-all cursor-pointer">
+                                    <div className="flex gap-4 w-full sm:w-auto">
+                                        <div className="w-14 h-14 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center text-white font-bold text-lg shrink-0">
+                                            {cv.personalInfo.photo ? (
+                                                <img src={cv.personalInfo.photo} alt={cv.personalInfo.fullName} className="w-full h-full object-cover" />
+                                            ) : (
+                                                cv.personalInfo.fullName.split(' ').map((n: string) => n[0]).join('')
+                                            )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-semibold text-gray-900 dark:text-white truncate">
+                                                {cv.personalInfo.fullName}
+                                            </h4>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 truncate">
+                                                <Briefcase size={14} /> {cv.experience[0]?.title || t.jobSeeker}
+                                            </p>
+                                            <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                                {cv.rating && <RatingDisplay rating={cv.rating} size="sm" showCount={false} />}
+                                                <div className="flex items-center gap-3 text-xs text-gray-500">
+                                                    <span className="flex items-center gap-1 whitespace-nowrap">
+                                                        <MapPin size={12} /> {cv.personalInfo.city}
+                                                    </span>
+                                                    <span className="whitespace-nowrap">{cv.yearsExperience}{t.yearsExp}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col items-end gap-2">
-                                        <MatchScore score={cv.matchScore || 0} size="sm" />
 
-                                        {aiScores[cv.id] ? (
-                                            <div className="flex items-center gap-1 text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full" title={aiScores[cv.id].reasoning}>
-                                                <Sparkles size={12} />
-                                                AI: {aiScores[cv.id].score}%
-                                            </div>
-                                        ) : (
+                                    {/* Mobile separator / Action area container */}
+                                    <div className="flex flex-row w-full sm:w-auto items-center justify-between sm:justify-end gap-3 mt-2 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-0 border-gray-200 dark:border-gray-600">
+                                        <div className="flex flex-col sm:items-end gap-1.5 order-2 sm:order-1">
+                                            <MatchScore score={cv.matchScore || 0} size="sm" />
+                                            {aiScores[cv.id] ? (
+                                                <div className="flex items-center gap-1 text-[10px] font-medium text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full" title={aiScores[cv.id].reasoning}>
+                                                    <Sparkles size={10} />
+                                                    AI: {aiScores[cv.id].score}%
+                                                </div>
+                                            ) : (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-5 px-1.5 text-[10px] text-purple-600 hover:bg-purple-50 shrink-0"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'AI Analysis coming soon', 'info');
+                                                    }}
+                                                    disabled={false}
+                                                >
+                                                    {t.aiScore}
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2 order-1 sm:order-2 w-full sm:w-auto justify-start sm:justify-end">
                                             <Button
-                                                variant="ghost"
+                                                variant="outline"
                                                 size="sm"
-                                                className="h-6 text-[10px] text-purple-600 hover:bg-purple-50"
+                                                className="flex-1 sm:flex-none"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    addToast(language === 'ar' ? 'الميزة قادمة قريباً' : 'AI Analysis coming soon', 'info');
+                                                    handleRate(cv);
                                                 }}
-                                                disabled={false}
                                             >
-                                                {t.aiScore}
+                                                {t.rate}
                                             </Button>
-                                        )}
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleRate(cv);
-                                            }}
-                                        >
-                                            {t.rate}
-                                        </Button>
-                                        <Link href={`/clinic/search?id=${cv.id}`}>
-                                            <Button variant="outline" size="sm">{t.view}</Button>
-                                        </Link>
+                                            <Link href={`/clinic/search?id=${cv.id}`} className="flex-1 sm:flex-none">
+                                                <Button variant="outline" size="sm" className="w-full">{t.view}</Button>
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

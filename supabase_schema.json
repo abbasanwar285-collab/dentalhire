@@ -1,0 +1,2860 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "",
+    "title": "standard public schema",
+    "version": "14.1"
+  },
+  "host": "kmjqdtupptbakhpihqfc.supabase.co:443",
+  "basePath": "/",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "produces": [
+    "application/json",
+    "application/vnd.pgrst.object+json;nulls=stripped",
+    "application/vnd.pgrst.object+json",
+    "text/csv"
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "produces": [
+          "application/openapi+json",
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "OpenAPI description (this document)",
+        "tags": [
+          "Introspection"
+        ]
+      }
+    },
+    "/profiles": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/profiles"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.profiles"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.profiles.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.full_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.profiles.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.profiles"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/appointments": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.time"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.assistant_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.completed_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.updated_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/appointments"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.appointments"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.time"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.assistant_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.completed_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.updated_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.appointments.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.time"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.status"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.assistant_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.completed_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.appointments.updated_at"
+          },
+          {
+            "$ref": "#/parameters/body.appointments"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "appointments"
+        ]
+      }
+    },
+    "/inventory_items": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.unit"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.min_stock"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.expiry_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.supplier"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.last_restocked"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_thumbnail"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.auto_decrement"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.consumption_rate"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.updated_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/inventory_items"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "inventory_items"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.inventory_items"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "inventory_items"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.unit"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.min_stock"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.expiry_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.supplier"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.last_restocked"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_thumbnail"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.auto_decrement"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.consumption_rate"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.updated_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "inventory_items"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.quantity"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.unit"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.min_stock"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.expiry_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.price"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.supplier"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.last_restocked"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image_thumbnail"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.image"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.auto_decrement"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.consumption_rate"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.inventory_items.updated_at"
+          },
+          {
+            "$ref": "#/parameters/body.inventory_items"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "inventory_items"
+        ]
+      }
+    },
+    "/allowed_users": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/allowed_users"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "allowed_users"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.allowed_users"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "allowed_users"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "allowed_users"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.email"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.role"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.allowed_users.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.allowed_users"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "allowed_users"
+        ]
+      }
+    },
+    "/expenses": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.expenses.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_by"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/expenses"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "expenses"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.expenses"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "expenses"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.expenses.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_by"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "expenses"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.expenses.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.category"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_by"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.expenses.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.expenses"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "expenses"
+        ]
+      }
+    },
+    "/patients": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patients.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.mobile"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.age"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.gender"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.procedures"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_visits"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_paid"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_count"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.payments"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.is_debt_only"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.updated_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/patients"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "patients"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.patients"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "patients"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patients.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.mobile"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.age"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.gender"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.procedures"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_visits"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_paid"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_count"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.payments"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.is_debt_only"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.updated_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "patients"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patients.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.mobile"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.age"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.gender"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.procedures"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_total_cost"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_paid_amount"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_diagnosis"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.ortho_visits"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_paid"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.consultation_fee_count"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.payments"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.is_debt_only"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.created_at"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patients.updated_at"
+          },
+          {
+            "$ref": "#/parameters/body.patients"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "patients"
+        ]
+      }
+    },
+    "/patient_scans": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_path"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.thumbnail_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.scan_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/patient_scans"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "patient_scans"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.patient_scans"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "patient_scans"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_path"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.thumbnail_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.scan_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "patient_scans"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_path"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.thumbnail_url"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.file_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.notes"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.scan_date"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.patient_scans.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.patient_scans"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "patient_scans"
+        ]
+      }
+    },
+    "/audit_logs": {
+      "get": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.action"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.old_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.new_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.created_at"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/order"
+          },
+          {
+            "$ref": "#/parameters/range"
+          },
+          {
+            "$ref": "#/parameters/rangeUnit"
+          },
+          {
+            "$ref": "#/parameters/offset"
+          },
+          {
+            "$ref": "#/parameters/limit"
+          },
+          {
+            "$ref": "#/parameters/preferCount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/audit_logs"
+              },
+              "type": "array"
+            }
+          },
+          "206": {
+            "description": "Partial Content"
+          }
+        },
+        "tags": [
+          "audit_logs"
+        ]
+      },
+      "post": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/body.audit_logs"
+          },
+          {
+            "$ref": "#/parameters/select"
+          },
+          {
+            "$ref": "#/parameters/preferPost"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        },
+        "tags": [
+          "audit_logs"
+        ]
+      },
+      "delete": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.action"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.old_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.new_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.created_at"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "audit_logs"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.doctor_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.action"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_type"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.entity_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_id"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.patient_name"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.description"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.old_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.new_value"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.timestamp"
+          },
+          {
+            "$ref": "#/parameters/rowFilter.audit_logs.created_at"
+          },
+          {
+            "$ref": "#/parameters/body.audit_logs"
+          },
+          {
+            "$ref": "#/parameters/preferReturn"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          }
+        },
+        "tags": [
+          "audit_logs"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "profiles": {
+      "required": [
+        "id",
+        "role"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "uuid",
+          "type": "string"
+        },
+        "email": {
+          "format": "text",
+          "type": "string"
+        },
+        "full_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "role": {
+          "default": "doctor",
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "appointments": {
+      "required": [
+        "id",
+        "date",
+        "time",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "patient_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "patient_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "doctor_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "date": {
+          "format": "text",
+          "type": "string"
+        },
+        "time": {
+          "format": "text",
+          "type": "string"
+        },
+        "type": {
+          "format": "text",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "status": {
+          "format": "text",
+          "type": "string"
+        },
+        "price": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "assistant_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "completed_at": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "updated_at": {
+          "default": "now()",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "inventory_items": {
+      "required": [
+        "id",
+        "name",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "name": {
+          "format": "text",
+          "type": "string"
+        },
+        "type": {
+          "format": "text",
+          "type": "string"
+        },
+        "quantity": {
+          "default": 0,
+          "format": "integer",
+          "type": "integer"
+        },
+        "unit": {
+          "format": "text",
+          "type": "string"
+        },
+        "min_stock": {
+          "default": 5,
+          "format": "integer",
+          "type": "integer"
+        },
+        "expiry_date": {
+          "format": "text",
+          "type": "string"
+        },
+        "price": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "supplier": {
+          "format": "text",
+          "type": "string"
+        },
+        "last_restocked": {
+          "format": "text",
+          "type": "string"
+        },
+        "image_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "image_thumbnail": {
+          "format": "text",
+          "type": "string"
+        },
+        "image": {
+          "format": "text",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "auto_decrement": {
+          "default": false,
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "consumption_rate": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "updated_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "allowed_users": {
+      "required": [
+        "email",
+        "name",
+        "role",
+        "created_at"
+      ],
+      "properties": {
+        "email": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "name": {
+          "format": "text",
+          "type": "string"
+        },
+        "role": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "expenses": {
+      "required": [
+        "id",
+        "amount",
+        "date",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "amount": {
+          "format": "numeric",
+          "type": "number"
+        },
+        "category": {
+          "format": "text",
+          "type": "string"
+        },
+        "description": {
+          "format": "text",
+          "type": "string"
+        },
+        "date": {
+          "format": "text",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "bigint",
+          "type": "integer"
+        },
+        "created_by": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "patients": {
+      "required": [
+        "id",
+        "name",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "name": {
+          "format": "text",
+          "type": "string"
+        },
+        "mobile": {
+          "format": "text",
+          "type": "string"
+        },
+        "age": {
+          "format": "integer",
+          "type": "integer"
+        },
+        "gender": {
+          "format": "text",
+          "type": "string"
+        },
+        "total_cost": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "paid_amount": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "diagnosis": {
+          "format": "text",
+          "type": "string"
+        },
+        "procedures": {
+          "format": "jsonb"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "ortho_doctor_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "ortho_total_cost": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "ortho_paid_amount": {
+          "default": 0,
+          "format": "numeric",
+          "type": "number"
+        },
+        "ortho_diagnosis": {
+          "format": "text",
+          "type": "string"
+        },
+        "ortho_visits": {
+          "format": "jsonb"
+        },
+        "consultation_fee_paid": {
+          "default": false,
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "consultation_fee_count": {
+          "default": 0,
+          "format": "integer",
+          "type": "integer"
+        },
+        "payments": {
+          "format": "jsonb"
+        },
+        "is_debt_only": {
+          "default": false,
+          "format": "boolean",
+          "type": "boolean"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        },
+        "updated_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "patient_scans": {
+      "required": [
+        "id",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "patient_id": {
+          "description": "Note:\nThis is a Foreign Key to `patients.id`.<fk table='patients' column='id'/>",
+          "format": "text",
+          "type": "string"
+        },
+        "type": {
+          "format": "text",
+          "type": "string"
+        },
+        "file_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "file_path": {
+          "format": "text",
+          "type": "string"
+        },
+        "thumbnail_url": {
+          "format": "text",
+          "type": "string"
+        },
+        "file_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "notes": {
+          "format": "text",
+          "type": "string"
+        },
+        "scan_date": {
+          "format": "text",
+          "type": "string"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "audit_logs": {
+      "required": [
+        "id",
+        "action",
+        "created_at"
+      ],
+      "properties": {
+        "id": {
+          "description": "Note:\nThis is a Primary Key.<pk/>",
+          "format": "text",
+          "type": "string"
+        },
+        "doctor_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "action": {
+          "format": "text",
+          "type": "string"
+        },
+        "entity_type": {
+          "format": "text",
+          "type": "string"
+        },
+        "entity_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "patient_id": {
+          "format": "text",
+          "type": "string"
+        },
+        "patient_name": {
+          "format": "text",
+          "type": "string"
+        },
+        "description": {
+          "format": "text",
+          "type": "string"
+        },
+        "old_value": {
+          "format": "text",
+          "type": "string"
+        },
+        "new_value": {
+          "format": "text",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "bigint",
+          "type": "integer"
+        },
+        "created_at": {
+          "default": "timezone('utc'::text, now())",
+          "format": "timestamp with time zone",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "parameters": {
+    "preferParams": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "in": "header",
+      "type": "string"
+    },
+    "preferReturn": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferCount": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "count=none"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "preferPost": {
+      "name": "Prefer",
+      "description": "Preference",
+      "required": false,
+      "enum": [
+        "return=representation",
+        "return=minimal",
+        "return=none",
+        "resolution=ignore-duplicates",
+        "resolution=merge-duplicates"
+      ],
+      "in": "header",
+      "type": "string"
+    },
+    "select": {
+      "name": "select",
+      "description": "Filtering Columns",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "on_conflict": {
+      "name": "on_conflict",
+      "description": "On Conflict",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "order": {
+      "name": "order",
+      "description": "Ordering",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "range": {
+      "name": "Range",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "header",
+      "type": "string"
+    },
+    "rangeUnit": {
+      "name": "Range-Unit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "default": "items",
+      "in": "header",
+      "type": "string"
+    },
+    "offset": {
+      "name": "offset",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "limit": {
+      "name": "limit",
+      "description": "Limiting and Pagination",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.profiles": {
+      "name": "profiles",
+      "description": "profiles",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/profiles"
+      }
+    },
+    "rowFilter.profiles.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.email": {
+      "name": "email",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.full_name": {
+      "name": "full_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.role": {
+      "name": "role",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.profiles.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.appointments": {
+      "name": "appointments",
+      "description": "appointments",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/appointments"
+      }
+    },
+    "rowFilter.appointments.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.patient_id": {
+      "name": "patient_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.patient_name": {
+      "name": "patient_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.doctor_id": {
+      "name": "doctor_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.date": {
+      "name": "date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.time": {
+      "name": "time",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.type": {
+      "name": "type",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.status": {
+      "name": "status",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.price": {
+      "name": "price",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.assistant_id": {
+      "name": "assistant_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.completed_at": {
+      "name": "completed_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.appointments.updated_at": {
+      "name": "updated_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.inventory_items": {
+      "name": "inventory_items",
+      "description": "inventory_items",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/inventory_items"
+      }
+    },
+    "rowFilter.inventory_items.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.type": {
+      "name": "type",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.quantity": {
+      "name": "quantity",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.unit": {
+      "name": "unit",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.min_stock": {
+      "name": "min_stock",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.expiry_date": {
+      "name": "expiry_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.price": {
+      "name": "price",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.supplier": {
+      "name": "supplier",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.last_restocked": {
+      "name": "last_restocked",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.image_url": {
+      "name": "image_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.image_thumbnail": {
+      "name": "image_thumbnail",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.image": {
+      "name": "image",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.auto_decrement": {
+      "name": "auto_decrement",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.consumption_rate": {
+      "name": "consumption_rate",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.inventory_items.updated_at": {
+      "name": "updated_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.allowed_users": {
+      "name": "allowed_users",
+      "description": "allowed_users",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/allowed_users"
+      }
+    },
+    "rowFilter.allowed_users.email": {
+      "name": "email",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.allowed_users.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.allowed_users.role": {
+      "name": "role",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.allowed_users.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.expenses": {
+      "name": "expenses",
+      "description": "expenses",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/expenses"
+      }
+    },
+    "rowFilter.expenses.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.amount": {
+      "name": "amount",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.category": {
+      "name": "category",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.description": {
+      "name": "description",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.date": {
+      "name": "date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.timestamp": {
+      "name": "timestamp",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.created_by": {
+      "name": "created_by",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.expenses.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.patients": {
+      "name": "patients",
+      "description": "patients",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/patients"
+      }
+    },
+    "rowFilter.patients.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.name": {
+      "name": "name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.mobile": {
+      "name": "mobile",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.age": {
+      "name": "age",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.gender": {
+      "name": "gender",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.total_cost": {
+      "name": "total_cost",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.paid_amount": {
+      "name": "paid_amount",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.diagnosis": {
+      "name": "diagnosis",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.procedures": {
+      "name": "procedures",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.ortho_doctor_id": {
+      "name": "ortho_doctor_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.ortho_total_cost": {
+      "name": "ortho_total_cost",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.ortho_paid_amount": {
+      "name": "ortho_paid_amount",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.ortho_diagnosis": {
+      "name": "ortho_diagnosis",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.ortho_visits": {
+      "name": "ortho_visits",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.consultation_fee_paid": {
+      "name": "consultation_fee_paid",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.consultation_fee_count": {
+      "name": "consultation_fee_count",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.payments": {
+      "name": "payments",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.is_debt_only": {
+      "name": "is_debt_only",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patients.updated_at": {
+      "name": "updated_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.patient_scans": {
+      "name": "patient_scans",
+      "description": "patient_scans",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/patient_scans"
+      }
+    },
+    "rowFilter.patient_scans.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.patient_id": {
+      "name": "patient_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.type": {
+      "name": "type",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.file_url": {
+      "name": "file_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.file_path": {
+      "name": "file_path",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.thumbnail_url": {
+      "name": "thumbnail_url",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.file_name": {
+      "name": "file_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.notes": {
+      "name": "notes",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.scan_date": {
+      "name": "scan_date",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.patient_scans.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "body.audit_logs": {
+      "name": "audit_logs",
+      "description": "audit_logs",
+      "required": false,
+      "in": "body",
+      "schema": {
+        "$ref": "#/definitions/audit_logs"
+      }
+    },
+    "rowFilter.audit_logs.id": {
+      "name": "id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.doctor_id": {
+      "name": "doctor_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.action": {
+      "name": "action",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.entity_type": {
+      "name": "entity_type",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.entity_id": {
+      "name": "entity_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.patient_id": {
+      "name": "patient_id",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.patient_name": {
+      "name": "patient_name",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.description": {
+      "name": "description",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.old_value": {
+      "name": "old_value",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.new_value": {
+      "name": "new_value",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.timestamp": {
+      "name": "timestamp",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    },
+    "rowFilter.audit_logs.created_at": {
+      "name": "created_at",
+      "required": false,
+      "in": "query",
+      "type": "string"
+    }
+  },
+  "externalDocs": {
+    "description": "PostgREST Documentation",
+    "url": "https://postgrest.org/en/v14/references/api.html"
+  }
+}

@@ -1,0 +1,339 @@
+/**
+ * Supabase Data Service
+ * Replaces the Express/SQLite backend with direct Supabase calls.
+ * Handles camelCase ↔ snake_case mapping.
+ */
+import { supabase } from './supabaseClient';
+import type {
+  Patient, Appointment, ClinicExpense, SupplyRequest,
+  ClinicTask, AppUser, WaitingPatient, ArrivalRecord
+} from '../types';
+
+// ═══════════════════════════════════════════
+// PATIENTS  (table: "patients_v2")
+// ═══════════════════════════════════════════
+
+const mapPatientFromDB = (row: any): Patient => ({
+  id: row.id,
+  name: row.name,
+  phone: row.phone || '',
+  email: row.email || '',
+  dateOfBirth: row.date_of_birth || '',
+  age: row.age,
+  bloodType: row.blood_type || '',
+  allergies: row.allergies || '',
+  medicalHistory: row.medical_history || '',
+  generalNotes: row.general_notes || '',
+  lastVisit: row.last_visit || '',
+  treatmentPlans: typeof row.treatment_plans === 'string'
+    ? JSON.parse(row.treatment_plans)
+    : (row.treatment_plans || []),
+});
+
+const mapPatientToDB = (p: Patient) => ({
+  id: p.id,
+  name: p.name,
+  phone: p.phone,
+  age: p.age,
+  medical_history: p.medicalHistory,
+  general_notes: p.generalNotes,
+  treatment_plans: p.treatmentPlans || [],
+  updated_at: new Date().toISOString(),
+});
+
+export async function fetchPatients(): Promise<Patient[]> {
+  const { data, error } = await supabase
+    .from('patients_v2')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('[Supabase] fetchPatients:', error); return []; }
+  return (data || []).map(mapPatientFromDB);
+}
+
+export async function upsertPatient(patient: Patient): Promise<void> {
+  const { error } = await supabase
+    .from('patients_v2')
+    .upsert(mapPatientToDB(patient));
+  if (error) console.error('[Supabase] upsertPatient:', error);
+}
+
+export async function deletePatientDB(id: string): Promise<void> {
+  const { error } = await supabase.from('patients_v2').delete().eq('id', id);
+  if (error) console.error('[Supabase] deletePatient:', error);
+}
+
+// ═══════════════════════════════════════════
+// APPOINTMENTS  (table: "appointments_v2")
+// ═══════════════════════════════════════════
+
+const mapAppointmentFromDB = (row: any): Appointment => ({
+  id: row.id,
+  patientId: row.patient_id || '',
+  patientName: row.patient_name || '',
+  doctorId: row.doctor_id || '',
+  doctorName: row.doctor_name || '',
+  date: row.date,
+  time: row.time,
+  treatment: row.treatment || '',
+  status: row.status || 'scheduled',
+  notes: row.notes || '',
+});
+
+const mapAppointmentToDB = (a: Appointment) => ({
+  id: a.id,
+  patient_id: a.patientId,
+  patient_name: a.patientName,
+  doctor_id: a.doctorId,
+  doctor_name: a.doctorName,
+  date: a.date,
+  time: a.time,
+  treatment: a.treatment,
+  status: a.status,
+  notes: a.notes,
+});
+
+export async function fetchAppointments(): Promise<Appointment[]> {
+  const { data, error } = await supabase
+    .from('appointments_v2')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) { console.error('[Supabase] fetchAppointments:', error); return []; }
+  return (data || []).map(mapAppointmentFromDB);
+}
+
+export async function upsertAppointment(appointment: Appointment): Promise<void> {
+  const { error } = await supabase
+    .from('appointments_v2')
+    .upsert(mapAppointmentToDB(appointment));
+  if (error) console.error('[Supabase] upsertAppointment:', error);
+}
+
+export async function deleteAppointmentDB(id: string): Promise<void> {
+  const { error } = await supabase.from('appointments_v2').delete().eq('id', id);
+  if (error) console.error('[Supabase] deleteAppointment:', error);
+}
+
+// ═══════════════════════════════════════════
+// EXPENSES  (table: "expenses_v2")
+// ═══════════════════════════════════════════
+
+const mapExpenseFromDB = (row: any): ClinicExpense => ({
+  id: row.id,
+  amount: row.amount,
+  category: row.category || 'other',
+  description: row.description || '',
+  date: row.date,
+  createdByUserId: row.created_by_user_id || '',
+  supplyRequestId: row.supply_request_id || '',
+});
+
+const mapExpenseToDB = (e: ClinicExpense) => ({
+  id: e.id,
+  amount: e.amount,
+  category: e.category,
+  description: e.description,
+  date: e.date,
+  created_by_user_id: e.createdByUserId,
+});
+
+export async function fetchExpenses(): Promise<ClinicExpense[]> {
+  const { data, error } = await supabase
+    .from('expenses_v2')
+    .select('*')
+    .order('date', { ascending: false });
+  if (error) { console.error('[Supabase] fetchExpenses:', error); return []; }
+  return (data || []).map(mapExpenseFromDB);
+}
+
+export async function upsertExpense(expense: ClinicExpense): Promise<void> {
+  const { error } = await supabase
+    .from('expenses_v2')
+    .upsert(mapExpenseToDB(expense));
+  if (error) console.error('[Supabase] upsertExpense:', error);
+}
+
+export async function deleteExpenseDB(id: string): Promise<void> {
+  const { error } = await supabase.from('expenses_v2').delete().eq('id', id);
+  if (error) console.error('[Supabase] deleteExpense:', error);
+}
+
+// ═══════════════════════════════════════════
+// USERS  (table: "users_v2")
+// ═══════════════════════════════════════════
+
+const mapUserFromDB = (row: any): AppUser => ({
+  id: row.id,
+  username: row.username,
+  displayName: row.display_name || '',
+  phone: row.phone || '',
+  role: row.role || 'secretary',
+  permissions: typeof row.permissions === 'string'
+    ? JSON.parse(row.permissions)
+    : (row.permissions || {}),
+  isActive: row.is_active !== false,
+  createdAt: row.created_at || '',
+  color: row.color,
+  specialization: row.specialization,
+  salaryType: row.salary_type,
+  fixedSalary: row.fixed_salary,
+  percentage: row.percentage,
+  salaryStartDate: row.salary_start_date,
+  bonuses: typeof row.bonuses === 'string' ? JSON.parse(row.bonuses) : (row.bonuses || []),
+  deductions: typeof row.deductions === 'string' ? JSON.parse(row.deductions) : (row.deductions || []),
+  salaryNotes: row.salary_notes,
+});
+
+const mapUserToDB = (u: AppUser) => ({
+  id: u.id,
+  username: u.username,
+  display_name: u.displayName,
+  phone: u.phone,
+  role: u.role,
+  permissions: u.permissions || {},
+  is_active: u.isActive,
+  created_at: u.createdAt,
+  color: u.color,
+  specialization: u.specialization,
+  salary_type: u.salaryType,
+  fixed_salary: u.fixedSalary,
+  percentage: u.percentage,
+  salary_start_date: u.salaryStartDate,
+  bonuses: u.bonuses || [],
+  deductions: u.deductions || [],
+  salary_notes: u.salaryNotes,
+});
+
+export async function fetchUsers(): Promise<AppUser[]> {
+  const { data, error } = await supabase
+    .from('users_v2')
+    .select('*');
+  if (error) { console.error('[Supabase] fetchUsers:', error); return []; }
+  return (data || []).map(mapUserFromDB);
+}
+
+export async function upsertUser(user: AppUser): Promise<void> {
+  const { error } = await supabase
+    .from('users_v2')
+    .upsert(mapUserToDB(user));
+  if (error) console.error('[Supabase] upsertUser:', error);
+}
+
+export async function deleteUserDB(id: string): Promise<void> {
+  const { error } = await supabase.from('users_v2').delete().eq('id', id);
+  if (error) console.error('[Supabase] deleteUser:', error);
+}
+
+// ═══════════════════════════════════════════
+// SUPPLY REQUESTS  (table: "app_supply_requests")
+// ═══════════════════════════════════════════
+
+const mapSupplyFromDB = (row: any): SupplyRequest => ({
+  id: row.id,
+  name: row.name,
+  quantity: row.quantity || 1,
+  unit: row.unit,
+  urgency: row.urgency || 'normal',
+  notes: row.notes,
+  requestedByUserId: row.requested_by_user_id || '',
+  status: row.status || 'pending',
+  createdAt: row.created_at || '',
+  purchasedAt: row.purchased_at,
+  purchasePrice: row.purchase_price,
+});
+
+const mapSupplyToDB = (r: SupplyRequest) => ({
+  id: r.id,
+  name: r.name,
+  quantity: r.quantity,
+  unit: r.unit,
+  urgency: r.urgency,
+  notes: r.notes,
+  requested_by_user_id: r.requestedByUserId,
+  status: r.status,
+  created_at: r.createdAt,
+  purchased_at: r.purchasedAt,
+  purchase_price: r.purchasePrice,
+});
+
+export async function fetchSupplyRequests(): Promise<SupplyRequest[]> {
+  const { data, error } = await supabase
+    .from('app_supply_requests')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('[Supabase] fetchSupplyRequests:', error); return []; }
+  return (data || []).map(mapSupplyFromDB);
+}
+
+export async function upsertSupplyRequest(req: SupplyRequest): Promise<void> {
+  const { error } = await supabase
+    .from('app_supply_requests')
+    .upsert(mapSupplyToDB(req));
+  if (error) console.error('[Supabase] upsertSupplyRequest:', error);
+}
+
+export async function deleteSupplyRequestDB(id: string): Promise<void> {
+  const { error } = await supabase.from('app_supply_requests').delete().eq('id', id);
+  if (error) console.error('[Supabase] deleteSupplyRequest:', error);
+}
+
+// ═══════════════════════════════════════════
+// TASKS  (table: "app_tasks")
+// ═══════════════════════════════════════════
+
+const mapTaskFromDB = (row: any): ClinicTask => ({
+  id: row.id,
+  title: row.title,
+  description: row.description,
+  priority: row.priority || 'normal',
+  assignedToUserId: row.assigned_to_user_id || '',
+  createdByUserId: row.created_by_user_id || '',
+  status: row.status || 'pending',
+  relatedPatientId: row.related_patient_id,
+  dueDate: row.due_date || '',
+  createdAt: row.created_at || '',
+  completedAt: row.completed_at,
+});
+
+const mapTaskToDB = (t: ClinicTask) => ({
+  id: t.id,
+  title: t.title,
+  description: t.description,
+  priority: t.priority,
+  assigned_to_user_id: t.assignedToUserId,
+  created_by_user_id: t.createdByUserId,
+  status: t.status,
+  related_patient_id: t.relatedPatientId,
+  due_date: t.dueDate,
+  created_at: t.createdAt,
+  completed_at: t.completedAt,
+});
+
+export async function fetchTasks(): Promise<ClinicTask[]> {
+  const { data, error } = await supabase
+    .from('app_tasks')
+    .select('*')
+    .order('created_at', { ascending: false });
+  if (error) { console.error('[Supabase] fetchTasks:', error); return []; }
+  return (data || []).map(mapTaskFromDB);
+}
+
+export async function upsertTask(task: ClinicTask): Promise<void> {
+  const { error } = await supabase
+    .from('app_tasks')
+    .upsert(mapTaskToDB(task));
+  if (error) console.error('[Supabase] upsertTask:', error);
+}
+
+export async function deleteTaskDB(id: string): Promise<void> {
+  const { error } = await supabase.from('app_tasks').delete().eq('id', id);
+  if (error) console.error('[Supabase] deleteTask:', error);
+}
+
+// ═══════════════════════════════════════════
+// WAITING ROOM  (localStorage only - ephemeral)
+// No Supabase table needed for real-time session data
+// ═══════════════════════════════════════════
+
+// ═══════════════════════════════════════════
+// ARRIVAL RECORDS  (localStorage only - ephemeral)
+// ═══════════════════════════════════════════

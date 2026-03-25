@@ -1,0 +1,36 @@
+{
+  "name": "عيادة آيرس — إدارة العيادة",
+  "short_name": "عيادتي",
+  "description": "نظام إدارة عيادة الأسنان الحديث — مواعيد، مرضى، علاجات، فريق العمل",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0d9488",
+  "dir": "rtl",
+  "lang": "ar",
+  "categories": ["medical", "health", "productivity"],
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/128/3467/3467831.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/256/3467/3467831.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3467/3467831.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

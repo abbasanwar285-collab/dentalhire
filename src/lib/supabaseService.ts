@@ -8,6 +8,7 @@ import type {
   Patient, Appointment, ClinicExpense, SupplyRequest,
   ClinicTask, AppUser, WaitingPatient, ArrivalRecord
 } from '../types';
+import type { ClinicSettings } from '../context/ClinicContext';
 
 // ═══════════════════════════════════════════
 // PATIENTS  (table: "patients_v2")
@@ -38,7 +39,8 @@ const mapPatientToDB = (p: Patient) => ({
   medical_history: p.medicalHistory,
   general_notes: p.generalNotes,
   treatment_plans: p.treatmentPlans || [],
-  updated_at: new Date().toISOString(),
+  // Removed updated_at as it doesn't exist in the patients_v2 schema 
+  // and was causing silent insert failures on Supabase
 });
 
 export async function fetchPatients(): Promise<Patient[]> {
@@ -134,6 +136,7 @@ const mapExpenseToDB = (e: ClinicExpense) => ({
   description: e.description,
   date: e.date,
   created_by_user_id: e.createdByUserId,
+  supply_request_id: e.supplyRequestId,
 });
 
 export async function fetchExpenses(): Promise<ClinicExpense[]> {
@@ -158,7 +161,7 @@ export async function deleteExpenseDB(id: string): Promise<void> {
 }
 
 // ═══════════════════════════════════════════
-// USERS  (table: "users_v2")
+// USERS  (table: "app_users")
 // ═══════════════════════════════════════════
 
 const mapUserFromDB = (row: any): AppUser => ({
@@ -205,7 +208,7 @@ const mapUserToDB = (u: AppUser) => ({
 
 export async function fetchUsers(): Promise<AppUser[]> {
   const { data, error } = await supabase
-    .from('users_v2')
+    .from('app_users')
     .select('*');
   if (error) { console.error('[Supabase] fetchUsers:', error); return []; }
   return (data || []).map(mapUserFromDB);
@@ -213,13 +216,13 @@ export async function fetchUsers(): Promise<AppUser[]> {
 
 export async function upsertUser(user: AppUser): Promise<void> {
   const { error } = await supabase
-    .from('users_v2')
+    .from('app_users')
     .upsert(mapUserToDB(user));
   if (error) console.error('[Supabase] upsertUser:', error);
 }
 
 export async function deleteUserDB(id: string): Promise<void> {
-  const { error } = await supabase.from('users_v2').delete().eq('id', id);
+  const { error } = await supabase.from('app_users').delete().eq('id', id);
   if (error) console.error('[Supabase] deleteUser:', error);
 }
 
@@ -330,6 +333,45 @@ export async function deleteTaskDB(id: string): Promise<void> {
 }
 
 // ═══════════════════════════════════════════
+// SETTINGS (table: "app_settings")
+// ═══════════════════════════════════════════
+
+export async function fetchSettings(): Promise<ClinicSettings | null> {
+  const { data, error } = await supabase
+    .from('app_settings')
+    .select('*')
+    .eq('id', 'default')
+    .single();
+    
+  if (error) {
+    if (error.code !== 'PGRST116') { // Ignore row not found
+      console.error('[Supabase] fetchSettings:', error);
+    }
+    return null;
+  }
+  
+  if (!data) return null;
+  return {
+    clinicName: data.clinic_name || 'Iris Clinic',
+    clinicPhone: data.clinic_phone || '',
+    clinicAddress: data.clinic_address || '',
+  };
+}
+
+export async function upsertSettings(settings: ClinicSettings): Promise<void> {
+  const { error } = await supabase
+    .from('app_settings')
+    .upsert({
+      id: 'default',
+      clinic_name: settings.clinicName,
+      clinic_phone: settings.clinicPhone,
+      clinic_address: settings.clinicAddress,
+    });
+    
+  if (error) console.error('[Supabase] upsertSettings:', error);
+}
+
+// ═══════════════════════════════════════════
 // WAITING ROOM  (localStorage only - ephemeral)
 // No Supabase table needed for real-time session data
 // ═══════════════════════════════════════════
@@ -337,3 +379,4 @@ export async function deleteTaskDB(id: string): Promise<void> {
 // ═══════════════════════════════════════════
 // ARRIVAL RECORDS  (localStorage only - ephemeral)
 // ═══════════════════════════════════════════
+

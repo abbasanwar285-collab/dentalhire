@@ -97,6 +97,8 @@ export interface ArrivalRecord {
   actualArrivalTime: string; // ISO string
   differenceMinutes: number; // negative = early, positive = late
   createdAt: string;         // ISO string
+  sessionStartTime?: string; // ISO string
+  sessionEndTime?: string;   // ISO string
 }
 
 export type TaskPriority = 'urgent' | 'normal' | 'low';

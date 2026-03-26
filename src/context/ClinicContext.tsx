@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { Patient, Appointment, Treatment, Doctor, WaitingPatient, ArrivalRecord, ClinicTask, SupplyRequest, ClinicExpense, DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES, AssistantDoctorAssignment } from '../types';
+import { Patient, Appointment, Treatment, Doctor, WaitingPatient, ArrivalRecord, ClinicTask, SupplyRequest, ClinicExpense, DisplayPreferences, DEFAULT_DISPLAY_PREFERENCES, AssistantDoctorAssignment, AppUser } from '../types';
 import {
   patients as initialPatients,
   appointments as initialAppointments,
@@ -141,7 +141,13 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       if (expsData && expsData.length > 0) setClinicExpenses(expsData);
       if (reqsData && reqsData.length > 0) setSupplyRequests(reqsData);
       if (tasksData && tasksData.length > 0) setTasks(tasksData);
-      setIsLoading(false);
+      
+      // Load Settings
+      db.fetchSettings().then(settingsData => {
+        if (!mounted) return;
+        if (settingsData) setClinicSettings(settingsData);
+        setIsLoading(false);
+      });
     }).catch(err => {
       console.error('Failed to init from Supabase:', err);
       if (mounted) setIsLoading(false);
@@ -449,7 +455,11 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
 
   // ── Clinic Settings ──
   const updateClinicSettings = useCallback((settings: Partial<ClinicSettings>) => {
-    setClinicSettings((prev: ClinicSettings) => ({ ...prev, ...settings }));
+    setClinicSettings((prev: ClinicSettings) => {
+      const next = { ...prev, ...settings };
+      db.upsertSettings(next);
+      return next;
+    });
   }, []);
 
   // ── Error Management ──

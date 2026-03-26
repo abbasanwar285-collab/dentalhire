@@ -35,15 +35,13 @@ const mapPatientToDB = (p: Patient) => ({
   id: p.id,
   name: p.name,
   phone: p.phone || null,
-  email: p.email || null,
   age: p.age || null,
-  date_of_birth: p.dateOfBirth || null,
-  blood_type: p.bloodType || null,
-  allergies: p.allergies || null,
   medical_history: p.medicalHistory || null,
   general_notes: p.generalNotes || null,
-  last_visit: p.lastVisit || null,
   treatment_plans: p.treatmentPlans || [],
+  // Note: email, date_of_birth, blood_type, allergies, last_visit
+  // do NOT exist in patients_v2 — they are kept only in localStorage
+  // via treatmentPlans JSONB until a schema migration adds them.
 });
 
 export async function fetchPatients(): Promise<Patient[] | null> {

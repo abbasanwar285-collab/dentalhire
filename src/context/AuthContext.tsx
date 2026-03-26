@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     let mounted = true;
     db.fetchUsers().then((usersData) => {
       if (!mounted) return;
-      if (usersData && usersData.length > 0) {
+      if (usersData !== null && usersData.length > 0) {
         // Ensure admin account always exists
         if (!usersData.find((u: AppUser) => u.role === 'admin')) {
           setUsers([DEFAULT_ADMIN, ...usersData]);
@@ -72,7 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setUsers(usersData);
         }
       }
-    }).catch(console.error);
+    }).catch(err => {
+      console.error('[Auth] Initial load failed:', err);
+    });
     return () => { mounted = false; };
   }, []);
 

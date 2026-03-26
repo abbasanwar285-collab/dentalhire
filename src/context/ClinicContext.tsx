@@ -125,7 +125,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load from Supabase on mount — ALWAYS use DB data as source of truth
+  // Load from Supabase on mount
   useEffect(() => {
     let mounted = true;
     Promise.all([
@@ -134,24 +134,33 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       db.fetchExpenses(),
       db.fetchSupplyRequests(),
       db.fetchTasks(),
-    ]).then(([patientsData, aptsData, expsData, reqsData, tasksData]) => {
+      db.fetchTreatments(),
+      db.fetchSettings(),
+    ]).then(([patientsData, aptsData, expsData, reqsData, tasksData, treatmentsData, settingsData]) => {
       if (!mounted) return;
-      // Always use Supabase data as source of truth (even if empty)
-      setPatients(patientsData || []);
-      setAppointments(aptsData || []);
-      setClinicExpenses(expsData || []);
-      setSupplyRequests(reqsData || []);
-      setTasks(tasksData || []);
       
-      // Load Settings
-      db.fetchSettings().then(settingsData => {
-        if (!mounted) return;
-        if (settingsData) setClinicSettings(settingsData);
-        setIsLoading(false);
-      });
+      // Crucial: Only update state if fetch was successful (not null)
+      // This prevents clearing local data on connection error
+      if (patientsData !== null) setPatients(patientsData);
+      if (aptsData !== null) setAppointments(aptsData);
+      if (expsData !== null) setClinicExpenses(expsData);
+      if (reqsData !== null) setSupplyRequests(reqsData);
+      if (tasksData !== null) setTasks(tasksData);
+      if (treatmentsData !== null) setTreatments(treatmentsData);
+      if (settingsData !== null) setClinicSettings(settingsData);
+      
+      // If any of the main entities failed to load, notify the user
+      if (patientsData === null || aptsData === null) {
+        setError('تعذر في الاتصال بالسيرفر. يتم استخدام البيانات المحلية حالياً.');
+      }
+      
+      setIsLoading(false);
     }).catch(err => {
       console.error('Failed to init from Supabase:', err);
-      if (mounted) setIsLoading(false);
+      if (mounted) {
+        setIsLoading(false);
+        setError('خطأ في الاتصال بالسيرفر. يرجoy التأكد من الإنترنت.');
+      }
     });
     return () => { mounted = false; };
   }, []);
@@ -496,11 +505,16 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const addTreatment = useCallback((treatmentData: Omit<Treatment, 'id'>) => {
     const newTreatment: Treatment = { ...treatmentData, id: generateId() };
     setTreatments((prev: Treatment[]) => [...prev, newTreatment]);
+    db.upsertTreatment(newTreatment).catch(err => {
+      setTreatments(prev => prev.filter(t => t.id !== newTreatment.id));
+      setError(`فشل حفظ الخدمة: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
   }, []);
 
   const addDoctor = useCallback((doctorData: Omit<Doctor, 'id'>) => {
     const newDoctor: Doctor = { ...doctorData, id: generateId() };
     setDoctors((prev: Doctor[]) => [...prev, newDoctor]);
+    // Note: doctors are currently derived from users, so we don't upsert directly to a doctors table
   }, []);
 
   // ── Waiting Room Operations ──
@@ -557,13 +571,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Clinic Settings ──
-  const updateClinicSettings = useCallback((settings: Partial<ClinicSettings>) => {
-    setClinicSettings((prev: ClinicSettings) => {
-      const next = { ...prev, ...settings };
-      db.upsertSettings(next);
-      return next;
-    });
-  }, []);
+  const updateClinicSettings = useCallback(async (settings: Partial<ClinicSettings>) => {
+    const originalSettings = clinicSettings;
+    const next = { ...clinicSettings, ...settings };
+    setClinicSettings(next);
+    
+    try {
+      await db.upsertSettings(next);
+    } catch (err: any) {
+      setClinicSettings(originalSettings);
+      setError(`فشل حفظ الإعدادات: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    }
+  }, [clinicSettings]);
 
   // ── Error Management ──
   const clearError = useCallback(() => setError(null), []);

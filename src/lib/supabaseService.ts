@@ -6,7 +6,7 @@
 import { supabase } from './supabaseClient';
 import type {
   Patient, Appointment, ClinicExpense, SupplyRequest,
-  ClinicTask, AppUser, WaitingPatient, ArrivalRecord
+  ClinicTask, AppUser, WaitingPatient, ArrivalRecord, Treatment
 } from '../types';
 import type { ClinicSettings } from '../context/ClinicContext';
 
@@ -43,12 +43,15 @@ const mapPatientToDB = (p: Patient) => ({
   // and was causing silent insert failures on Supabase
 });
 
-export async function fetchPatients(): Promise<Patient[]> {
+export async function fetchPatients(): Promise<Patient[] | null> {
   const { data, error } = await supabase
     .from('patients_v2')
     .select('*')
     .order('created_at', { ascending: false });
-  if (error) { console.error('[Supabase] fetchPatients:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchPatients:', error);
+    return null; // Return null on error to distinguish from empty array
+  }
   return (data || []).map(mapPatientFromDB);
 }
 
@@ -100,12 +103,15 @@ const mapAppointmentToDB = (a: Appointment) => ({
   notes: a.notes,
 });
 
-export async function fetchAppointments(): Promise<Appointment[]> {
+export async function fetchAppointments(): Promise<Appointment[] | null> {
   const { data, error } = await supabase
     .from('appointments_v2')
     .select('*')
     .order('date', { ascending: false });
-  if (error) { console.error('[Supabase] fetchAppointments:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchAppointments:', error);
+    return null;
+  }
   return (data || []).map(mapAppointmentFromDB);
 }
 
@@ -156,12 +162,15 @@ const mapExpenseToDB = (e: ClinicExpense) => {
   return obj;
 };
 
-export async function fetchExpenses(): Promise<ClinicExpense[]> {
+export async function fetchExpenses(): Promise<ClinicExpense[] | null> {
   const { data, error } = await supabase
     .from('expenses_v2')
     .select('*')
     .order('date', { ascending: false });
-  if (error) { console.error('[Supabase] fetchExpenses:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchExpenses:', error);
+    return null;
+  }
   return (data || []).map(mapExpenseFromDB);
 }
 
@@ -229,11 +238,14 @@ const mapUserToDB = (u: AppUser) => ({
   salary_notes: u.salaryNotes,
 });
 
-export async function fetchUsers(): Promise<AppUser[]> {
+export async function fetchUsers(): Promise<AppUser[] | null> {
   const { data, error } = await supabase
     .from('app_users')
     .select('*');
-  if (error) { console.error('[Supabase] fetchUsers:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchUsers:', error);
+    return null;
+  }
   return (data || []).map(mapUserFromDB);
 }
 
@@ -287,12 +299,15 @@ const mapSupplyToDB = (r: SupplyRequest) => ({
   purchase_price: r.purchasePrice,
 });
 
-export async function fetchSupplyRequests(): Promise<SupplyRequest[]> {
+export async function fetchSupplyRequests(): Promise<SupplyRequest[] | null> {
   const { data, error } = await supabase
     .from('app_supply_requests')
     .select('*')
     .order('created_at', { ascending: false });
-  if (error) { console.error('[Supabase] fetchSupplyRequests:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchSupplyRequests:', error);
+    return null;
+  }
   return (data || []).map(mapSupplyFromDB);
 }
 
@@ -346,12 +361,15 @@ const mapTaskToDB = (t: ClinicTask) => ({
   completed_at: t.completedAt,
 });
 
-export async function fetchTasks(): Promise<ClinicTask[]> {
+export async function fetchTasks(): Promise<ClinicTask[] | null> {
   const { data, error } = await supabase
     .from('app_tasks')
     .select('*')
     .order('created_at', { ascending: false });
-  if (error) { console.error('[Supabase] fetchTasks:', error); return []; }
+  if (error) {
+    console.error('[Supabase] fetchTasks:', error);
+    return null;
+  }
   return (data || []).map(mapTaskFromDB);
 }
 
@@ -416,11 +434,60 @@ export async function upsertSettings(settings: ClinicSettings): Promise<void> {
 }
 
 // ═══════════════════════════════════════════
-// WAITING ROOM  (localStorage only - ephemeral)
-// No Supabase table needed for real-time session data
+// TREATMENTS (table: "app_treatments")
 // ═══════════════════════════════════════════
 
+const mapTreatmentFromDB = (row: any): Treatment => ({
+  id: row.id,
+  name: row.name,
+  price: row.price || 0,
+  duration: row.duration || 30,
+});
+
+const mapTreatmentToDB = (t: Treatment) => ({
+  id: t.id,
+  name: t.name,
+  price: t.price,
+  duration: t.duration,
+});
+
+export async function fetchTreatments(): Promise<Treatment[] | null> {
+  const { data, error } = await supabase
+    .from('app_treatments')
+    .select('*')
+    .order('name');
+  if (error) {
+    if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+      return []; // Return empty if table doesn't exist yet
+    }
+    console.error('[Supabase] fetchTreatments:', error);
+    return null;
+  }
+  return (data || []).map(mapTreatmentFromDB);
+}
+
+export async function upsertTreatment(treatment: Treatment): Promise<void> {
+  const { error } = await supabase
+    .from('app_treatments')
+    .upsert(mapTreatmentToDB(treatment));
+  if (error) {
+    console.error('[Supabase] upsertTreatment:', error);
+    throw error;
+  }
+}
+
+export async function deleteTreatmentDB(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('app_treatments')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    console.error('[Supabase] deleteTreatment:', error);
+    throw error;
+  }
+}
+
 // ═══════════════════════════════════════════
-// ARRIVAL RECORDS  (localStorage only - ephemeral)
+// WAITING ROOM  (localStorage only - ephemeral)
 // ═══════════════════════════════════════════
 

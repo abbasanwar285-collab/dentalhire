@@ -7,7 +7,9 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { BottomNav } from './components/ui/BottomNav';
 import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
 import { NotificationPrompt } from './components/ui/NotificationPrompt';
+import { ErrorToast } from './components/ui/ErrorToast';
 import { Login } from './pages/Login';
+import { useClinic } from './context/ClinicContext';
 
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const Appointments = lazy(() => import('./pages/Appointments').then(m => ({ default: m.Appointments })));
@@ -27,8 +29,9 @@ const AssistantAssignment = lazy(() => import('./pages/AssistantAssignment').the
 const FinancialManagement = lazy(() => import('./pages/FinancialManagement').then(m => ({ default: m.FinancialManagement })));
 
 function AppContent() {
+  const { error, clearError } = useClinic();
   const { isAuthenticated } = useAuth();
-
+  
   if (!isAuthenticated) {
     return <Login />;
   }
@@ -59,6 +62,7 @@ function AppContent() {
         </Routes>
       </Suspense>
       <NotificationPrompt />
+      <ErrorToast message={error} onClear={clearError} />
       <BottomNav />
     </Router>
   );

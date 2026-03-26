@@ -145,17 +145,15 @@ export function Patients() {
       result = [...result].sort((a, b) => a.name.localeCompare(b.name, 'ar'));
     } else if (sortBy === 'recent') {
       result = [...result].sort((a, b) => {
-        if (!a.computedLastVisit && !b.computedLastVisit) return 0;
-        if (!a.computedLastVisit) return 1;
-        if (!b.computedLastVisit) return -1;
-        return new Date(b.computedLastVisit).getTime() - new Date(a.computedLastVisit).getTime();
+        const timeA = a.computedLastVisit ? new Date(a.computedLastVisit).getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+        const timeB = b.computedLastVisit ? new Date(b.computedLastVisit).getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+        return timeB - timeA;
       });
     } else if (sortBy === 'oldest') {
       result = [...result].sort((a, b) => {
-        if (!a.computedLastVisit && !b.computedLastVisit) return 0;
-        if (!a.computedLastVisit) return 1;
-        if (!b.computedLastVisit) return -1;
-        return new Date(a.computedLastVisit).getTime() - new Date(b.computedLastVisit).getTime();
+        const timeA = a.computedLastVisit ? new Date(a.computedLastVisit).getTime() : (a.createdAt ? new Date(a.createdAt).getTime() : 0);
+        const timeB = b.computedLastVisit ? new Date(b.computedLastVisit).getTime() : (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+        return timeA - timeB;
       });
     }
 

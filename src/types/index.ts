@@ -74,6 +74,7 @@ export interface Patient {
   generalNotes?: string;
   lastVisit?: string;
   treatmentPlans?: TreatmentPlan[];
+  createdAt?: string;
 }
 
 export interface WaitingPatient {

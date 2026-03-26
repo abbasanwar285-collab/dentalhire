@@ -29,6 +29,7 @@ const mapPatientFromDB = (row: any): Patient => ({
   treatmentPlans: typeof row.treatment_plans === 'string'
     ? JSON.parse(row.treatment_plans)
     : (row.treatment_plans || []),
+  createdAt: row.created_at,
 });
 
 const mapPatientToDB = (p: Patient) => ({
@@ -39,6 +40,7 @@ const mapPatientToDB = (p: Patient) => ({
   medical_history: p.medicalHistory || null,
   general_notes: p.generalNotes || null,
   treatment_plans: p.treatmentPlans || [],
+  created_at: p.createdAt || undefined,
   // Note: email, date_of_birth, blood_type, allergies, last_visit
   // do NOT exist in patients_v2 — they are kept only in localStorage
   // via treatmentPlans JSONB until a schema migration adds them.

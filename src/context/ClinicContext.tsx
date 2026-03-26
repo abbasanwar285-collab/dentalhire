@@ -279,7 +279,11 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    const newPatient: Patient = { ...sanitizedData, id: generateId() };
+    const newPatient: Patient = { 
+      ...sanitizedData, 
+      id: generateId(),
+      createdAt: new Date().toISOString()
+    };
     setPatients((prev) => [...prev, newPatient]);
     
     db.upsertPatient(newPatient).catch(err => {

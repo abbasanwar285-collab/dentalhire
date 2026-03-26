@@ -125,7 +125,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load from Supabase on mount
+  // Load from Supabase on mount — ALWAYS use DB data as source of truth
   useEffect(() => {
     let mounted = true;
     Promise.all([
@@ -136,11 +136,12 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       db.fetchTasks(),
     ]).then(([patientsData, aptsData, expsData, reqsData, tasksData]) => {
       if (!mounted) return;
-      if (patientsData && patientsData.length > 0) setPatients(patientsData);
-      if (aptsData && aptsData.length > 0) setAppointments(aptsData);
-      if (expsData && expsData.length > 0) setClinicExpenses(expsData);
-      if (reqsData && reqsData.length > 0) setSupplyRequests(reqsData);
-      if (tasksData && tasksData.length > 0) setTasks(tasksData);
+      // Always use Supabase data as source of truth (even if empty)
+      setPatients(patientsData || []);
+      setAppointments(aptsData || []);
+      setClinicExpenses(expsData || []);
+      setSupplyRequests(reqsData || []);
+      setTasks(tasksData || []);
       
       // Load Settings
       db.fetchSettings().then(settingsData => {
@@ -256,7 +257,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       return { success: false, error: 'البريد الإلكتروني غير صالح' };
     }
 
-    // Duplicate detection by phone or email
+    // Duplicate detection using current state (read from patients directly)
     const newPhoneDigits = normalizePhone(sanitizedData.phone);
     const phoneExists = patients.some((p: Patient) => normalizePhone(p.phone) === newPhoneDigits && newPhoneDigits.length > 0);
     if (phoneExists) {
@@ -278,24 +279,24 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     });
     
     return { success: true, patient: newPatient };
-  }, []);
+  }, [patients]);
 
   const updatePatient = useCallback((id: string, updates: Partial<Patient>) => {
-    let originalPatient: Patient | undefined;
+    // Capture original BEFORE setState so it's available in .catch() closure
+    const originalPatient = patients.find((p: Patient) => p.id === id);
     
     setPatients((prev: Patient[]) => {
-      originalPatient = prev.find((p: Patient) => p.id === id);
       return prev.map((p: Patient) => (p.id === id ? { ...p, ...updates } : p));
     });
     
     if (originalPatient) {
       const targetP = { ...originalPatient, ...updates } as Patient;
       db.upsertPatient(targetP).catch(err => {
-        setPatients((prev: Patient[]) => prev.map((p: Patient) => p.id === id ? originalPatient! : p));
+        setPatients((prev: Patient[]) => prev.map((p: Patient) => p.id === id ? originalPatient : p));
         setError(`فشل تحديث بيانات المريض: ${err.message || 'يرجى المحاولة مجدداً'}`);
       });
     }
-  }, []);
+  }, [patients]);
 
   const deletePatient = useCallback((id: string) => {
     let originalPatient: Patient | undefined;
@@ -323,19 +324,29 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
 
   // ── Treatment Plan Operations ──
   const addTreatmentPlan = useCallback((patientId: string, plan: any) => {
+    const newPlanId = generateId();
     setPatients((prev: Patient[]) => {
       const updatedList = prev.map((p: Patient) => {
         if (p.id === patientId) {
           const newPlan = {
             ...plan,
-            id: generateId(),
+            id: newPlanId,
             createdAt: new Date().toISOString(),
           };
           const updated = {
             ...p,
             treatmentPlans: p.treatmentPlans ? [...p.treatmentPlans, newPlan] : [newPlan],
           };
-          db.upsertPatient(updated);
+          db.upsertPatient(updated).catch(err => {
+            // Rollback: remove the newly added plan
+            setPatients((rollback: Patient[]) => rollback.map((rp: Patient) => {
+              if (rp.id === patientId) {
+                return { ...rp, treatmentPlans: (rp.treatmentPlans || []).filter((tp: any) => tp.id !== newPlanId) };
+              }
+              return rp;
+            }));
+            setError(`فشل حفظ خطة العلاج: ${err.message || 'يرجى المحاولة مجدداً'}`);
+          });
           return updated;
         }
         return p;
@@ -345,6 +356,10 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateTreatmentPlan = useCallback((patientId: string, planId: string, updates: object) => {
+    // Capture original plan for rollback
+    const originalPatient = patients.find((p: Patient) => p.id === patientId);
+    const originalPlan = originalPatient?.treatmentPlans?.find((tp: any) => tp.id === planId);
+    
     setPatients((prev: Patient[]) => {
       const updatedList = prev.map((p: Patient) => {
         if (p.id === patientId && p.treatmentPlans) {
@@ -354,16 +369,31 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
               plan.id === planId ? { ...plan, ...updates } : plan
             ),
           };
-          db.upsertPatient(updated);
+          db.upsertPatient(updated).catch(err => {
+            // Rollback to original plan
+            if (originalPlan) {
+              setPatients((rollback: Patient[]) => rollback.map((rp: Patient) => {
+                if (rp.id === patientId && rp.treatmentPlans) {
+                  return { ...rp, treatmentPlans: rp.treatmentPlans.map((tp: any) => tp.id === planId ? originalPlan : tp) };
+                }
+                return rp;
+              }));
+            }
+            setError(`فشل تحديث خطة العلاج: ${err.message || 'يرجى المحاولة مجدداً'}`);
+          });
           return updated;
         }
         return p;
       });
       return updatedList;
     });
-  }, []);
+  }, [patients]);
 
   const deleteTreatmentPlan = useCallback((patientId: string, planId: string) => {
+    // Capture original plan for rollback
+    const originalPatient = patients.find((p: Patient) => p.id === patientId);
+    const deletedPlan = originalPatient?.treatmentPlans?.find((tp: any) => tp.id === planId);
+    
     setPatients((prev: Patient[]) => {
       const updatedList = prev.map((p: Patient) => {
         if (p.id === patientId && p.treatmentPlans) {
@@ -375,10 +405,23 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
         return p;
       });
       const targetP = updatedList.find((p: Patient) => p.id === patientId);
-      if (targetP) db.upsertPatient(targetP);
+      if (targetP) {
+        db.upsertPatient(targetP).catch(err => {
+          // Rollback: restore deleted plan
+          if (deletedPlan) {
+            setPatients((rollback: Patient[]) => rollback.map((rp: Patient) => {
+              if (rp.id === patientId) {
+                return { ...rp, treatmentPlans: [...(rp.treatmentPlans || []), deletedPlan] };
+              }
+              return rp;
+            }));
+          }
+          setError(`فشل حذف خطة العلاج: ${err.message || 'يرجى المحاولة مجدداً'}`);
+        });
+      }
       return updatedList;
     });
-  }, []);
+  }, [patients]);
 
   // ── Appointment Operations ──
   const addAppointment = useCallback((appointmentData: Omit<Appointment, 'id'>) => {
@@ -400,38 +443,38 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const updateAppointmentStatus = useCallback((id: string, status: Appointment['status']) => {
-    let originalApt: Appointment | undefined;
+    // Capture original BEFORE setState so it's available in .catch() closure
+    const originalApt = appointments.find((a: Appointment) => a.id === id);
     
     setAppointments((prev: Appointment[]) => {
-      originalApt = prev.find((a: Appointment) => a.id === id);
       return prev.map((apt: Appointment) => (apt.id === id ? { ...apt, status } : apt));
     });
     
     if (originalApt) {
       const targetApt = { ...originalApt, status };
       db.upsertAppointment(targetApt).catch(err => {
-        setAppointments(prev => prev.map(a => a.id === id ? originalApt! : a));
+        setAppointments(prev => prev.map(a => a.id === id ? originalApt : a));
         setError(`فشل تحديث حالة الموعد: ${err.message || 'يرجى المحاولة مجدداً'}`);
       });
     }
-  }, []);
+  }, [appointments]);
 
   const updateAppointment = useCallback((id: string, updates: Partial<Appointment>) => {
-    let originalApt: Appointment | undefined;
+    // Capture original BEFORE setState so it's available in .catch() closure
+    const originalApt = appointments.find((a: Appointment) => a.id === id);
     
     setAppointments((prev: Appointment[]) => {
-      originalApt = prev.find((a: Appointment) => a.id === id);
       return prev.map((apt: Appointment) => (apt.id === id ? { ...apt, ...updates } : apt));
     });
     
     if (originalApt) {
       const targetApt = { ...originalApt, ...updates } as Appointment;
       db.upsertAppointment(targetApt).catch(err => {
-        setAppointments(prev => prev.map(a => a.id === id ? originalApt! : a));
+        setAppointments(prev => prev.map(a => a.id === id ? originalApt : a));
         setError(`فشل تحديث بيانات الموعد: ${err.message || 'يرجى المحاولة مجدداً'}`);
       });
     }
-  }, []);
+  }, [appointments]);
 
   const deleteAppointment = useCallback((id: string) => {
     let originalApt: Appointment | undefined;
@@ -564,24 +607,38 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setTasks((prev: ClinicTask[]) => [...prev, newTask]);
-    db.upsertTask(newTask);
-  }, []);
-
-  const completeTask = useCallback((taskId: string) => {
-    setTasks((prev: ClinicTask[]) => {
-      const updated = prev.map((t: ClinicTask) =>
-        t.id === taskId ? { ...t, status: 'completed' as const, completedAt: new Date().toISOString() } : t
-      );
-      const task = updated.find((t: ClinicTask) => t.id === taskId);
-      if (task) db.upsertTask(task);
-      return updated;
+    db.upsertTask(newTask).catch(err => {
+      setTasks((prev: ClinicTask[]) => prev.filter(t => t.id !== newTask.id));
+      setError(`فشل حفظ المهمة: ${err.message || 'يرجى المحاولة مجدداً'}`);
     });
   }, []);
 
+  const completeTask = useCallback((taskId: string) => {
+    const originalTask = tasks.find((t: ClinicTask) => t.id === taskId);
+    const completedAt = new Date().toISOString();
+    
+    setTasks((prev: ClinicTask[]) => {
+      return prev.map((t: ClinicTask) =>
+        t.id === taskId ? { ...t, status: 'completed' as const, completedAt } : t
+      );
+    });
+    
+    if (originalTask) {
+      db.upsertTask({ ...originalTask, status: 'completed', completedAt }).catch(err => {
+        setTasks((prev: ClinicTask[]) => prev.map(t => t.id === taskId ? originalTask : t));
+        setError(`فشل إكمال المهمة: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
+  }, [tasks]);
+
   const deleteTask = useCallback((taskId: string) => {
+    const originalTask = tasks.find((t: ClinicTask) => t.id === taskId);
     setTasks((prev: ClinicTask[]) => prev.filter((t: ClinicTask) => t.id !== taskId));
-    db.deleteTaskDB(taskId);
-  }, []);
+    db.deleteTaskDB(taskId).catch(err => {
+      if (originalTask) setTasks(prev => [...prev, originalTask]);
+      setError(`فشل حذف المهمة: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
+  }, [tasks]);
 
   // ── Supply Request Operations ──
   const addSupplyRequest = useCallback((data: Omit<SupplyRequest, 'id' | 'createdAt' | 'status'>) => {
@@ -592,39 +649,61 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setSupplyRequests((prev: SupplyRequest[]) => [...prev, newReq]);
-    db.upsertSupplyRequest(newReq);
+    db.upsertSupplyRequest(newReq).catch(err => {
+      setSupplyRequests((prev: SupplyRequest[]) => prev.filter(r => r.id !== newReq.id));
+      setError(`فشل حفظ طلب المستلزم: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
   }, []);
 
   const markSupplyPurchased = useCallback((id: string, price?: number, purchasedByUserId?: string) => {
     const now = new Date().toISOString();
+    const originalReq = supplyRequests.find((r: SupplyRequest) => r.id === id);
+    let expenseId: string | null = null;
+    
+    if (originalReq && price && price > 0) {
+      expenseId = generateId();
+      const expense: ClinicExpense = {
+        id: expenseId,
+        amount: price,
+        category: 'supply',
+        description: `شراء مستلزم: ${originalReq.name}${originalReq.quantity > 1 ? ` (×${originalReq.quantity})` : ''}`,
+        date: now,
+        createdByUserId: purchasedByUserId || '',
+        supplyRequestId: id,
+      };
+      setClinicExpenses((prevExp: ClinicExpense[]) => [...prevExp, expense]);
+      db.upsertExpense(expense).catch(err => {
+        setClinicExpenses((prevExp: ClinicExpense[]) => prevExp.filter(e => e.id !== expense.id));
+        setError(`فشل حفظ المصروف: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
+    
     setSupplyRequests((prev: SupplyRequest[]) => {
-      const item = prev.find((r: SupplyRequest) => r.id === id);
-      if (item && price && price > 0) {
-        const expense: ClinicExpense = {
-          id: generateId(),
-          amount: price,
-          category: 'supply',
-          description: `شراء مستلزم: ${item.name}${item.quantity > 1 ? ` (×${item.quantity})` : ''}`,
-          date: now,
-          createdByUserId: purchasedByUserId || '',
-          supplyRequestId: id,
-        };
-        setClinicExpenses((prevExp: ClinicExpense[]) => [...prevExp, expense]);
-        db.upsertExpense(expense);
-      }
-      const updated = prev.map((r: SupplyRequest) =>
+      return prev.map((r: SupplyRequest) =>
         r.id === id ? { ...r, status: 'purchased' as const, purchasedAt: now, purchasePrice: price } : r
       );
-      const req = updated.find((r: SupplyRequest) => r.id === id);
-      if (req) db.upsertSupplyRequest(req);
-      return updated;
     });
-  }, []);
+    
+    if (originalReq) {
+      const updatedReq = { ...originalReq, status: 'purchased' as const, purchasedAt: now, purchasePrice: price };
+      db.upsertSupplyRequest(updatedReq).catch(err => {
+        // Rollback supply request status
+        setSupplyRequests(prev => prev.map(r => r.id === id ? originalReq : r));
+        // Rollback the expense too
+        if (expenseId) setClinicExpenses(prev => prev.filter(e => e.id !== expenseId));
+        setError(`فشل تحديث حالة المستلزم: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
+  }, [supplyRequests]);
 
   const deleteSupplyRequest = useCallback((id: string) => {
+    const originalReq = supplyRequests.find((r: SupplyRequest) => r.id === id);
     setSupplyRequests((prev: SupplyRequest[]) => prev.filter((r: SupplyRequest) => r.id !== id));
-    db.deleteSupplyRequestDB(id);
-  }, []);
+    db.deleteSupplyRequestDB(id).catch(err => {
+      if (originalReq) setSupplyRequests(prev => [...prev, originalReq]);
+      setError(`فشل حذف طلب المستلزم: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
+  }, [supplyRequests]);
 
   // ── Assistant Assignment Operations ──
   const addAssignment = useCallback((assistantUserId: string, doctorUserId: string) => {
@@ -654,13 +733,20 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const addExpense = useCallback((data: Omit<ClinicExpense, 'id'>) => {
     const newExpense: ClinicExpense = { ...data, id: generateId() };
     setClinicExpenses((prev: ClinicExpense[]) => [...prev, newExpense]);
-    db.upsertExpense(newExpense);
+    db.upsertExpense(newExpense).catch(err => {
+      setClinicExpenses((prev: ClinicExpense[]) => prev.filter(e => e.id !== newExpense.id));
+      setError(`فشل حفظ المصروف: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
   }, []);
 
   const deleteExpense = useCallback((id: string) => {
+    const originalExpense = clinicExpenses.find((e: ClinicExpense) => e.id === id);
     setClinicExpenses((prev: ClinicExpense[]) => prev.filter((e: ClinicExpense) => e.id !== id));
-    db.deleteExpenseDB(id);
-  }, []);
+    db.deleteExpenseDB(id).catch(err => {
+      if (originalExpense) setClinicExpenses(prev => [...prev, originalExpense]);
+      setError(`فشل حذف المصروف: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
+  }, [clinicExpenses]);
 
   const contextValue = useMemo<ClinicContextType>(() => ({
     patients,

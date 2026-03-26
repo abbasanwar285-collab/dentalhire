@@ -141,15 +141,20 @@ const mapExpenseFromDB = (row: any): ClinicExpense => ({
   supplyRequestId: row.supply_request_id || '',
 });
 
-const mapExpenseToDB = (e: ClinicExpense) => ({
-  id: e.id,
-  amount: e.amount,
-  category: e.category,
-  description: e.description,
-  date: e.date,
-  created_by_user_id: e.createdByUserId,
-  supply_request_id: e.supplyRequestId,
-});
+const mapExpenseToDB = (e: ClinicExpense) => {
+  const obj: Record<string, any> = {
+    id: e.id,
+    amount: e.amount,
+    category: e.category,
+    description: e.description,
+    date: e.date,
+    created_by_user_id: e.createdByUserId,
+    // supply_request_id removed — column does not exist in expenses_v2 table
+  };
+  // Strip undefined values to prevent Supabase silent rejections
+  Object.keys(obj).forEach(k => { if (obj[k] === undefined) delete obj[k]; });
+  return obj;
+};
 
 export async function fetchExpenses(): Promise<ClinicExpense[]> {
   const { data, error } = await supabase

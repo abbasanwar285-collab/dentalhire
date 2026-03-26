@@ -144,26 +144,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       createdAt: new Date().toISOString(),
     };
     setUsers(prev => [...prev, newUser]);
-    db.upsertUser(newUser);
+    db.upsertUser(newUser).catch(err => {
+      setUsers(prev => prev.filter(u => u.id !== newUser.id));
+      console.error('[Auth] Failed to save user:', err);
+    });
     return { success: true };
   }, [users]);
 
   const updateUser = useCallback((id: string, updates: Partial<AppUser>) => {
+    const originalUser = users.find(u => u.id === id);
     setUsers(prev => {
       const updated = prev.map(u => u.id === id ? { ...u, ...updates } : u);
-      const user = updated.find(u => u.id === id);
-      if (user) db.upsertUser(user);
       return updated;
     });
-  }, []);
+    if (originalUser) {
+      db.upsertUser({ ...originalUser, ...updates } as AppUser).catch(err => {
+        setUsers(prev => prev.map(u => u.id === id ? originalUser : u));
+        console.error('[Auth] Failed to update user:', err);
+      });
+    }
+  }, [users]);
 
   const deleteUser = useCallback((id: string) => {
-    // Cannot delete admin
-    setUsers(prev => prev.filter(u => !(u.id === id && u.role !== 'admin')));
-    db.deleteUserDB(id);
-  }, []);
+    const originalUser = users.find(u => u.id === id);
+    if (!originalUser || originalUser.role === 'admin') return; // Cannot delete admin
+    setUsers(prev => prev.filter(u => u.id !== id));
+    db.deleteUserDB(id).catch(err => {
+      if (originalUser) setUsers(prev => [...prev, originalUser]);
+      console.error('[Auth] Failed to delete user:', err);
+    });
+  }, [users]);
 
   const toggleUserActive = useCallback((id: string) => {
+    const originalUser = users.find(u => u.id === id);
     setUsers(prev => {
       const updated = prev.map(u => {
         if (u.id === id && u.role !== 'admin') {
@@ -171,11 +184,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return u;
       });
-      const user = updated.find(u => u.id === id);
-      if (user) db.upsertUser(user);
       return updated;
     });
-  }, []);
+    if (originalUser && originalUser.role !== 'admin') {
+      db.upsertUser({ ...originalUser, isActive: !originalUser.isActive }).catch(err => {
+        setUsers(prev => prev.map(u => u.id === id ? originalUser : u));
+        console.error('[Auth] Failed to toggle user active:', err);
+      });
+    }
+  }, [users]);
 
   const contextValue = useMemo<AuthContextType>(() => ({
     currentUser,

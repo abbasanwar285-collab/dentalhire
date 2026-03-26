@@ -259,7 +259,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
     if (!sanitizedData.name || sanitizedData.name.trim().length < 2) {
       return { success: false, error: 'الاسم يجب أن يكون على الأقل حرفين' };
     }
-    if (!validatePhone(sanitizedData.phone)) {
+    if (sanitizedData.phone && !validatePhone(sanitizedData.phone)) {
       return { success: false, error: 'رقم الهاتف غير صالح' };
     }
     if (sanitizedData.email && !validateEmail(sanitizedData.email)) {

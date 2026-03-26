@@ -34,13 +34,16 @@ const mapPatientFromDB = (row: any): Patient => ({
 const mapPatientToDB = (p: Patient) => ({
   id: p.id,
   name: p.name,
-  phone: p.phone,
-  age: p.age,
-  medical_history: p.medicalHistory,
-  general_notes: p.generalNotes,
+  phone: p.phone || null,
+  email: p.email || null,
+  age: p.age || null,
+  date_of_birth: p.dateOfBirth || null,
+  blood_type: p.bloodType || null,
+  allergies: p.allergies || null,
+  medical_history: p.medicalHistory || null,
+  general_notes: p.generalNotes || null,
+  last_visit: p.lastVisit || null,
   treatment_plans: p.treatmentPlans || [],
-  // Removed updated_at as it doesn't exist in the patients_v2 schema 
-  // and was causing silent insert failures on Supabase
 });
 
 export async function fetchPatients(): Promise<Patient[] | null> {

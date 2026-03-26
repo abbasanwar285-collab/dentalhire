@@ -271,26 +271,54 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
 
     const newPatient: Patient = { ...sanitizedData, id: generateId() };
     setPatients((prev) => [...prev, newPatient]);
-    db.upsertPatient(newPatient);
+    
+    db.upsertPatient(newPatient).catch(err => {
+      setPatients((prev) => prev.filter(p => p.id !== newPatient.id));
+      setError(`فشل حفظ المريض في السيرفر: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
+    
     return { success: true, patient: newPatient };
   }, []);
 
   const updatePatient = useCallback((id: string, updates: Partial<Patient>) => {
+    let originalPatient: Patient | undefined;
+    
     setPatients((prev: Patient[]) => {
-      const updatedList = prev.map((p: Patient) => (p.id === id ? { ...p, ...updates } : p));
-      const targetP = updatedList.find((p: Patient) => p.id === id);
-      if (targetP) {
-        db.upsertPatient(targetP);
-      }
-      return updatedList;
+      originalPatient = prev.find((p: Patient) => p.id === id);
+      return prev.map((p: Patient) => (p.id === id ? { ...p, ...updates } : p));
     });
+    
+    if (originalPatient) {
+      const targetP = { ...originalPatient, ...updates } as Patient;
+      db.upsertPatient(targetP).catch(err => {
+        setPatients((prev: Patient[]) => prev.map((p: Patient) => p.id === id ? originalPatient! : p));
+        setError(`فشل تحديث بيانات المريض: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
   }, []);
 
   const deletePatient = useCallback((id: string) => {
-    setPatients((prev: Patient[]) => prev.filter((p: Patient) => p.id !== id));
+    let originalPatient: Patient | undefined;
+    let originalAppointments: Appointment[] = [];
+    
+    setPatients((prev: Patient[]) => {
+      originalPatient = prev.find(p => p.id === id);
+      return prev.filter((p: Patient) => p.id !== id);
+    });
+    
     // Also remove related appointments
-    setAppointments((prev: Appointment[]) => prev.filter((a: Appointment) => a.patientId !== id));
-    db.deletePatientDB(id);
+    setAppointments((prev: Appointment[]) => {
+      originalAppointments = prev.filter(a => a.patientId === id);
+      return prev.filter((a: Appointment) => a.patientId !== id);
+    });
+    
+    db.deletePatientDB(id).catch(err => {
+      if (originalPatient) {
+        setPatients(prev => [...prev, originalPatient!]);
+        setAppointments(prev => [...prev, ...originalAppointments]);
+        setError(`فشل حذف المريض من السيرفر: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      }
+    });
   }, []);
 
   // ── Treatment Plan Operations ──
@@ -362,31 +390,63 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       id: generateId(),
     };
     setAppointments((prev: Appointment[]) => [...prev, newAppointment]);
-    db.upsertAppointment(newAppointment);
+    
+    db.upsertAppointment(newAppointment).catch(err => {
+      setAppointments(prev => prev.filter(a => a.id !== newAppointment.id));
+      setError(`فشل حفظ الموعد في السيرفر: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
+    
     return { success: true };
   }, []);
 
   const updateAppointmentStatus = useCallback((id: string, status: Appointment['status']) => {
+    let originalApt: Appointment | undefined;
+    
     setAppointments((prev: Appointment[]) => {
-      const updatedList = prev.map((apt: Appointment) => (apt.id === id ? { ...apt, status } : apt));
-      const apt = updatedList.find((a: Appointment) => a.id === id);
-      if (apt) db.upsertAppointment(apt);
-      return updatedList;
+      originalApt = prev.find((a: Appointment) => a.id === id);
+      return prev.map((apt: Appointment) => (apt.id === id ? { ...apt, status } : apt));
     });
+    
+    if (originalApt) {
+      const targetApt = { ...originalApt, status };
+      db.upsertAppointment(targetApt).catch(err => {
+        setAppointments(prev => prev.map(a => a.id === id ? originalApt! : a));
+        setError(`فشل تحديث حالة الموعد: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
   }, []);
 
   const updateAppointment = useCallback((id: string, updates: Partial<Appointment>) => {
+    let originalApt: Appointment | undefined;
+    
     setAppointments((prev: Appointment[]) => {
-      const updatedList = prev.map((apt: Appointment) => (apt.id === id ? { ...apt, ...updates } : apt));
-      const apt = updatedList.find((a: Appointment) => a.id === id);
-      if (apt) db.upsertAppointment(apt);
-      return updatedList;
+      originalApt = prev.find((a: Appointment) => a.id === id);
+      return prev.map((apt: Appointment) => (apt.id === id ? { ...apt, ...updates } : apt));
     });
+    
+    if (originalApt) {
+      const targetApt = { ...originalApt, ...updates } as Appointment;
+      db.upsertAppointment(targetApt).catch(err => {
+        setAppointments(prev => prev.map(a => a.id === id ? originalApt! : a));
+        setError(`فشل تحديث بيانات الموعد: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
   }, []);
 
   const deleteAppointment = useCallback((id: string) => {
-    setAppointments((prev: Appointment[]) => prev.filter((apt: Appointment) => apt.id !== id));
-    db.deleteAppointmentDB(id);
+    let originalApt: Appointment | undefined;
+    
+    setAppointments((prev: Appointment[]) => {
+      originalApt = prev.find(a => a.id === id);
+      return prev.filter((apt: Appointment) => apt.id !== id);
+    });
+    
+    db.deleteAppointmentDB(id).catch(err => {
+      if (originalApt) {
+        setAppointments(prev => [...prev, originalApt!]);
+        setError(`فشل حذف الموعد من السيرفر: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      }
+    });
   }, []);
 
   // ── Treatment & Doctor Operations ──
@@ -669,6 +729,20 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   return (
     <ClinicContext.Provider value={contextValue}>
       {children}
+      {/* Global Error Toast for background persistence failures */}
+      {error && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[9999] animate-in slide-in-from-bottom-5 fade-in duration-300 pointer-events-none">
+           <div className="bg-rose-600/95 backdrop-blur-md text-white px-5 py-3.5 rounded-2xl shadow-xl border border-rose-500/50 flex items-center gap-3 pointer-events-auto min-w-[300px] max-w-[90vw]">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              </div>
+              <span className="text-[14px] font-bold leading-relaxed flex-1">{error}</span>
+              <button title="إغلاق التنبيه" onClick={clearError} className="p-2 hover:bg-white/20 rounded-full transition-colors shrink-0">
+                 <svg className="w-4 h-4 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+           </div>
+        </div>
+      )}
     </ClinicContext.Provider>
   );
 }

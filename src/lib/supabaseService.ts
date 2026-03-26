@@ -56,12 +56,18 @@ export async function upsertPatient(patient: Patient): Promise<void> {
   const { error } = await supabase
     .from('patients_v2')
     .upsert(mapPatientToDB(patient));
-  if (error) console.error('[Supabase] upsertPatient:', error);
+  if (error) {
+    console.error('[Supabase] upsertPatient:', error);
+    throw error;
+  }
 }
 
 export async function deletePatientDB(id: string): Promise<void> {
   const { error } = await supabase.from('patients_v2').delete().eq('id', id);
-  if (error) console.error('[Supabase] deletePatient:', error);
+  if (error) {
+    console.error('[Supabase] deletePatient:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -107,12 +113,18 @@ export async function upsertAppointment(appointment: Appointment): Promise<void>
   const { error } = await supabase
     .from('appointments_v2')
     .upsert(mapAppointmentToDB(appointment));
-  if (error) console.error('[Supabase] upsertAppointment:', error);
+  if (error) {
+    console.error('[Supabase] upsertAppointment:', error);
+    throw error;
+  }
 }
 
 export async function deleteAppointmentDB(id: string): Promise<void> {
   const { error } = await supabase.from('appointments_v2').delete().eq('id', id);
-  if (error) console.error('[Supabase] deleteAppointment:', error);
+  if (error) {
+    console.error('[Supabase] deleteAppointment:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -152,12 +164,18 @@ export async function upsertExpense(expense: ClinicExpense): Promise<void> {
   const { error } = await supabase
     .from('expenses_v2')
     .upsert(mapExpenseToDB(expense));
-  if (error) console.error('[Supabase] upsertExpense:', error);
+  if (error) {
+    console.error('[Supabase] upsertExpense:', error);
+    throw error;
+  }
 }
 
 export async function deleteExpenseDB(id: string): Promise<void> {
   const { error } = await supabase.from('expenses_v2').delete().eq('id', id);
-  if (error) console.error('[Supabase] deleteExpense:', error);
+  if (error) {
+    console.error('[Supabase] deleteExpense:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -218,12 +236,18 @@ export async function upsertUser(user: AppUser): Promise<void> {
   const { error } = await supabase
     .from('app_users')
     .upsert(mapUserToDB(user));
-  if (error) console.error('[Supabase] upsertUser:', error);
+  if (error) {
+    console.error('[Supabase] upsertUser:', error);
+    throw error;
+  }
 }
 
 export async function deleteUserDB(id: string): Promise<void> {
   const { error } = await supabase.from('app_users').delete().eq('id', id);
-  if (error) console.error('[Supabase] deleteUser:', error);
+  if (error) {
+    console.error('[Supabase] deleteUser:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -271,12 +295,18 @@ export async function upsertSupplyRequest(req: SupplyRequest): Promise<void> {
   const { error } = await supabase
     .from('app_supply_requests')
     .upsert(mapSupplyToDB(req));
-  if (error) console.error('[Supabase] upsertSupplyRequest:', error);
+  if (error) {
+    console.error('[Supabase] upsertSupplyRequest:', error);
+    throw error;
+  }
 }
 
 export async function deleteSupplyRequestDB(id: string): Promise<void> {
   const { error } = await supabase.from('app_supply_requests').delete().eq('id', id);
-  if (error) console.error('[Supabase] deleteSupplyRequest:', error);
+  if (error) {
+    console.error('[Supabase] deleteSupplyRequest:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -324,12 +354,18 @@ export async function upsertTask(task: ClinicTask): Promise<void> {
   const { error } = await supabase
     .from('app_tasks')
     .upsert(mapTaskToDB(task));
-  if (error) console.error('[Supabase] upsertTask:', error);
+  if (error) {
+    console.error('[Supabase] upsertTask:', error);
+    throw error;
+  }
 }
 
 export async function deleteTaskDB(id: string): Promise<void> {
   const { error } = await supabase.from('app_tasks').delete().eq('id', id);
-  if (error) console.error('[Supabase] deleteTask:', error);
+  if (error) {
+    console.error('[Supabase] deleteTask:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════
@@ -368,7 +404,10 @@ export async function upsertSettings(settings: ClinicSettings): Promise<void> {
       clinic_address: settings.clinicAddress,
     });
     
-  if (error) console.error('[Supabase] upsertSettings:', error);
+  if (error) {
+    console.error('[Supabase] upsertSettings:', error);
+    throw error;
+  }
 }
 
 // ═══════════════════════════════════════════

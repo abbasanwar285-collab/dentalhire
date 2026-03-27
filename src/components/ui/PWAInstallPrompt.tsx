@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, Download, Smartphone, Info } from 'lucide-react';
+import { Download, Smartphone, Info, Compass, MoreVertical } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -8,26 +8,39 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [showPrompt, setShowPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-  const [isLocalIP, setIsLocalIP] = useState(false);
-  const [dismissedSession, setDismissedSession] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(true); // Default true to avoid flash
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     // Check if installed
-    const standalone = window.matchMedia('(display-mode: standalone)').matches
-      || (window.navigator as any).standalone === true;
-    setIsStandalone(standalone);
+    const checkStandalone = () => {
+      const standalone = window.matchMedia('(display-mode: standalone)').matches
+        || (window.navigator as any).standalone === true
+        || document.referrer.includes('android-app://');
+      setIsStandalone(standalone);
+      if (!standalone) {
+        setShowPrompt(true);
+      }
+    };
+    checkStandalone();
+    window.matchMedia('(display-mode: standalone)').addEventListener('change', checkStandalone);
 
-    // Detect OS & Local IP
-    const ua = window.navigator.userAgent;
-    const isIOSDevice = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
-    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-    setIsIOS(isIOSDevice);
+    // Detect OS & Browser
+    const ua = window.navigator.userAgent.toLowerCase();
+    const iosDevice = /ipad|iphone|ipod/.test(ua) && !(window as any).MSStream;
+    setIsIOS(iosDevice);
     
-    const local = window.location.hostname === 'localhost' || window.location.hostname.startsWith('192.') || window.location.hostname.startsWith('10.');
-    setIsLocalIP(local);
+    // Detect In-App Browsers
+    const telegram = /telegram/i.test(ua);
+    const inAppStr = ['fbav', 'instagram', 'line', 'snapchat', 'micromessenger', 'twitter'];
+    const inAppRegex = new RegExp(inAppStr.join('|'), 'i');
+    
+    // iOS Safari WebViews often don't contain 'safari', but real Safari does
+    const isIOSWebView = iosDevice && !/safari/i.test(ua) && !/crios/i.test(ua) && !/fxios/i.test(ua);
+    
+    setIsInAppBrowser(inAppRegex.test(ua) || telegram || isIOSWebView);
 
     const handler = (e: Event) => {
       e.preventDefault();
@@ -35,87 +48,96 @@ export function PWAInstallPrompt() {
     };
     window.addEventListener('beforeinstallprompt', handler);
 
-    // Aggressively show prompt on mobile if not installed AND not dismissed in THIS session
-    if (!standalone && isMobileDevice && !dismissedSession) {
-      setTimeout(() => {
-        setShowPrompt(true);
-      }, 1000);
-    }
-
-    return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, [dismissedSession]);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+      window.matchMedia('(display-mode: standalone)').removeEventListener('change', checkStandalone);
+    };
+  }, []);
 
   const handleInstall = useCallback(async () => {
     if (deferredPrompt) {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        setShowPrompt(false);
+        // Assume installed, usually triggers display-mode media query
       }
       setDeferredPrompt(null);
     }
   }, [deferredPrompt]);
 
-  const handleDismiss = () => {
-    setShowPrompt(false);
-    setDismissedSession(true); // Will reset if user refreshes page (per request to keep appearing)
-  };
-
-  if (!showPrompt || isStandalone) return null;
+  if (isStandalone || !showPrompt) return null;
 
   return (
     <>
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 z-[9998] bg-slate-900/40 backdrop-blur-sm animate-fade-in transition-all"
-        onClick={handleDismiss}
-      />
+      <div className="fixed inset-0 z-[9998] bg-slate-900/60 backdrop-blur-md animate-fade-in transition-all" />
       
-      {/* Centered Modal Card */}
       <div className="fixed inset-0 z-[9999] p-4 flex items-center justify-center pointer-events-none">
-        
-        <div className="bg-white dark:bg-[#1c1f2b] w-full max-w-[360px] rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.12)] overflow-hidden pointer-events-auto flex flex-col animate-scale-in border border-slate-100 dark:border-white/5 relative">
+        <div className="bg-white dark:bg-[#1c1f2b] w-full max-w-[400px] rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto flex flex-col animate-scale-in border border-slate-100 dark:border-white/5">
           
-          <button
-            onClick={handleDismiss}
-            className="absolute top-3 left-3 w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors z-10"
-            title="إغلاق التنبيه"
-          >
-            <X className="w-4 h-4" />
-          </button>
-
           <div className="p-6 pt-8 flex flex-col items-center text-center">
-            
-            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30 mb-5 ring-4 ring-white dark:ring-[#1c1f2b]">
-              <span className="text-4xl shadow-sm">🦷</span>
+            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30 mb-5 ring-4 ring-white dark:ring-[#1c1f2b] overflow-hidden">
+              <img src="https://cdn-icons-png.flaticon.com/128/3467/3467831.png" alt="App Icon" className="w-12 h-12 object-contain" />
             </div>
             
-            <h2 className="text-[20px] font-black text-slate-800 dark:text-white mb-2 tracking-tight">تثبيت عيادة آيرس</h2>
-            <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium mb-6">
-              قم بتثبيت التطبيق على هاتفك للحصول على تجربة سريعة تعمل بكامل الشاشة
+            <h2 className="text-[22px] font-black text-slate-800 dark:text-white mb-2 tracking-tight">إلزامية تثبيت التطبيق</h2>
+            <p className="text-[14px] text-slate-500 dark:text-slate-400 font-medium mb-6 leading-relaxed">
+              لضمان أفضل أداء وأمان وحفظ للبيانات، يرجى تثبيت التطبيق على جهازك. لا يمكن استخدام النظام عبر المتصفح العادي.
             </p>
 
-            <div className="w-full">
-              {isIOS ? (
-                // iOS Instructions
-                <div className="bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800/30 rounded-2xl p-4 text-right">
-                  <p className="text-[13px] font-bold text-blue-800 dark:text-blue-300 mb-2.5 flex items-center gap-1.5">
-                    <Smartphone className="w-4 h-4" />
-                    للتثبيت على الآيفون:
+            <div className="w-full text-right">
+              {isInAppBrowser ? (
+                // In-App Browser Instructions (Telegram, FB, etc)
+                <div className="bg-purple-50/80 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 rounded-2xl p-4">
+                  <p className="text-[13px] font-bold text-purple-800 dark:text-purple-300 mb-3 flex items-center gap-1.5">
+                    <Info className="w-4 h-4" />
+                    أنت تتصفح من خلال تطبيق تليجرام أو تطبيق آخر
                   </p>
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2.5 text-[13px] text-blue-700 dark:text-blue-200/90 font-medium">
-                      <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center text-[11px] font-bold shrink-0">1</span>
-                      انقر على أيقونة المشاركة <span className="text-[15px] -mt-1 shadow-sm">⬆️</span>
+                  <p className="text-[12px] font-bold text-purple-700 dark:text-purple-400 mb-3">
+                    لإكمال تثبيت عيادة آيرس، يجب فتح الرابط في المتصفح الأساسي أولاً:
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2.5 text-[13px] text-purple-800 dark:text-purple-200/90 font-medium">
+                      <span className="w-5 h-5 rounded-full bg-purple-200 dark:bg-purple-800/50 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">1</span>
+                      <span className="leading-snug">
+                        {isIOS ? 'اضغط على علامة المتصفح (البوصلة)' : 'اضغط على قائمة الخيارات المتمثلة بثلاث نقاط '}
+                        <span className="inline-flex items-center justify-center bg-white dark:bg-slate-800 px-1 py-0.5 rounded border border-purple-200 dark:border-purple-700 mx-1 shadow-sm">
+                          {isIOS ? <Compass className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" /> : <MoreVertical className="w-3.5 h-3.5 text-slate-600 dark:text-slate-300" />}
+                        </span>
+                        {isIOS ? 'في الزاوية لفتح الرابط في متصفح سفاري (Safari)' : 'في أعلى الشاشة واختر "فتح في متصفح Chrome"'}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-[13px] text-blue-700 dark:text-blue-200/90 font-medium">
-                      <span className="w-5 h-5 rounded-full bg-blue-100 dark:bg-blue-800/50 flex items-center justify-center text-[11px] font-bold shrink-0">2</span>
-                      اختر <strong>"الإضافة للصفحة الرئيسية"</strong>
+                    <div className="flex items-start gap-2.5 text-[13px] text-purple-800 dark:text-purple-200/90 font-medium">
+                      <span className="w-5 h-5 rounded-full bg-purple-200 dark:bg-purple-800/50 flex items-center justify-center text-[11px] font-bold shrink-0 mt-0.5">2</span>
+                      <span className="leading-snug">
+                        {isIOS ? 'بمجرد فتح سفاري، اضغط على زر المشاركة ثم "إضافة للصفحة الرئيسية"' : 'بمجرد فتح Chrome، ستظهر لك رسالة تثبيت التطبيق تلقائياً أو من القائمة الجانبية'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ) : isIOS ? (
+                // Standard iOS Safari
+                <div className="bg-blue-50/80 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30 rounded-2xl p-4">
+                  <p className="text-[14px] font-bold text-blue-800 dark:text-blue-300 mb-3 flex items-center gap-1.5">
+                    <Smartphone className="w-4.5 h-4.5" />
+                    لتثبيت التطبيق على جهازك (آيفون/آيباد):
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2.5 text-[14px] text-blue-800 dark:text-blue-200/90 font-medium">
+                      <span className="w-6 h-6 rounded-full bg-blue-200 dark:bg-blue-800/50 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">1</span>
+                      <span className="leading-snug">انقر على أيقونة المشاركة (Share) في المتصفح <span className="text-[16px] mx-1 inline-block -translate-y-0.5 shadow-sm">⬆️</span></span>
+                    </div>
+                    <div className="flex items-start gap-2.5 text-[14px] text-blue-800 dark:text-blue-200/90 font-medium">
+                      <span className="w-6 h-6 rounded-full bg-blue-200 dark:bg-blue-800/50 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">2</span>
+                      <span className="leading-snug">اسحب لأسفل ضمن الخيارات، واختر <strong>"الإضافة للصفحة الرئيسية"</strong> (Add to Home Screen)</span>
+                    </div>
+                    <div className="flex items-start gap-2.5 text-[14px] text-blue-800 dark:text-blue-200/90 font-medium opacity-80 mt-1">
+                      <span className="w-6 h-6 rounded-full bg-transparent flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5"></span>
+                      <span className="leading-snug text-xs flex items-center gap-1"><Info className="w-3.5 h-3.5" /> ثم اضغط <strong>إضافة</strong> (Add) في الزاوية العليا</span>
                     </div>
                   </div>
                 </div>
               ) : deferredPrompt ? (
-                // Android Auto-Install Button
+                // Android & Desktop (Chrome, Edge etc) Auto-Install
                 <button
                   onClick={handleInstall}
                   className="w-full py-4 rounded-2xl font-bold text-[16px] flex items-center justify-center gap-2.5 shadow-xl shadow-teal-500/30 active:scale-[0.97] transition-all bg-gradient-to-r from-teal-500 to-teal-600 text-white"
@@ -124,42 +146,31 @@ export function PWAInstallPrompt() {
                   تثبيت التطبيق الآن
                 </button>
               ) : (
-                // Android Manual/Local Instructions
-                <div className="bg-teal-50/80 dark:bg-teal-900/20 border border-teal-100 dark:border-teal-800/30 rounded-2xl p-4 text-right">
-                  {isLocalIP ? (
-                     <div className="mb-4 bg-amber-100/50 dark:bg-amber-900/30 p-3 rounded-xl border border-amber-200 dark:border-amber-700/50">
-                        <p className="text-amber-800 dark:text-amber-300 text-[12px] font-bold flex items-start gap-1.5">
-                           <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                           ملاحظة للمطور: زر التثبيت لا يظهر التلقائي بسبب تجربة التطبيق على Local IP (يحتاج HTTPS). يرجى استخدام القائمة:
-                        </p>
-                     </div>
-                  ) : (
-                     <p className="text-[13px] font-bold text-teal-800 dark:text-teal-300 mb-2.5 flex items-center gap-1.5">
-                       <Smartphone className="w-4 h-4" />
-                       لتثبيت التطبيق يدوياً:
-                     </p>
-                  )}
-                  
-                  <div className="space-y-2.5">
-                    <div className="flex items-center gap-2.5 text-[13px] text-teal-700 dark:text-teal-200/90 font-medium">
-                      <span className="w-5 h-5 rounded-full bg-teal-100 dark:bg-teal-800/50 flex items-center justify-center text-[11px] font-bold shrink-0">1</span>
-                      انقر على قائمة المتصفح <strong>(⋮)</strong>
+                // Fallback for Android/General browsers without specific PWA handling
+                <div className="bg-teal-50/80 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800/30 rounded-2xl p-4">
+                  <p className="text-[14px] font-bold text-teal-800 dark:text-teal-300 mb-3 flex items-center gap-1.5">
+                    <Smartphone className="w-4.5 h-4.5" />
+                    خطوات التثبيت اليدوية:
+                  </p>
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2.5 text-[14px] text-teal-800 dark:text-teal-200/90 font-medium">
+                      <span className="w-6 h-6 rounded-full bg-teal-200 dark:bg-teal-800/50 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">1</span>
+                      <span className="leading-snug">انقر على قائمة الخيارات السريعة للمتصفح <strong>(⋮) أو (≡)</strong></span>
                     </div>
-                    <div className="flex items-center gap-2.5 text-[13px] text-teal-700 dark:text-teal-200/90 font-medium">
-                      <span className="w-5 h-5 rounded-full bg-teal-100 dark:bg-teal-800/50 flex items-center justify-center text-[11px] font-bold shrink-0">2</span>
-                      اختر <strong>"Add to Home screen"</strong>
+                    <div className="flex items-start gap-2.5 text-[14px] text-teal-800 dark:text-teal-200/90 font-medium">
+                      <span className="w-6 h-6 rounded-full bg-teal-200 dark:bg-teal-800/50 flex items-center justify-center text-[12px] font-bold shrink-0 mt-0.5">2</span>
+                      <span className="leading-snug">اختر <strong>"إضافة إلى الشاشة الرئيسية"</strong> (Add to Home screen) أو <strong>"تثبيت التطبيق"</strong> (Install App)</span>
                     </div>
                   </div>
+                  <p className="mt-4 flex items-start gap-1.5 text-[11px] font-bold text-teal-600 dark:text-teal-400">
+                    <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                    ملاحظة: إذا لم يظهر زر التثبيت التلقائي، تأكد من أنك تستخدم متصفح Google Chrome الحديث.
+                  </p>
                 </div>
               )}
-
-              <button
-                onClick={handleDismiss}
-                className="w-full mt-4 py-2.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 rounded-xl text-[14px] font-bold transition-colors"
-              >
-                المتابعة في المتصفح
-              </button>
             </div>
+            
+            {/* FORCE INSTALLATION: Intentionally omitting any "Skip" button to ensure full compliance with 'an insistence on the issue until this app is installed'. */}
           </div>
         </div>
       </div>

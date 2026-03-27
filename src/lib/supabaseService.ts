@@ -135,6 +135,10 @@ const buildTreatmentPlansFromOldPatient = (row: any, v2Plans: any[]): any[] => {
     // Merge any plans that were added via the new app (not covered by gen/ortho)
     for (const tp of savedPlans) {
       if (tp.id !== savedGeneral?.id && tp.id !== savedOrtho?.id) {
+        // BUGFIX CLEANUP: If the bug created a duplicate "علاج عام" plan while a custom general plan was active, ignore it
+        if (tp.name === 'علاج عام' && savedGeneral && savedGeneral.name !== 'علاج عام') {
+          continue;
+        }
         const isDuplicate = plans.some(p => p.id === tp.id);
         if (!isDuplicate) {
           plans.push(tp);

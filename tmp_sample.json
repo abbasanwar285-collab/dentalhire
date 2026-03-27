@@ -1,0 +1,41 @@
+{
+  "patient": {
+    "id": "010e2915-e35d-42ca-8bc8-87b3b494a84a",
+    "name": "زينب خالد ",
+    "mobile": "07852135892",
+    "age": 18,
+    "gender": null,
+    "total_cost": 0,
+    "paid_amount": 0,
+    "diagnosis": null,
+    "procedures": [],
+    "notes": null,
+    "ortho_doctor_id": "dr_ali",
+    "ortho_total_cost": 0,
+    "ortho_paid_amount": 0,
+    "ortho_diagnosis": null,
+    "ortho_visits": [],
+    "consultation_fee_paid": false,
+    "consultation_fee_count": 0,
+    "payments": [],
+    "is_debt_only": false,
+    "created_at": "2025-12-30T15:45:08.109+00:00",
+    "updated_at": null
+  },
+  "appointment": {
+    "id": "1771151231952bz82r",
+    "patient_id": "7b5c2907-db86-4e45-aa51-177424328f77",
+    "patient_name": "اية حسان",
+    "doctor_id": "dr_abbas",
+    "date": "2026-02-16",
+    "time": "06:00 م",
+    "type": "حشوة ضوئية",
+    "notes": "",
+    "status": "confirmed",
+    "price": null,
+    "assistant_id": null,
+    "completed_at": null,
+    "created_at": "2026-02-15T10:27:11.952+00:00",
+    "updated_at": "2026-02-15T10:27:12.3516+00:00"
+  }
+}

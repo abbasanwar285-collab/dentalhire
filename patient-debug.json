@@ -1,0 +1,115 @@
+{
+  "old": {
+    "id": "8da13877-649f-4218-95c6-356b21797024",
+    "name": "ابراهيم علي ابراهيم ",
+    "mobile": "07831653312",
+    "age": 18,
+    "gender": null,
+    "total_cost": 100,
+    "paid_amount": 20,
+    "diagnosis": "حي الجزيرة ",
+    "procedures": [
+      {
+        "id": "1774360770761",
+        "date": "2026-03-24",
+        "type": "36: حشوة جذر",
+        "notes": "",
+        "price": 100,
+        "tooth": "36",
+        "status": "planned",
+        "doctorId": "dr_abbas",
+        "payments": [
+          {
+            "id": "1774360776562",
+            "date": "2026-03-24",
+            "amount": 20,
+            "timestamp": 1774360776562
+          }
+        ],
+        "xrayImages": []
+      }
+    ],
+    "notes": "",
+    "ortho_doctor_id": "dr_ali",
+    "ortho_total_cost": 0,
+    "ortho_paid_amount": 0,
+    "ortho_diagnosis": null,
+    "ortho_visits": [],
+    "consultation_fee_paid": true,
+    "consultation_fee_count": 1,
+    "payments": [],
+    "is_debt_only": false,
+    "created_at": "2026-03-24T13:58:34.537251+00:00",
+    "updated_at": "2026-03-26T21:54:50.960929+00:00"
+  },
+  "v2": {
+    "id": "8da13877-649f-4218-95c6-356b21797024",
+    "name": "ابراهيم علي ابراهيم ",
+    "phone": "07831653312",
+    "age": 18,
+    "medical_history": "حي الجزيرة ",
+    "general_notes": "",
+    "treatment_plans": [
+      {
+        "id": "ba5bcdd7-2968-4a1b-a9e7-e88b2b8528e1",
+        "name": "خطة علاج - د. عباس أنور",
+        "notes": "حي الجزيرة ",
+        "steps": [],
+        "status": "in_progress",
+        "payments": [
+          {
+            "id": "1774360776562",
+            "date": "2026-03-24",
+            "notes": "دفعة لإجراء: 36: حشوة جذر",
+            "amount": 20,
+            "method": "cash"
+          }
+        ],
+        "createdAt": "2026-03-24",
+        "patientId": "8da13877-649f-4218-95c6-356b21797024",
+        "totalCost": 100,
+        "paidAmount": 20,
+        "treatments": [
+          {
+            "id": "1774360770761",
+            "cost": 100,
+            "notes": "",
+            "doctorId": "dr_abbas",
+            "toothNumber": 36,
+            "treatmentType": "36: حشوة جذر"
+          }
+        ],
+        "attachments": []
+      },
+      {
+        "id": "j4262mokmn7wqc0t",
+        "name": "علاج عام",
+        "notes": "حي الجزيرة ",
+        "steps": [],
+        "status": "in_progress",
+        "payments": [],
+        "createdAt": "2026-03-24T13:58:34.537251+00:00",
+        "patientId": "8da13877-649f-4218-95c6-356b21797024",
+        "totalCost": 0,
+        "paidAmount": 0,
+        "treatments": [
+          {
+            "id": "862bwaopmn7wqc0t",
+            "cost": 100,
+            "notes": "",
+            "doctorId": "dr_abbas",
+            "toothNumber": 0,
+            "treatmentType": "36: حشوة جذر"
+          }
+        ]
+      }
+    ],
+    "created_at": "2026-03-25T18:08:27.528022+00:00",
+    "email": null,
+    "date_of_birth": null,
+    "blood_type": null,
+    "allergies": null,
+    "last_visit": null,
+    "updated_at": null
+  }
+}

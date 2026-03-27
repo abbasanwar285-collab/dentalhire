@@ -54,7 +54,7 @@ export function PatientProfile() {
     const planDoctorName = plan.doctorName;
     const planDoctor = doctors.find(d => d.id === planDoctorId);
     // Match by doctor name against the user's display name
-    const userName = currentUser.displayName.replace('د. ', '').replace('د.', '').trim().toLowerCase();
+    const userName = (currentUser.displayName || '').replace('د. ', '').replace('د.', '').trim().toLowerCase();
     const docName = (planDoctorName || planDoctor?.name || '').replace('د. ', '').replace('د.', '').trim().toLowerCase();
     return userName !== '' && docName !== '' && (userName === docName || userName.includes(docName) || docName.includes(userName));
   };
@@ -156,11 +156,11 @@ export function PatientProfile() {
     if (!patient?.treatmentPlans) return [];
     
     return [...patient.treatmentPlans].sort((a, b) => {
-      const aIsCompleted = a.paidAmount >= a.totalCost && a.totalCost > 0;
-      const bIsCompleted = b.paidAmount >= b.totalCost && b.totalCost > 0;
+      const aIsCompleted = (a.paidAmount || 0) >= (a.totalCost || 0) && (a.totalCost || 0) > 0;
+      const bIsCompleted = (b.paidAmount || 0) >= (b.totalCost || 0) && (b.totalCost || 0) > 0;
       
-      const aIsOrtho = a.orthoDetails !== undefined || a.name?.includes('تقويم') || a.treatments?.some(t => t.treatmentType.includes('تقويم'));
-      const bIsOrtho = b.orthoDetails !== undefined || b.name?.includes('تقويم') || b.treatments?.some(t => t.treatmentType.includes('تقويم'));
+      const aIsOrtho = a.orthoDetails !== undefined || a.name?.includes('تقويم') || a.treatments?.some((t: any) => t.treatmentType?.includes('تقويم'));
+      const bIsOrtho = b.orthoDetails !== undefined || b.name?.includes('تقويم') || b.treatments?.some((t: any) => t.treatmentType?.includes('تقويم'));
 
       // If one is completed and the other is not, the incomplete one comes first
       if (aIsCompleted && !bIsCompleted) return 1;
@@ -303,8 +303,8 @@ export function PatientProfile() {
     });
   };
 
-  const totalCostAll = patient.treatmentPlans?.reduce((s, p) => s + p.totalCost, 0) || 0;
-  const totalPaidAll = patient.treatmentPlans?.reduce((s, p) => s + p.paidAmount, 0) || 0;
+  const totalCostAll = patient.treatmentPlans?.reduce((s, p) => s + (p.totalCost || 0), 0) || 0;
+  const totalPaidAll = patient.treatmentPlans?.reduce((s, p) => s + (p.paidAmount || 0), 0) || 0;
   const activePlans = patient.treatmentPlans?.filter(p => p.status === 'in_progress').length || 0;
 
   const handleGenerateInvoice = (plan: any) => {
@@ -451,15 +451,15 @@ export function PatientProfile() {
               <div className="space-y-4">
                 {sortedTreatmentPlans.map((plan, idx) => {
                   const canSeePrices = canViewPlanPrices(plan);
-                  const isCompleted = canSeePrices ? (plan.paidAmount >= plan.totalCost && plan.totalCost > 0) : false;
+                  const isCompleted = canSeePrices ? ((plan.paidAmount || 0) >= (plan.totalCost || 0) && (plan.totalCost || 0) > 0) : false;
                   const statusLabel = canSeePrices ? (isCompleted ? 'مكتملة' : 'قيد التنفيذ') : 'نشطة';
                   const statusBg = canSeePrices ? (isCompleted ? '#ecfdf5' : '#fffbeb') : '#f0fdf4';
                   const statusColor = canSeePrices ? (isCompleted ? '#059669' : '#d97706') : '#16a34a';
                   const progressColor = isCompleted ? '#059669' : '#d97706';
                   
                   const accent = accentColors[idx % accentColors.length];
-                  const progress = canSeePrices && plan.totalCost > 0 ? (plan.paidAmount / plan.totalCost) * 100 : 0;
-                  const remaining = canSeePrices ? plan.totalCost - plan.paidAmount : 0;
+                          const progress = canSeePrices && (plan.totalCost || 0) > 0 ? ((plan.paidAmount || 0) / (plan.totalCost || 1)) * 100 : 0;
+                  const remaining = canSeePrices ? (plan.totalCost || 0) - (plan.paidAmount || 0) : 0;
                   
                   const toothNumbers = plan.treatments?.map(t => t.toothNumber).filter(Boolean) || [];
                   const planDoctorId = plan.doctorId || plan.treatments?.[0]?.doctorId;
@@ -562,9 +562,9 @@ export function PatientProfile() {
 
                         {canViewPlanPrices(plan) && (
                           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white">
-                            <div className="flex justify-between text-xs mb-2"><span className="text-emerald-600">مدفوع: <strong>{plan.paidAmount.toLocaleString()}</strong></span><span className="text-slate-600">الإجمالي: <strong>{plan.totalCost.toLocaleString()}</strong></span></div>
+                            <div className="flex justify-between text-xs mb-2"><span className="text-emerald-600">مدفوع: <strong>{(plan.paidAmount || 0).toLocaleString()}</strong></span><span className="text-slate-600">الإجمالي: <strong>{(plan.totalCost || 0).toLocaleString()}</strong></span></div>
                             <div className="h-1.5 bg-slate-200/60 rounded-full overflow-hidden"><div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, backgroundColor: progressColor }} /></div>
-                            {remaining > 0 && <p className="text-xs mt-2 text-amber-600 font-medium">متبقي: {remaining.toLocaleString()} د.ع</p>}
+                            {remaining > 0 && <p className="text-xs mt-2 text-amber-600 font-medium">متبقي: {(remaining || 0).toLocaleString()} د.ع</p>}
                           </div>
                         )}
 
@@ -743,7 +743,7 @@ export function PatientProfile() {
                                           </div>
                                           <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between">
-                                              <span className="text-[13px] font-bold text-slate-800">{payment.amount.toLocaleString()} <span className="text-[10px] font-medium text-slate-400">د.ع</span></span>
+                                              <span className="text-[13px] font-bold text-slate-800">{(payment.amount || 0).toLocaleString()} <span className="text-[10px] font-medium text-slate-400">د.ع</span></span>
                                               <span className="text-[10px] text-slate-400 font-medium shrink-0">
                                                 {format(parseISO(payment.date), 'dd/MM/yyyy', { locale: ar })}
                                               </span>

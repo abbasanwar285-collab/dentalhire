@@ -1,0 +1,391 @@
+﻿
+> ╪╣┘è╪º╪»╪¬┘è-┘ä┘ä╪ú╪│┘å╪º┘å-(my-dental-clinic)@0.0.0 lint
+> eslint . --ext .ts,.tsx
+
+
+C:\Users\abbas\Desktop\my projects\clinic\apply_schema.ts
+  28:7  error    'supabase' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+  31:5  warning  Unexpected console statement                                                         no-console
+  49:5  warning  Unexpected console statement                                                         no-console
+  50:5  warning  Unexpected console statement                                                         no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\audit_financials.ts
+  10:5   warning  Unexpected console statement              no-console
+  31:45  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  38:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:5   warning  Unexpected console statement              no-console
+  44:5   warning  Unexpected console statement              no-console
+  45:5   warning  Unexpected console statement              no-console
+  46:5   warning  Unexpected console statement              no-console
+  47:5   warning  Unexpected console statement              no-console
+  48:5   warning  Unexpected console statement              no-console
+  49:5   warning  Unexpected console statement              no-console
+  50:5   warning  Unexpected console statement              no-console
+  54:5   warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_esraa_storage.ts
+  13:5   warning  Unexpected console statement  no-console
+  15:5   warning  Unexpected console statement  no-console
+  16:32  warning  Unexpected console statement  no-console
+  18:5   warning  Unexpected console statement  no-console
+  20:5   warning  Unexpected console statement  no-console
+  21:28  warning  Unexpected console statement  no-console
+  24:5   warning  Unexpected console statement  no-console
+  28:9   warning  Unexpected console statement  no-console
+  30:31  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_ids.ts
+  17:5   warning  Unexpected console statement  no-console
+  26:13  warning  Unexpected console statement  no-console
+  28:13  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_ortho_payments.ts
+  19:13  warning  Unexpected console statement  no-console
+  25:9   warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_patients.ts
+  17:5   warning  Unexpected console statement  no-console
+  27:9   warning  Unexpected console statement  no-console
+  42:9   warning  Unexpected console statement  no-console
+  43:28  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_patients_by_name.ts
+  10:5   warning  Unexpected console statement  no-console
+  20:9   warning  Unexpected console statement  no-console
+  21:27  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_scans.ts
+  36:5   warning  Unexpected console statement  no-console
+  41:1   warning  Unexpected console statement  no-console
+  44:5   warning  Unexpected console statement  no-console
+  49:1   warning  Unexpected console statement  no-console
+  52:5   warning  Unexpected console statement  no-console
+  62:1   warning  Unexpected console statement  no-console
+  65:1   warning  Unexpected console statement  no-console
+  77:9   warning  Unexpected console statement  no-console
+  78:35  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\check_staff_latency.ts
+  33:5  warning  Unexpected console statement  no-console
+  41:9  warning  Unexpected console statement  no-console
+  42:9  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\components\AIInsightsModal.tsx
+   17:64  warning  Arrow function has a complexity of 19. Maximum allowed is 15                                                 complexity
+   20:44  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   22:56  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   46:24  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   47:32  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+   71:8   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   74:22  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  362:65  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  363:19  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  381:54  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\components\InventoryItemDetailsModal.tsx
+  12:84  warning  Arrow function has a complexity of 21. Maximum allowed is 15                                                    complexity
+  61:8   warning  React Hook useEffect has a missing dependency: 'handleClose'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\abbas\Desktop\my projects\clinic\components\Layout.tsx
+  12:33  warning  Arrow function has a complexity of 20. Maximum allowed is 15  complexity
+
+C:\Users\abbas\Desktop\my projects\clinic\components\PatientScans.tsx
+   30:8   warning  React Hook useEffect has a missing dependency: 'loadScans'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  100:60  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  122:42  warning  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\components\ThreeDViewer.tsx
+   25:116  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   47:81   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   53:28   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   64:81   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   86:133  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:53   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:59   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\components\Toast.tsx
+   43:8  warning  React Hook useCallback has a missing dependency: 'removeToast'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  119:9  warning  Unexpected console statement                                                                                      no-console
+  122:9  warning  Unexpected console statement                                                                                      no-console
+  125:9  warning  Unexpected console statement                                                                                      no-console
+  128:9  warning  Unexpected console statement                                                                                      no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\components\XrayModal.tsx
+   33:8   warning  React Hook useEffect has missing dependencies: 'capturedImage', 'startCamera', and 'stopCamera'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  234:64  warning  Arrow function has a complexity of 17. Maximum allowed is 15                                                                                         complexity
+  548:1   warning  File has too many lines (506). Maximum allowed is 500                                                                                                max-lines
+
+C:\Users\abbas\Desktop\my projects\clinic\debug_columns.ts
+  10:5  warning  Unexpected console statement  no-console
+  15:9  warning  Unexpected console statement  no-console
+  18:5  warning  Unexpected console statement  no-console
+  23:9  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\diagnose_esraa.ts
+  10:5   warning  Unexpected console statement  no-console
+  20:9   warning  Unexpected console statement  no-console
+  24:5   warning  Unexpected console statement  no-console
+  33:9   warning  Unexpected console statement  no-console
+  37:9   warning  Unexpected console statement  no-console
+  39:20  warning  Unexpected console statement  no-console
+  44:5   warning  Unexpected console statement  no-console
+  64:17  warning  Unexpected console statement  no-console
+  65:38  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\diagnose_stats.ts
+   35:5   warning  Unexpected console statement                                  no-console
+   53:22  warning  Arrow function has a complexity of 23. Maximum allowed is 15  complexity
+  120:5   warning  Unexpected console statement                                  no-console
+  121:5   warning  Unexpected console statement                                  no-console
+  122:5   warning  Unexpected console statement                                  no-console
+  126:5   warning  Unexpected console statement                                  no-console
+  128:5   warning  Unexpected console statement                                  no-console
+  129:5   warning  Unexpected console statement                                  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\find_esraa.ts
+  10:5   warning  Unexpected console statement  no-console
+  21:9   warning  Unexpected console statement  no-console
+  22:27  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\fix_esraa.ts
+  13:5   warning  Unexpected console statement  no-console
+  17:9   warning  Unexpected console statement  no-console
+  21:5   warning  Unexpected console statement  no-console
+  27:9   warning  Unexpected console statement  no-console
+  54:17  warning  Unexpected console statement  no-console
+  61:5   warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\hooks\usePerformance.ts
+   31:49  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+   31:59  warning  Unexpected any. Specify a different type                                                                    @typescript-eslint/no-explicit-any
+   37:12  warning  React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead  react-hooks/exhaustive-deps
+  154:13  warning  Unexpected console statement                                                                                no-console
+  175:68  warning  Forbidden non-null assertion                                                                                @typescript-eslint/no-non-null-assertion
+  179:16  warning  Forbidden non-null assertion                                                                                @typescript-eslint/no-non-null-assertion
+
+C:\Users\abbas\Desktop\my projects\clinic\hooks\useRealtimeData.ts
+  11:19  warning  Unexpected any. Specify a different type                                                                                                                 @typescript-eslint/no-explicit-any
+  33:13  warning  Unexpected console statement                                                                                                                             no-console
+  40:26  warning  React Hook useEffect has a spread element in its dependency array. This means we can't statically verify whether you've passed the correct dependencies  react-hooks/exhaustive-deps
+
+C:\Users\abbas\Desktop\my projects\clinic\hooks\useSync.ts
+  30:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\inspect_ortho.ts
+  15:5  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\list_recent.ts
+  10:5   warning  Unexpected console statement  no-console
+  21:31  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\migrate_scans.ts
+  26:5   warning  Unexpected console statement  no-console
+  37:9   warning  Unexpected console statement  no-console
+  41:5   warning  Unexpected console statement  no-console
+  53:9   warning  Unexpected console statement  no-console
+  61:13  warning  Unexpected console statement  no-console
+  70:5   warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\ActivityLog.tsx
+  29:8  warning  React Hook useEffect has a missing dependency: 'loadLogs'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\AppointmentBooking.tsx
+   10:45  warning  Arrow function has a complexity of 19. Maximum allowed is 15                                                                                                                                                                  complexity
+   55:6   warning  React Hook useEffect has a missing dependency: 'date'. Either include it or remove the dependency array. You can also replace multiple useState variables with useReducer if 'setViewDate' needs the current value of 'date'  react-hooks/exhaustive-deps
+   58:22  warning  Async arrow function has a complexity of 27. Maximum allowed is 15                                                                                                                                                            complexity
+  468:58  warning  Unexpected any. Specify a different type                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  504:60  warning  Unexpected any. Specify a different type                                                                                                                                                                                      @typescript-eslint/no-explicit-any
+  583:1   warning  File has too many lines (507). Maximum allowed is 500                                                                                                                                                                         max-lines
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\CalendarView.tsx
+   21:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  375:73  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\Inventory.tsx
+   12:36  warning  Arrow function has a complexity of 25. Maximum allowed is 15                                                     complexity
+  118:17  warning  Unexpected console statement                                                                                     no-console
+  127:8   warning  React Hook useEffect has a missing dependency: 'items.length'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  204:23  warning  Forbidden non-null assertion                                                                                     @typescript-eslint/no-non-null-assertion
+  225:9   warning  Unexpected console statement                                                                                     no-console
+  245:13  warning  Unexpected console statement                                                                                     no-console
+  255:17  warning  Unexpected console statement                                                                                     no-console
+  620:1   warning  File has too many lines (767). Maximum allowed is 500                                                            max-lines
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\PatientDetails.tsx
+    33:34  warning  Arrow function has a complexity of 23. Maximum allowed is 15                                                               complexity
+    50:13  warning  Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+   179:59  warning  Forbidden non-null assertion                                                                                               @typescript-eslint/no-non-null-assertion
+   235:12  warning  Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+   306:41  warning  Arrow function has a complexity of 57. Maximum allowed is 15                                                               complexity
+   382:8   warning  React Hook useEffect has a missing dependency: 'loadPatient'. Either include it or remove the dependency array             react-hooks/exhaustive-deps
+   479:8   warning  React Hook useCallback has a missing dependency: 'loadPatient'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+   500:8   warning  React Hook useCallback has a missing dependency: 'loadPatient'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+   529:8   warning  React Hook useCallback has an unnecessary dependency: 'currentDoctorId'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+   605:1   warning  File has too many lines (1427). Maximum allowed is 500                                                                     max-lines
+   721:38  warning  Async arrow function has a complexity of 18. Maximum allowed is 15                                                         complexity
+   731:44  warning  Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+   743:31  warning  Forbidden non-null assertion                                                                                               @typescript-eslint/no-non-null-assertion
+   747:60  warning  Forbidden non-null assertion                                                                                               @typescript-eslint/no-non-null-assertion
+   763:8   warning  React Hook useCallback has an unnecessary dependency: 'toothTreatments'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+   818:8   warning  React Hook useCallback has a missing dependency: 'loadPatient'. Either include it or remove the dependency array           react-hooks/exhaustive-deps
+  1124:44  warning  Unexpected any. Specify a different type                                                                                   @typescript-eslint/no-explicit-any
+  1566:50  warning  Forbidden non-null assertion                                                                                               @typescript-eslint/no-non-null-assertion
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\PatientList.tsx
+    9:32  warning  Arrow function has a complexity of 18. Maximum allowed is 15  complexity
+   96:38  warning  Arrow function has a complexity of 18. Maximum allowed is 15  complexity
+  242:47  warning  Arrow function has a complexity of 30. Maximum allowed is 15  complexity
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\Reports.tsx
+   46:8   warning  React Hook useEffect has a missing dependency: 'generateReport'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  314:68  warning  Forbidden non-null assertion                                                                                       @typescript-eslint/no-non-null-assertion
+  351:48  warning  Forbidden non-null assertion                                                                                       @typescript-eslint/no-non-null-assertion
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\Stats.tsx
+   13:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  194:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  194:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  197:76  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  203:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\__tests__\PatientList.test.tsx
+  114:25  warning  Forbidden non-null assertion  @typescript-eslint/no-non-null-assertion
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\admin\StaffManagement.tsx
+   26:17  warning  Unexpected console statement                                                                                   no-console
+   34:13  warning  Unexpected console statement                                                                                   no-console
+   36:13  warning  Unexpected console statement                                                                                   no-console
+   39:23  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   59:8   warning  React Hook useEffect has a missing dependency: 'fetchStaff'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   81:23  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+   97:23  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+  166:83  warning  Unexpected any. Specify a different type                                                                       @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\auth\LoginPage.tsx
+  17:9   warning  Unexpected console statement              no-console
+  21:13  warning  Unexpected console statement              no-console
+  23:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:13  warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\pages\auth\SignupPage.tsx
+  24:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\restore_admin.ts
+  32:5  warning  Unexpected console statement  no-console
+  46:9  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\restore_zynab.ts
+  13:5   warning  Unexpected console statement  no-console
+  18:9   warning  Unexpected console statement  no-console
+  22:5   warning  Unexpected console statement  no-console
+  32:9   warning  Unexpected console statement  no-console
+  39:13  warning  Unexpected console statement  no-console
+  42:5   warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\__tests__\db.test.ts
+   33:35  warning  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+   43:35  warning  Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+  108:53  warning  Too many nested callbacks (4). Maximum allowed is 3  max-nested-callbacks
+
+C:\Users\abbas\Desktop\my projects\clinic\services\aiLearning.ts
+  203:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  205:13  warning  Unexpected console statement              no-console
+  238:13  warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\aiService.ts
+  25:27  warning  Async method 'generateInsights' has a complexity of 21. Maximum allowed is 15  complexity
+
+C:\Users\abbas\Desktop\my projects\clinic\services\auditService.ts
+   57:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   62:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  265:13  warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\auth.ts
+   66:59  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:43  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  100:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  102:21  warning  Unexpected console statement              no-console
+  111:13  warning  Unexpected console statement              no-console
+  131:21  warning  Unexpected console statement              no-console
+  156:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\services\cacheManager.ts
+   19:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  195:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  196:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:13  warning  Unexpected console statement              no-console
+  224:13  warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\inventoryService.ts
+  46:13  warning  Unexpected console statement  no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\logger.ts
+   9:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  11:13  warning  Unexpected console statement              no-console
+  15:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:13  warning  Unexpected console statement              no-console
+  32:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:13  warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\managerService.ts
+  150:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\services\notificationService.ts
+   10:13  warning  Unexpected console statement              no-console
+   33:13  warning  Unexpected console statement              no-console
+   42:13  warning  Unexpected console statement              no-console
+   60:13  warning  Unexpected console statement              no-console
+  100:13  warning  Unexpected console statement              no-console
+  124:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:1   warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\offlineService.ts
+   13:11  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:17  warning  Unexpected console statement              no-console
+   81:17  warning  Unexpected console statement              no-console
+  135:9   warning  Unexpected console statement              no-console
+  152:13  warning  Unexpected console statement              no-console
+  204:9   warning  Unexpected console statement              no-console
+  209:13  warning  Unexpected console statement              no-console
+  248:9   warning  Unexpected console statement              no-console
+  260:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  264:21  warning  Unexpected console statement              no-console
+  287:9   warning  Unexpected console statement              no-console
+  297:9   warning  Unexpected console statement              no-console
+
+C:\Users\abbas\Desktop\my projects\clinic\services\xrayAIService.ts
+   36:29  warning  Forbidden non-null assertion                                                  @typescript-eslint/no-non-null-assertion
+  115:5   warning  Method 'analyzeCellRegion' has too many parameters (6). Maximum allowed is 5  max-params
+
+C:\Users\abbas\Desktop\my projects\clinic\supabase\functions\send-push\index.ts
+  11:18  warning  Forbidden non-null assertion              @typescript-eslint/no-non-null-assertion
+  14:62  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\types.ts
+   33:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   34:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   39:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   77:15  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  238:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\abbas\Desktop\my projects\clinic\verify_strict_payments.ts
+   35:5   warning  Unexpected console statement                                  no-console
+   46:23  warning  Arrow function has a complexity of 16. Maximum allowed is 15  complexity
+   55:79  warning  Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+   64:45  warning  Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+   67:61  warning  Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+   96:78  warning  Unexpected any. Specify a different type                      @typescript-eslint/no-explicit-any
+  103:5   warning  Unexpected console statement                                  no-console
+  104:5   warning  Unexpected console statement                                  no-console
+
+Γ£û 272 problems (1 error, 271 warnings)
+

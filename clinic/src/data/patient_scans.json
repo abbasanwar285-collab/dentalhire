@@ -1,0 +1,2117 @@
+[
+  {
+    "id": "4c18e28c-821a-486d-a8b6-1f1522cbef68",
+    "patient_id": "4a480d84-9eea-4256-b5fa-2c209cf1d972",
+    "file_name": "2025-12-08_00002-001.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/4a480d84-9eea-4256-b5fa-2c209cf1d972/1768296224069_2025-12-08_00002-001.stl",
+    "file_path": "4a480d84-9eea-4256-b5fa-2c209cf1d972/1768296224069_2025-12-08_00002-001.stl",
+    "scan_date": "2026-01-13T09:23:54.532071+00:00",
+    "created_at": "2026-01-13T09:23:54.532071+00:00"
+  },
+  {
+    "id": "06e70f17-4944-4545-962c-33637161db30",
+    "patient_id": "4a480d84-9eea-4256-b5fa-2c209cf1d972",
+    "file_name": "lower.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/4a480d84-9eea-4256-b5fa-2c209cf1d972/1768296224009_lower.stl",
+    "file_path": "4a480d84-9eea-4256-b5fa-2c209cf1d972/1768296224009_lower.stl",
+    "scan_date": "2026-01-13T09:23:55.732833+00:00",
+    "created_at": "2026-01-13T09:23:55.732833+00:00"
+  },
+  {
+    "id": "55447d3a-5db6-4b91-960d-7101ae1df700",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad%20ali-maxillary.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad ali-maxillary.stl",
+    "scan_date": "2026-01-13T09:31:27.983494+00:00",
+    "created_at": "2026-01-13T09:31:27.983494+00:00"
+  },
+  {
+    "id": "9c81497d-6618-444d-b89e-3cdbfae1662e",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad%20ali-occlusionfirst.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad ali-occlusionfirst.ply",
+    "scan_date": "2026-01-13T09:31:29.062423+00:00",
+    "created_at": "2026-01-13T09:31:29.062423+00:00"
+  },
+  {
+    "id": "d2f2e44f-571b-4bf5-9d92-c7409a145947",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad%20ali-maxillary_scanbody.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad ali-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T09:31:30.851039+00:00",
+    "created_at": "2026-01-13T09:31:30.851039+00:00"
+  },
+  {
+    "id": "4cf98b1f-1fcb-4b47-8829-135c7d9cd34e",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad%20ali-occlusionfirst.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad ali-occlusionfirst.stl",
+    "scan_date": "2026-01-13T09:31:32.900592+00:00",
+    "created_at": "2026-01-13T09:31:32.900592+00:00"
+  },
+  {
+    "id": "a9baa7c7-47c1-4c8b-b4ba-3d6b984688c7",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad%20ali-maxillary_scanbody.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad ali-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T09:31:32.918394+00:00",
+    "created_at": "2026-01-13T09:31:32.918394+00:00"
+  },
+  {
+    "id": "d75fda2a-775b-4129-b7e2-b6f536fc7a7c",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad%20ali-mandibular.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad ali-mandibular.ply",
+    "scan_date": "2026-01-13T09:31:33.198118+00:00",
+    "created_at": "2026-01-13T09:31:33.198118+00:00"
+  },
+  {
+    "id": "d67da510-1b7f-408b-80d7-5ff109370837",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad%20ali-maxillary.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad ali-maxillary.ply",
+    "scan_date": "2026-01-13T09:31:34.115283+00:00",
+    "created_at": "2026-01-13T09:31:34.115283+00:00"
+  },
+  {
+    "id": "d7f30420-ba77-4b88-9e31-302a073d1cfa",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "172026-saad ali-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad%20ali-mandibular.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad ali-mandibular.stl",
+    "scan_date": "2026-01-13T09:31:34.960492+00:00",
+    "created_at": "2026-01-13T09:31:34.960492+00:00"
+  },
+  {
+    "id": "1a7e7f43-2b96-47ab-b748-a6245235289e",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136763_12142025-huda_mohammed-occlusionfirst.ply",
+    "file_path": "1764772905832u9xch/1768299136763_12142025-huda_mohammed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:23.548379+00:00",
+    "created_at": "2026-01-13T10:12:23.548379+00:00"
+  },
+  {
+    "id": "6bf78fb6-7ef7-42bd-abdb-2a62cf589dc1",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:23.593957+00:00",
+    "created_at": "2026-01-13T10:12:23.593957+00:00"
+  },
+  {
+    "id": "d4fc7d47-3dca-4261-a424-51eb919d4c8a",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136705_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136705_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:25.209353+00:00",
+    "created_at": "2026-01-13T10:12:25.209353+00:00"
+  },
+  {
+    "id": "8b168e79-b8b6-48c3-9cfc-d9d121d43e27",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136771_12142025-huda_mohammed-occlusionfirst.stl",
+    "file_path": "1764772905832u9xch/1768299136771_12142025-huda_mohammed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:25.998547+00:00",
+    "created_at": "2026-01-13T10:12:25.998547+00:00"
+  },
+  {
+    "id": "3c3c1d9f-53b5-44f7-a5ef-f5153d1580ef",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136850_12282025-huda_mohammed-occlusionfirst.ply",
+    "file_path": "1764772905832u9xch/1768299136850_12282025-huda_mohammed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:26.140595+00:00",
+    "created_at": "2026-01-13T10:12:26.140595+00:00"
+  },
+  {
+    "id": "37b3e31c-e4e0-40cb-bbbb-047b2fc0a2a0",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136691_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136691_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T10:12:26.385486+00:00",
+    "created_at": "2026-01-13T10:12:26.385486+00:00"
+  },
+  {
+    "id": "6f26d16a-aba3-4ee9-aec8-431a397a97c2",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136895_172026-saad_ali-mandibular.ply",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136895_172026-saad_ali-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:27.125865+00:00",
+    "created_at": "2026-01-13T10:12:27.125865+00:00"
+  },
+  {
+    "id": "48cc0787-10c6-4cb5-b5ca-af30b8aa0c85",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136733_12142025-huda_mohammed-mandibular.ply",
+    "file_path": "1764772905832u9xch/1768299136733_12142025-huda_mohammed-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:27.291105+00:00",
+    "created_at": "2026-01-13T10:12:27.291105+00:00"
+  },
+  {
+    "id": "09f816b9-848d-4cc5-997f-9ec70d0427e1",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136698_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136698_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T10:12:28.714134+00:00",
+    "created_at": "2026-01-13T10:12:28.714134+00:00"
+  },
+  {
+    "id": "3b842799-10f0-4a92-8709-26cac716725f",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136713_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136713_1112026-asraa_mohamed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:29.554258+00:00",
+    "created_at": "2026-01-13T10:12:29.554258+00:00"
+  },
+  {
+    "id": "a7842999-2f24-443e-ae83-8ccb7b623d69",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:30.070069+00:00",
+    "created_at": "2026-01-13T10:12:30.070069+00:00"
+  },
+  {
+    "id": "73b30a5e-97d3-4b4f-adf1-d3cd9c5609ec",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136830_12282025-huda_mohammed-mandibular.ply",
+    "file_path": "1764772905832u9xch/1768299136830_12282025-huda_mohammed-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:35.024963+00:00",
+    "created_at": "2026-01-13T10:12:35.024963+00:00"
+  },
+  {
+    "id": "d5e8fd38-0726-425c-9c7d-9ba5d0baa014",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136945_172026-saad_ali-occlusionfirst.ply",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136945_172026-saad_ali-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:31.778608+00:00",
+    "created_at": "2026-01-13T10:12:31.778608+00:00"
+  },
+  {
+    "id": "38530f85-6951-4ebb-856d-c266d2f906a4",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136637_1112026-asraa_mohamed-mandibular.ply",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136637_1112026-asraa_mohamed-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:35.608145+00:00",
+    "created_at": "2026-01-13T10:12:35.608145+00:00"
+  },
+  {
+    "id": "231261f6-fe33-4b56-bde0-d00e6edf9119",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136742_12142025-huda_mohammed-maxillary.ply",
+    "file_path": "1764772905832u9xch/1768299136742_12142025-huda_mohammed-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:37.08621+00:00",
+    "created_at": "2026-01-13T10:12:37.08621+00:00"
+  },
+  {
+    "id": "4d6f3605-fd01-4b92-aadb-b6dbad7cd812",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137064_12152025-tGryd_flH_aabd_lHsn-occlusionfirst.ply",
+    "file_path": "17651139457626j686/1768299137064_12152025-tGryd_flH_aabd_lHsn-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:38.519841+00:00",
+    "created_at": "2026-01-13T10:12:38.519841+00:00"
+  },
+  {
+    "id": "cf467947-6586-481b-b34d-6bfe20f68d2f",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:49.870993+00:00",
+    "created_at": "2026-01-13T10:12:49.870993+00:00"
+  },
+  {
+    "id": "f03e273c-ea01-4165-9ff9-98ab756d6966",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137038_12152025-tGryd_flH_aabd_lHsn-maxillary.stl",
+    "file_path": "17651139457626j686/1768299137038_12152025-tGryd_flH_aabd_lHsn-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:55.54515+00:00",
+    "created_at": "2026-01-13T10:12:55.54515+00:00"
+  },
+  {
+    "id": "7110cb0f-19e4-439c-a0c2-0531f0e34704",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:31.927269+00:00",
+    "created_at": "2026-01-13T10:12:31.927269+00:00"
+  },
+  {
+    "id": "bcd92b31-ea22-4503-92ab-c18bad3c135e",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136889_12282025-huda_mohammed-occlusionfirst.stl",
+    "file_path": "1764772905832u9xch/1768299136889_12282025-huda_mohammed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:33.663127+00:00",
+    "created_at": "2026-01-13T10:12:33.663127+00:00"
+  },
+  {
+    "id": "dd6a3bb2-dcb3-48a6-9ef7-cd6f25e38940",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:36.247565+00:00",
+    "created_at": "2026-01-13T10:12:36.247565+00:00"
+  },
+  {
+    "id": "3b01b8f5-33c2-4866-990f-c10cc28d8dc7",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:37.293483+00:00",
+    "created_at": "2026-01-13T10:12:37.293483+00:00"
+  },
+  {
+    "id": "05b69e13-2790-4503-a37a-30c534316dcb",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136949_172026-saad_ali-occlusionfirst.stl",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136949_172026-saad_ali-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:41.171802+00:00",
+    "created_at": "2026-01-13T10:12:41.171802+00:00"
+  },
+  {
+    "id": "589c3c2a-e3a0-41d3-8df9-8356b6ae3f40",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136661_1112026-asraa_mohamed-maxillary.ply",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136661_1112026-asraa_mohamed-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:42.803113+00:00",
+    "created_at": "2026-01-13T10:12:42.803113+00:00"
+  },
+  {
+    "id": "34222040-dd58-44ff-9812-e84f9a9f2308",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:43.090001+00:00",
+    "created_at": "2026-01-13T10:12:43.090001+00:00"
+  },
+  {
+    "id": "e45624f8-a40b-49bb-852f-00d2da017c5f",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136842_12282025-huda_mohammed-mandibular.stl",
+    "file_path": "1764772905832u9xch/1768299136842_12282025-huda_mohammed-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:45.376456+00:00",
+    "created_at": "2026-01-13T10:12:45.376456+00:00"
+  },
+  {
+    "id": "55c7fe95-b983-4a91-b8c6-bafa8ad4614f",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137087_12152025-tGryd_flH_aabd_lHsn-occlusionfirst.stl",
+    "file_path": "17651139457626j686/1768299137087_12152025-tGryd_flH_aabd_lHsn-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:47.088971+00:00",
+    "created_at": "2026-01-13T10:12:47.088971+00:00"
+  },
+  {
+    "id": "99db309f-6115-4f92-b236-330c81345e41",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136902_172026-saad_ali-mandibular.stl",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136902_172026-saad_ali-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:49.562182+00:00",
+    "created_at": "2026-01-13T10:12:49.562182+00:00"
+  },
+  {
+    "id": "65c4313a-7c07-4a6a-a10e-e828cd633582",
+    "patient_id": "1765208958542dflo0",
+    "file_name": "1282025-donia shabban-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765208958542dflo0/1768299137000_1282025-donia_shabban-mandibular.stl",
+    "file_path": "1765208958542dflo0/1768299137000_1282025-donia_shabban-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:53.681779+00:00",
+    "created_at": "2026-01-13T10:12:53.681779+00:00"
+  },
+  {
+    "id": "010f467f-d51f-4093-a585-d10dd1dd2b28",
+    "patient_id": "1765208958542dflo0",
+    "file_name": "1282025-donia shabban-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765208958542dflo0/1768299136985_1282025-donia_shabban-maxillary.stl",
+    "file_path": "1765208958542dflo0/1768299136985_1282025-donia_shabban-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:54.215505+00:00",
+    "created_at": "2026-01-13T10:12:54.215505+00:00"
+  },
+  {
+    "id": "c09ff1c3-41af-47ab-a693-a8ac2fd6fb61",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136929_172026-saad_ali-maxillary_scanbody.ply",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136929_172026-saad_ali-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T10:12:36.922338+00:00",
+    "created_at": "2026-01-13T10:12:36.922338+00:00"
+  },
+  {
+    "id": "e9aa2163-66a9-4b79-a9f2-064a2b202862",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137025_12152025-tGryd_flH_aabd_lHsn-mandibular.ply",
+    "file_path": "17651139457626j686/1768299137025_12152025-tGryd_flH_aabd_lHsn-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:40.50907+00:00",
+    "created_at": "2026-01-13T10:12:40.50907+00:00"
+  },
+  {
+    "id": "c7bccead-6fe2-4815-9529-04a320ffc2ac",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137076_12152025-tGryd_flH_aabd_lHsn-maxillary.ply",
+    "file_path": "17651139457626j686/1768299137076_12152025-tGryd_flH_aabd_lHsn-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:43.864843+00:00",
+    "created_at": "2026-01-13T10:12:43.864843+00:00"
+  },
+  {
+    "id": "9467ab9c-0ad6-4d60-a6b2-614cd3b8413d",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136910_172026-saad_ali-maxillary.ply",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136910_172026-saad_ali-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:46.705922+00:00",
+    "created_at": "2026-01-13T10:12:46.705922+00:00"
+  },
+  {
+    "id": "87a07246-f9fa-414d-af79-622a622ea9c6",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136683_1112026-asraa_mohamed-maxillary.stl",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136683_1112026-asraa_mohamed-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:49.802075+00:00",
+    "created_at": "2026-01-13T10:12:49.802075+00:00"
+  },
+  {
+    "id": "05bdf4af-6ab3-4ecb-98bf-2916ef2fae17",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136874_12282025-huda_mohammed-maxillary.stl",
+    "file_path": "1764772905832u9xch/1768299136874_12282025-huda_mohammed-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:53.021828+00:00",
+    "created_at": "2026-01-13T10:12:53.021828+00:00"
+  },
+  {
+    "id": "c28e0c02-bf45-4cb9-9dec-0fde1e77b21d",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1102026-zynab ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:37.740794+00:00",
+    "created_at": "2026-01-13T10:12:37.740794+00:00"
+  },
+  {
+    "id": "4a6cae3b-606c-46a7-a421-545a2b30baee",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768299136648_1112026-asraa_mohamed-mandibular.stl",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768299136648_1112026-asraa_mohamed-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:43.349213+00:00",
+    "created_at": "2026-01-13T10:12:43.349213+00:00"
+  },
+  {
+    "id": "30acb046-a43a-4592-a3de-ec59b6d888b4",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136922_172026-saad_ali-maxillary.stl",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136922_172026-saad_ali-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:48.558434+00:00",
+    "created_at": "2026-01-13T10:12:48.558434+00:00"
+  },
+  {
+    "id": "456867b8-6a56-469b-9bac-4544213c28e5",
+    "patient_id": "17651139457626j686",
+    "file_name": "12152025-تغريد فلاح عبد الحسن-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17651139457626j686/1768299137053_12152025-tGryd_flH_aabd_lHsn-mandibular.stl",
+    "file_path": "17651139457626j686/1768299137053_12152025-tGryd_flH_aabd_lHsn-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:49.673767+00:00",
+    "created_at": "2026-01-13T10:12:49.673767+00:00"
+  },
+  {
+    "id": "06b5361e-84a6-4c6a-9301-99b28b0fecd8",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:37.979732+00:00",
+    "created_at": "2026-01-13T10:12:37.979732+00:00"
+  },
+  {
+    "id": "38c36cc5-ee66-4cf2-bd3f-83935e2228d1",
+    "patient_id": "1765208958542dflo0",
+    "file_name": "1282025-donia shabban-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765208958542dflo0/1768299136958_1282025-donia_shabban-mandibular.ply",
+    "file_path": "1765208958542dflo0/1768299136958_1282025-donia_shabban-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:39.992666+00:00",
+    "created_at": "2026-01-13T10:12:39.992666+00:00"
+  },
+  {
+    "id": "170ce8ff-3bc7-46ae-954b-c95f50477f7d",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:41.962759+00:00",
+    "created_at": "2026-01-13T10:12:41.962759+00:00"
+  },
+  {
+    "id": "d6fb6cf8-83c3-41d8-a54e-cbf4817139bb",
+    "patient_id": "17656296852598bhdp",
+    "file_name": "12132025-rida ahmed hashim-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17656296852598bhdp/1768299136615_12132025-rida_ahmed_hashim-maxillary.ply",
+    "file_path": "17656296852598bhdp/1768299136615_12132025-rida_ahmed_hashim-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:49.680006+00:00",
+    "created_at": "2026-01-13T10:12:49.680006+00:00"
+  },
+  {
+    "id": "b301beb9-b748-4e1c-b5dc-6e5210ee1041",
+    "patient_id": "2a02a36d-79c3-4105-9366-f9f97e20f5f5",
+    "file_name": "172026-saad ali-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136936_172026-saad_ali-maxillary_scanbody.stl",
+    "file_path": "2a02a36d-79c3-4105-9366-f9f97e20f5f5/1768299136936_172026-saad_ali-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T10:12:53.017148+00:00",
+    "created_at": "2026-01-13T10:12:53.017148+00:00"
+  },
+  {
+    "id": "84eb807c-4ccd-4d09-a02f-80f4edf37134",
+    "patient_id": "17656296852598bhdp",
+    "file_name": "12132025-rida ahmed hashim-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17656296852598bhdp/1768299136596_12132025-rida_ahmed_hashim-maxillary.stl",
+    "file_path": "17656296852598bhdp/1768299136596_12132025-rida_ahmed_hashim-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:54.593223+00:00",
+    "created_at": "2026-01-13T10:12:54.593223+00:00"
+  },
+  {
+    "id": "47290bbf-8fef-4744-b69c-cf095bab68db",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136724_12142025-huda_mohammed-mandibular.stl",
+    "file_path": "1764772905832u9xch/1768299136724_12142025-huda_mohammed-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:39.412299+00:00",
+    "created_at": "2026-01-13T10:12:39.412299+00:00"
+  },
+  {
+    "id": "f9ed578b-f8f6-4dcd-a065-5fb06e730430",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12282025-huda mohammed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136861_12282025-huda_mohammed-maxillary.ply",
+    "file_path": "1764772905832u9xch/1768299136861_12282025-huda_mohammed-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:41.045674+00:00",
+    "created_at": "2026-01-13T10:12:41.045674+00:00"
+  },
+  {
+    "id": "96d78818-f377-4c04-8bf8-6487a895fc61",
+    "patient_id": "1765208958542dflo0",
+    "file_name": "1282025-donia shabban-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765208958542dflo0/1768299136967_1282025-donia_shabban-maxillary.ply",
+    "file_path": "1765208958542dflo0/1768299136967_1282025-donia_shabban-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:45.272058+00:00",
+    "created_at": "2026-01-13T10:12:45.272058+00:00"
+  },
+  {
+    "id": "5d161fdb-a4c6-4e58-bbd6-719dd51297c7",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:47.397713+00:00",
+    "created_at": "2026-01-13T10:12:47.397713+00:00"
+  },
+  {
+    "id": "2687d440-77d4-4f51-bfdb-75d69f60e5ed",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768299136754_12142025-huda_mohammed-maxillary.stl",
+    "file_path": "1764772905832u9xch/1768299136754_12142025-huda_mohammed-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:50.574134+00:00",
+    "created_at": "2026-01-13T10:12:50.574134+00:00"
+  },
+  {
+    "id": "86b80427-6d88-405f-9366-1a3848badf48",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "142026-hashmia haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:58.91318+00:00",
+    "created_at": "2026-01-13T10:12:58.91318+00:00"
+  },
+  {
+    "id": "09669b1c-229a-44c5-8040-39072a52a2af",
+    "patient_id": "1765208958542dflo0",
+    "file_name": "1282025-donia shabban-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765208958542dflo0/1768305338540_1282025-donia_shabban-maxillary.ply",
+    "file_path": "1765208958542dflo0/1768305338540_1282025-donia_shabban-maxillary.ply",
+    "scan_date": "2026-01-13T11:56:10.286082+00:00",
+    "created_at": "2026-01-13T11:56:10.286082+00:00"
+  },
+  {
+    "id": "80e44d58-69b0-46b7-a26a-2cb46fd238e2",
+    "patient_id": "a79481b8-994f-475c-89ea-88453a5a4bea",
+    "file_name": "1112026-asraa mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/a79481b8-994f-475c-89ea-88453a5a4bea/1768333319856_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "a79481b8-994f-475c-89ea-88453a5a4bea/1768333319856_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:42:30.193723+00:00",
+    "created_at": "2026-01-13T19:42:30.193723+00:00"
+  },
+  {
+    "id": "99e6a6f9-5e8d-49c1-aafc-2d92dd4120ed",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768333320675_12142025-huda_mohammed-occlusionfirst.stl",
+    "file_path": "1764772905832u9xch/1768333320675_12142025-huda_mohammed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:42:46.387966+00:00",
+    "created_at": "2026-01-13T19:42:46.387966+00:00"
+  },
+  {
+    "id": "024e740d-5510-400f-822b-7f1da0776d65",
+    "patient_id": "1764772905832u9xch",
+    "file_name": "12142025-huda mohammed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1764772905832u9xch/1768333320611_12142025-huda_mohammed-maxillary.ply",
+    "file_path": "1764772905832u9xch/1768333320611_12142025-huda_mohammed-maxillary.ply",
+    "scan_date": "2026-01-13T19:42:50.10079+00:00",
+    "created_at": "2026-01-13T19:42:50.10079+00:00"
+  },
+  {
+    "id": "0968c6e9-85d7-4f91-b74b-359a77523a89",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "file_path": "1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:45:14.661924+00:00",
+    "created_at": "2026-01-13T19:45:14.661924+00:00"
+  },
+  {
+    "id": "66cad41e-15e9-4bf3-a918-84a8ac23b56e",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "file_path": "1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T19:45:25.272764+00:00",
+    "created_at": "2026-01-13T19:45:25.272764+00:00"
+  },
+  {
+    "id": "93c35797-1ad4-4dc4-a64d-4430814cd159",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "file_path": "1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:59.630177+00:00",
+    "created_at": "2026-01-13T19:45:59.630177+00:00"
+  },
+  {
+    "id": "0a4e60f6-169a-4848-ae83-9b86ef633a4e",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "file_path": "1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "scan_date": "2026-01-13T19:46:01.663982+00:00",
+    "created_at": "2026-01-13T19:46:01.663982+00:00"
+  },
+  {
+    "id": "ba6a9847-3fee-437d-9868-223fd5e2a6ed",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "file_path": "1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:46:03.226133+00:00",
+    "created_at": "2026-01-13T19:46:03.226133+00:00"
+  },
+  {
+    "id": "ca6d6580-9f67-4c3a-a5dc-7c67a392d11c",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "hashim ridha ahmed_sg.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "scan_date": "2026-01-13T19:46:05.093459+00:00",
+    "created_at": "2026-01-13T19:46:05.093459+00:00"
+  },
+  {
+    "id": "27677233-41bb-4489-8ed0-7d9fddd393c1",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "file_path": "1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "scan_date": "2026-01-13T19:46:11.614343+00:00",
+    "created_at": "2026-01-13T19:46:11.614343+00:00"
+  },
+  {
+    "id": "cb45704b-ed66-4966-aac6-3d8ea7a67594",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "12242025-intazar rahi-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "file_path": "1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "scan_date": "2026-01-13T19:46:13.093091+00:00",
+    "created_at": "2026-01-13T19:46:13.093091+00:00"
+  },
+  {
+    "id": "8b1a7722-c947-4c2b-8605-e72769efc4c8",
+    "patient_id": "b356772b-358e-4455-a0b8-64a9fe25afa6",
+    "file_name": "abd mazin muhsin_sg.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/b356772b-358e-4455-a0b8-64a9fe25afa6/1768333496675_abd_mazin_muhsin_sg.stl",
+    "file_path": "b356772b-358e-4455-a0b8-64a9fe25afa6/1768333496675_abd_mazin_muhsin_sg.stl",
+    "scan_date": "2026-01-13T19:46:21.610501+00:00",
+    "created_at": "2026-01-13T19:46:21.610501+00:00"
+  },
+  {
+    "id": "dc4c4787-4c0a-48c7-b7ef-596c5e363360",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137101_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:35.231+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "e1662ca3-e57a-43db-b163-06c107d29433",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137119_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:46.561+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "69bb44de-ea12-4e2f-84e8-3d8d95ca7d57",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:31.165+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "d1870291-834c-4592-b653-ad039e5569d4",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137163_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:58.169+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "11a90ef1-dd57-4dee-8e94-f3a2d1283d1a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137185_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:41.135+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "b2140fc6-3ab2-4b6d-9191-71f7ca05efb3",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:37.049+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "c8452d53-1551-43a9-a75e-06aedd8d34b5",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338700_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338700_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338700_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T11:56:00.172+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "c7fb9bc8-b78a-4627-9982-bfd73f512c38",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338719_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338719_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338719_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T11:56:18.299+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "83983950-2bb2-4dfb-92c9-924330369e43",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338737_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338737_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338737_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T11:56:11.948+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "d245e46b-7d3f-4549-ba13-9bb269920061",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338769_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338769_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338769_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T11:56:20.763+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "69b12390-c583-45e1-8fc6-0a738a76c258",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T11:55:50.923+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "93e0f065-1f54-4a2b-8afa-95d6c97a6ad9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T11:55:57.236+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "44a28593-32a7-4e67-a955-5de46f8de1a9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320759_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320759_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320759_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T19:42:58.676+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "93f50118-a2c3-42c5-b321-d03dafc2fbc3",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320773_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320773_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320773_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T19:42:55.613+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "71f77ca2-15f3-4db9-89d8-af0193afd1e4",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320789_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320789_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320789_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T19:42:51.472+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "b2e9195b-61af-45b6-9e75-ad61c8282f8b",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320812_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320812_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320812_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T19:43:01.287+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "8c83be9e-fc81-49b3-b127-22cae2f38578",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:42:15.381+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "155a6243-7f7a-437a-bc59-09c047da9a77",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:42:28.329+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "229878ab-5bb1-4837-b085-00e5aa6927dd",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333495923_hashim_ridha_ahmed_sg.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "scan_date": "2026-01-13T19:45:50.755+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "345063c3-0fb2-4281-81dc-f626d5b80c95",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496021_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496021_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496021_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T19:45:18.213+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "c0be1e56-9e59-4030-8e58-46a9d42636da",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496037_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496037_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496037_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:56.561+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "dbb4fcc7-94da-4f9c-9d3c-2d81162b517a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496050_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496050_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496050_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T19:45:34.482+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "c6681bc6-5cad-4570-b3eb-241ed3abe3e9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496065_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496065_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496065_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T19:45:49.443+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "88e01e55-973d-4822-945d-ba313d014655",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:45:08.118+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "325427af-9633-452d-8eb4-6f040d71a542",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:45:28.661+00:00",
+    "created_at": "2026-01-14T14:55:09.057032+00:00"
+  },
+  {
+    "id": "1e0f279c-5bf9-464c-a36a-8c316317c199",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137101_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137101_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:35.231+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "cf72dcc1-3364-49b8-9e69-913069f83c2a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137119_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137119_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:46.561+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "b43697a0-f52b-4100-a189-3d909b25e25f",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137131_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:31.165+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "e53c6488-934f-4077-87b2-3fe1bd46ff47",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137163_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137163_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:58.169+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "fa6d964e-00df-4955-9b0b-439a31467a9d",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137185_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137185_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:41.135+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "f2ccab8b-e2c2-40d8-a56f-86d858eb00a8",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768299137196_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:37.049+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "f5ee3471-6c40-47cd-a44d-a22acea14023",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338700_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338700_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338700_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T11:56:00.172+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "cbcf19c3-7c91-4853-b589-1d3cae8ec2a9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338719_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338719_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338719_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T11:56:18.299+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "278d4b94-ab78-4d6b-aa0e-941074fceb0a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338737_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338737_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338737_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T11:56:11.948+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "f4a88eaf-c316-4b6e-8ccc-f4eb19771059",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338769_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338769_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338769_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T11:56:20.763+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "84f885e9-51c6-45c9-897f-97851534330a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338784_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T11:55:50.923+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "174edfab-302e-47cf-a7fc-9eb9e1a06341",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768305338795_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T11:55:57.236+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "0b3a1827-e41e-4721-9748-22e7bdc59684",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320759_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320759_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320759_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T19:42:58.676+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "f0ef74f9-a12d-438f-989e-8b51dd6a28a5",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320773_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320773_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320773_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T19:42:55.613+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "18f3b90b-e1ad-416c-bd9b-aa9db51a06f9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320789_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320789_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320789_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T19:42:51.472+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "a0ce5386-7bf6-4657-b05f-0eced296a0e9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320812_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320812_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320812_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T19:43:01.287+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "4cd4528b-5d30-4d5e-8031-2b1f5fceb4d9",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320832_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:42:15.381+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "d87759d4-0252-4ae4-b822-0eb430de70de",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333320849_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:42:28.329+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "2f2d6ab7-acef-479c-bb87-838a252c617a",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333495923_hashim_ridha_ahmed_sg.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333495923_hashim_ridha_ahmed_sg.stl",
+    "scan_date": "2026-01-13T19:45:50.755+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "8a963ac5-7104-45f8-b1b3-fc3a0badb362",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496021_142026-hashmia_haider-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496021_142026-hashmia_haider-mandibular.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496021_142026-hashmia_haider-mandibular.ply",
+    "scan_date": "2026-01-13T19:45:18.213+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "d2ae8f22-3bd4-465b-bf12-0359fcdcca18",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496037_142026-hashmia_haider-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496037_142026-hashmia_haider-mandibular.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496037_142026-hashmia_haider-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:56.561+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "640b8be2-46dc-45bc-a329-4b668a17f329",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496050_142026-hashmia_haider-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496050_142026-hashmia_haider-maxillary.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496050_142026-hashmia_haider-maxillary.ply",
+    "scan_date": "2026-01-13T19:45:34.482+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "7d91523c-0de5-4b74-b139-44f53cec12fe",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496065_142026-hashmia_haider-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496065_142026-hashmia_haider-maxillary.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496065_142026-hashmia_haider-maxillary.stl",
+    "scan_date": "2026-01-13T19:45:49.443+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "2bdcf839-e703-4e73-a9c1-f1cf41c27302",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496082_142026-hashmia_haider-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:45:08.118+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "f5af4679-8a3d-4838-b319-0a1f32475237",
+    "patient_id": "17727721-c091-4f33-98d7-df53417f5484",
+    "file_name": "1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/17727721-c091-4f33-98d7-df53417f5484/1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "file_path": "17727721-c091-4f33-98d7-df53417f5484/1768333496090_142026-hashmia_haider-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:45:28.661+00:00",
+    "created_at": "2026-01-14T14:55:09.237907+00:00"
+  },
+  {
+    "id": "38f79ed7-84d5-4119-ac09-fe9abb876e51",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296677605_172026-saad ali-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad%20ali-maxillary_scanbody.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad ali-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T09:31:30.464+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "c58182c8-04dd-4570-abe4-9ca2f7641258",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296677690_172026-saad ali-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad%20ali-maxillary.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad ali-maxillary.stl",
+    "scan_date": "2026-01-13T09:31:27.539+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "bf7e1686-1783-48bb-aa9a-c247f228bff1",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296678696_172026-saad ali-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad%20ali-occlusionfirst.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad ali-occlusionfirst.stl",
+    "scan_date": "2026-01-13T09:31:32.442+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "f6a30fc5-9515-4911-8be2-2f3a3c5ec2d8",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296678793_172026-saad ali-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad%20ali-maxillary.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad ali-maxillary.ply",
+    "scan_date": "2026-01-13T09:31:33.675+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "f3650f57-9725-4c30-8b0b-265ce45d07b6",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296679921_172026-saad ali-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad%20ali-mandibular.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad ali-mandibular.stl",
+    "scan_date": "2026-01-13T09:31:34.587+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "053df03c-8149-4f4f-9924-01caefc771f3",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296679947_172026-saad ali-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad%20ali-mandibular.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad ali-mandibular.ply",
+    "scan_date": "2026-01-13T09:31:32.82+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "15ac4f0a-c99e-4a79-9f45-d57919084a16",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296680050_172026-saad ali-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad%20ali-maxillary_scanbody.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad ali-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T09:31:32.549+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "94876eb4-b6a3-4e7f-86f7-d6d597e14f2f",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296680200_172026-saad ali-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad%20ali-occlusionfirst.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad ali-occlusionfirst.ply",
+    "scan_date": "2026-01-13T09:31:28.531+00:00",
+    "created_at": "2026-01-14T15:16:07.31891+00:00"
+  },
+  {
+    "id": "b834f993-3a8e-4480-853e-d650e8e0aece",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296677605_172026-saad ali-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad%20ali-maxillary_scanbody.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677605_172026-saad ali-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T09:31:30.464+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "ccd7a03d-24d5-4430-854f-cbd604f31946",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296677690_172026-saad ali-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad%20ali-maxillary.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296677690_172026-saad ali-maxillary.stl",
+    "scan_date": "2026-01-13T09:31:27.539+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "f5660d91-5546-4204-ba4b-37ee5a1360cb",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296678696_172026-saad ali-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad%20ali-occlusionfirst.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678696_172026-saad ali-occlusionfirst.stl",
+    "scan_date": "2026-01-13T09:31:32.442+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "36d5e5c5-c719-4460-b112-1247bda18048",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296678793_172026-saad ali-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad%20ali-maxillary.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296678793_172026-saad ali-maxillary.ply",
+    "scan_date": "2026-01-13T09:31:33.675+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "652c70fc-5ae4-42cc-b5c3-ab958b7bb32b",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296679921_172026-saad ali-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad%20ali-mandibular.stl",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679921_172026-saad ali-mandibular.stl",
+    "scan_date": "2026-01-13T09:31:34.587+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "2950a0ff-4ce2-407b-bccb-4b0c1b856366",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296679947_172026-saad ali-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad%20ali-mandibular.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296679947_172026-saad ali-mandibular.ply",
+    "scan_date": "2026-01-13T09:31:32.82+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "2042fcbd-94b5-47cb-bbd8-135eaecde505",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296680050_172026-saad ali-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad%20ali-maxillary_scanbody.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680050_172026-saad ali-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T09:31:32.549+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "a6ef8038-d7ce-478b-9f29-14ae6ae48cb9",
+    "patient_id": "967ffc6f-2422-4ede-8606-74a139f685cb",
+    "file_name": "1768296680200_172026-saad ali-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad%20ali-occlusionfirst.ply",
+    "file_path": "967ffc6f-2422-4ede-8606-74a139f685cb/1768296680200_172026-saad ali-occlusionfirst.ply",
+    "scan_date": "2026-01-13T09:31:28.531+00:00",
+    "created_at": "2026-01-14T15:16:07.866868+00:00"
+  },
+  {
+    "id": "17fc074a-c24b-477c-8dcb-222da32c931c",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:15.734+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "3eed7155-5e4b-4760-b5ce-c8ee59906297",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:17.084+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "a107f1d7-162e-4164-ab57-d010267ad4c7",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:19.083+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "9ae5b7e0-38ba-4665-b092-00a2e0b63d87",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:21.341+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "745ae5a0-d639-4fdf-a0e8-68f045458d96",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:22.505+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "a732a619-a57f-4d00-b016-2303f7ca30e0",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:23.908+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "ed21e98f-ee51-4e54-b5fa-3147dea19763",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:25.546+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "eefcce3c-f260-4318-b02b-aac9915983d2",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:26.703+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "ba6658a2-606d-44bd-adfc-7ad44e246f9b",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:27.892+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "f1f51cec-3d7f-48fe-9d33-85aa6383b0f4",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:29.787+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "5cd78776-1c05-45b2-b9ee-df5f6e1b0a72",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:31.473+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "ff0ca8a3-4651-4ecb-b835-5cb0cbb9c0ff",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:33.17+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "28c2ba28-8f76-44db-bb98-8fb2f3d0e172",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:34.507+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "5a609586-392d-4eeb-86d5-cf18adcad6a5",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:37.058+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "b541ee77-ecd2-43a3-9b3e-6d86f7b90b74",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:38.205+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "1fa04e0b-d697-46b0-828f-c61d928f57cf",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:39.658+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "5b938360-d57e-4f19-84da-f96c17e09f48",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:40.969+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "715248ba-2405-4723-960c-9bd9a2dbfd1c",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:42.759+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "106e9f22-0b7f-4103-8f58-9b8f81bc6603",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:43.933+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "23b68184-5eeb-4dc1-8381-02def5b2da96",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:46.333+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "c0ba88b4-35d8-40af-9a24-70ddb4ff38f4",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:47.651+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "c7116078-e558-4ee0-ae7f-b72969beeafb",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:48.897+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "408b82e7-ed2c-4e4d-8e25-e13b8d985966",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:50.048+00:00",
+    "created_at": "2026-01-14T16:06:18.519985+00:00"
+  },
+  {
+    "id": "ee830082-9300-4151-a14f-6f90ca39b5e6",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768299136503_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:15.734+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "fe301113-005f-438e-b095-4d9a148beb66",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768299136518_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:17.084+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "78f7cbda-cff8-4a49-b594-324374423072",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768299136536_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:19.083+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "a257c11f-ffde-4c44-8664-0c6b209ef286",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768299136551_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:21.341+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "16c8abba-d77e-4082-b48f-aca02fa4a8aa",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768299136563_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:22.505+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "b8b24c73-d0cb-4363-b1b3-7d5a35d891a0",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768299136572_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:23.908+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "4e1c9936-160d-490f-a439-5fda8e25d822",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768305338059_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:25.546+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "46e36c08-e063-447b-bf14-0e934db46ae8",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768305338082_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:26.703+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "b4d6cb2b-8301-4b09-bd86-689f9c425383",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768305338098_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:27.892+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "3dadae28-09ca-4f26-a1b9-5868290e5390",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768305338113_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:29.787+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "4ae84b63-2bca-4216-aa68-bed600cb028e",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768305338123_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:31.473+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "4d2762d2-cc00-4e76-af16-c59e24414e3b",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768305338136_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:33.17+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "607d7d24-23ae-4f52-bcf6-959ab321af75",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768333319905_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:34.507+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "4439ee8e-87b8-447d-b3df-319aa0c5058c",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768333319942_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:37.058+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "79ecb8ad-46a2-4fe8-87ae-8a0156cee3d8",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768333319955_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:38.205+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "870fe828-8da2-4b7a-9893-80a1fbe76cca",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768333319968_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:39.658+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "3b526638-e84e-4b48-b9fb-b74ca1a544f6",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768333320005_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:40.969+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "b3f550bc-a12c-432d-8fd1-debfc037abd0",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "file_path": "1766070590632ztiea/1768333496715_1102026-zynab_ihssan-mandibular.ply",
+    "scan_date": "2026-01-14T14:13:42.759+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "e5a219f4-208c-4fe2-9161-88cd470e6119",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "file_path": "1766070590632ztiea/1768333496725_1102026-zynab_ihssan-maxillary.ply",
+    "scan_date": "2026-01-14T14:13:43.933+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "c14ca55a-65c8-4fc3-b277-5f8029b9dac2",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "file_path": "1766070590632ztiea/1768333496737_1102026-zynab_ihssan-mandibular.stl",
+    "scan_date": "2026-01-14T14:13:46.333+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "e621cb04-d1d8-4fb9-a1ca-341087937f45",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "file_path": "1766070590632ztiea/1768333496747_1102026-zynab_ihssan-occlusionfirst.ply",
+    "scan_date": "2026-01-14T14:13:47.651+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "eddb11f3-74f7-401c-b062-d9946ebb0513",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "file_path": "1766070590632ztiea/1768333496755_1102026-zynab_ihssan-occlusionfirst.stl",
+    "scan_date": "2026-01-14T14:13:48.897+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "fb994748-872c-4f0a-a741-27362b153b29",
+    "patient_id": "1766070590632ztiea",
+    "file_name": "1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1766070590632ztiea/1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "file_path": "1766070590632ztiea/1768333496765_1102026-zynab_ihssan-maxillary.stl",
+    "scan_date": "2026-01-14T14:13:50.048+00:00",
+    "created_at": "2026-01-14T16:06:18.652063+00:00"
+  },
+  {
+    "id": "7bbc4551-62ee-4072-b939-69b1fed603a4",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136637_1112026-asraa_mohamed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136637_1112026-asraa_mohamed-mandibular.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136637_1112026-asraa_mohamed-mandibular.ply",
+    "scan_date": "2026-01-13T10:12:34.767+00:00",
+    "created_at": "2026-01-13T10:12:34.767+00:00"
+  },
+  {
+    "id": "31e6432f-24aa-41d8-97c1-b4cf8a57f61c",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136648_1112026-asraa_mohamed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136648_1112026-asraa_mohamed-mandibular.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136648_1112026-asraa_mohamed-mandibular.stl",
+    "scan_date": "2026-01-13T10:12:42.514+00:00",
+    "created_at": "2026-01-13T10:12:42.514+00:00"
+  },
+  {
+    "id": "54b58d1f-4cfb-43b0-9fb9-447c9248a83a",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136661_1112026-asraa_mohamed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136661_1112026-asraa_mohamed-maxillary.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136661_1112026-asraa_mohamed-maxillary.ply",
+    "scan_date": "2026-01-13T10:12:41.707+00:00",
+    "created_at": "2026-01-13T10:12:41.707+00:00"
+  },
+  {
+    "id": "a971b556-46ab-47ff-883a-22e796a0f023",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136683_1112026-asraa_mohamed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136683_1112026-asraa_mohamed-maxillary.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136683_1112026-asraa_mohamed-maxillary.stl",
+    "scan_date": "2026-01-13T10:12:49.035+00:00",
+    "created_at": "2026-01-13T10:12:49.035+00:00"
+  },
+  {
+    "id": "3c57ef54-e5a5-43bd-a6c6-4b9b0c0c4f4c",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136691_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136691_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136691_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T10:12:25.361+00:00",
+    "created_at": "2026-01-13T10:12:25.361+00:00"
+  },
+  {
+    "id": "513fd89b-0767-4166-8bea-9ea0d66c9a73",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136698_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136698_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136698_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T10:12:27.944+00:00",
+    "created_at": "2026-01-13T10:12:27.944+00:00"
+  },
+  {
+    "id": "3a296baf-ec3e-4388-86d4-4d2793812f89",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136705_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136705_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136705_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T10:12:23.502+00:00",
+    "created_at": "2026-01-13T10:12:23.502+00:00"
+  },
+  {
+    "id": "d0c1a910-2dc8-416d-af01-71555785d6b2",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768299136713_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136713_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768299136713_1112026-asraa_mohamed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T10:12:28.473+00:00",
+    "created_at": "2026-01-13T10:12:28.473+00:00"
+  },
+  {
+    "id": "8eced05e-5e9c-4e49-9f3e-33b5d75c3f0e",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338342_1112026-asraa_mohamed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338342_1112026-asraa_mohamed-mandibular.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338342_1112026-asraa_mohamed-mandibular.ply",
+    "scan_date": "2026-01-13T11:55:57.077+00:00",
+    "created_at": "2026-01-13T11:55:57.077+00:00"
+  },
+  {
+    "id": "7112c3ef-733d-448e-b361-90c8bf1e6b99",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338356_1112026-asraa_mohamed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338356_1112026-asraa_mohamed-mandibular.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338356_1112026-asraa_mohamed-mandibular.stl",
+    "scan_date": "2026-01-13T11:56:02.937+00:00",
+    "created_at": "2026-01-13T11:56:02.937+00:00"
+  },
+  {
+    "id": "bc51427b-de3a-4b57-9e4a-e4589aced65c",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338370_1112026-asraa_mohamed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338370_1112026-asraa_mohamed-maxillary.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338370_1112026-asraa_mohamed-maxillary.ply",
+    "scan_date": "2026-01-13T11:56:00.319+00:00",
+    "created_at": "2026-01-13T11:56:00.319+00:00"
+  },
+  {
+    "id": "830eb9b1-6197-4c44-8005-387a651ca921",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338394_1112026-asraa_mohamed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338394_1112026-asraa_mohamed-maxillary.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338394_1112026-asraa_mohamed-maxillary.stl",
+    "scan_date": "2026-01-13T11:56:09.912+00:00",
+    "created_at": "2026-01-13T11:56:09.912+00:00"
+  },
+  {
+    "id": "a62a0b11-07dc-484f-8f73-0e48c140634a",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338403_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338403_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338403_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T11:55:47.071+00:00",
+    "created_at": "2026-01-13T11:55:47.071+00:00"
+  },
+  {
+    "id": "f8b90b5c-a214-4510-b6d5-24d7ffe9f4d6",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338412_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338412_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338412_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T11:55:48.776+00:00",
+    "created_at": "2026-01-13T11:55:48.776+00:00"
+  },
+  {
+    "id": "ff604a87-b71e-4008-bfdd-395201e5eea3",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338425_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338425_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338425_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T11:55:45.238+00:00",
+    "created_at": "2026-01-13T11:55:45.238+00:00"
+  },
+  {
+    "id": "243f018a-0467-4d31-9861-cf9d7788737d",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768305338435_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338435_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768305338435_1112026-asraa_mohamed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T11:55:53.425+00:00",
+    "created_at": "2026-01-13T11:55:53.425+00:00"
+  },
+  {
+    "id": "2b8ac124-974c-4002-b54c-ec35ea7f2bcd",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319756_1112026-asraa_mohamed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319756_1112026-asraa_mohamed-mandibular.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319756_1112026-asraa_mohamed-mandibular.ply",
+    "scan_date": "2026-01-13T19:42:03.703+00:00",
+    "created_at": "2026-01-13T19:42:03.703+00:00"
+  },
+  {
+    "id": "2976e2ca-9964-409a-9f04-101c023641f5",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319842_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319842_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319842_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T19:42:24.108+00:00",
+    "created_at": "2026-01-13T19:42:24.108+00:00"
+  },
+  {
+    "id": "5426c3f7-95ed-4e00-9247-377b31fc7f16",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496288_1112026-asraa_mohamed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496288_1112026-asraa_mohamed-mandibular.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496288_1112026-asraa_mohamed-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:51.825+00:00",
+    "created_at": "2026-01-13T19:45:51.825+00:00"
+  },
+  {
+    "id": "ed947f51-9c9e-42f4-a410-7c17cde96ac9",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496346_1112026-asraa_mohamed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496346_1112026-asraa_mohamed-maxillary.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496346_1112026-asraa_mohamed-maxillary.ply",
+    "scan_date": "2026-01-13T19:46:15.161+00:00",
+    "created_at": "2026-01-13T19:46:15.161+00:00"
+  },
+  {
+    "id": "c31ea5b7-4712-408f-aad9-b9d738e09d02",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319773_1112026-asraa_mohamed-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319773_1112026-asraa_mohamed-maxillary.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319773_1112026-asraa_mohamed-maxillary.ply",
+    "scan_date": "2026-01-13T19:42:29.892+00:00",
+    "created_at": "2026-01-13T19:42:29.892+00:00"
+  },
+  {
+    "id": "7ef26d12-dd99-4742-a93b-fb3b53e08a51",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319856_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319856_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319856_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:42:11.592+00:00",
+    "created_at": "2026-01-13T19:42:11.592+00:00"
+  },
+  {
+    "id": "70168d3f-d5e6-4c52-b839-77232cc8f5a7",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496298_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496298_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496298_1112026-asraa_mohamed-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T19:46:12.385+00:00",
+    "created_at": "2026-01-13T19:46:12.385+00:00"
+  },
+  {
+    "id": "fcb9ba66-deba-4cb0-aa45-afd928566b55",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319792_1112026-asraa_mohamed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319792_1112026-asraa_mohamed-maxillary.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319792_1112026-asraa_mohamed-maxillary.stl",
+    "scan_date": "2026-01-13T19:42:18.044+00:00",
+    "created_at": "2026-01-13T19:42:18.044+00:00"
+  },
+  {
+    "id": "b63c483b-3a76-47e9-ac3a-b73186dce468",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319866_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319866_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319866_1112026-asraa_mohamed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:42:21.836+00:00",
+    "created_at": "2026-01-13T19:42:21.836+00:00"
+  },
+  {
+    "id": "1de3e381-2fcd-4ba3-9f97-892e2fa7fdf0",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496309_1112026-asraa_mohamed-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496309_1112026-asraa_mohamed-maxillary.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496309_1112026-asraa_mohamed-maxillary.stl",
+    "scan_date": "2026-01-13T19:46:17.07+00:00",
+    "created_at": "2026-01-13T19:46:17.07+00:00"
+  },
+  {
+    "id": "07e99efd-a940-4782-9ba7-240c795c14a7",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319807_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319807_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319807_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T19:42:05.952+00:00",
+    "created_at": "2026-01-13T19:42:05.952+00:00"
+  },
+  {
+    "id": "944400d0-f558-43ca-8075-e6867b663580",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496268_1112026-asraa_mohamed-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496268_1112026-asraa_mohamed-mandibular.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496268_1112026-asraa_mohamed-mandibular.ply",
+    "scan_date": "2026-01-13T19:46:12.498+00:00",
+    "created_at": "2026-01-13T19:46:12.498+00:00"
+  },
+  {
+    "id": "9333d755-4974-4104-b9f6-912e306331c1",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496324_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496324_1112026-asraa_mohamed-occlusionfirst.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496324_1112026-asraa_mohamed-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:46:07.269+00:00",
+    "created_at": "2026-01-13T19:46:07.269+00:00"
+  },
+  {
+    "id": "9de4da31-0662-4be7-acb5-aa5ea51cd961",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333319823_1112026-asraa_mohamed-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319823_1112026-asraa_mohamed-mandibular.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333319823_1112026-asraa_mohamed-mandibular.stl",
+    "scan_date": "2026-01-13T19:42:17.912+00:00",
+    "created_at": "2026-01-13T19:42:17.912+00:00"
+  },
+  {
+    "id": "9ef68664-de43-4606-86a7-3a56da405bc0",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496277_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496277_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496277_1112026-asraa_mohamed-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T19:46:06.012+00:00",
+    "created_at": "2026-01-13T19:46:06.012+00:00"
+  },
+  {
+    "id": "d1c844ee-c3b2-4a1c-a230-e90e6b160eb4",
+    "patient_id": "e14339a2-622d-47fc-b7e6-5ae486e6855a",
+    "file_name": "1768333496335_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496335_1112026-asraa_mohamed-occlusionfirst.stl",
+    "file_path": "e14339a2-622d-47fc-b7e6-5ae486e6855a/1768333496335_1112026-asraa_mohamed-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:46:12.86+00:00",
+    "created_at": "2026-01-13T19:46:12.86+00:00"
+  },
+  {
+    "id": "284b6d4a-aa9c-4b10-bebf-73bf66d9dca9",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "file_path": "1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "scan_date": "2026-01-13T19:45:55.795+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "26bf15fe-fcc2-4e14-be1e-d5807498f087",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "file_path": "1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "scan_date": "2026-01-13T19:46:06.899+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "3ac07a0a-58f1-402d-a757-e21c02b3a40d",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "file_path": "1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "scan_date": "2026-01-13T19:46:08.413+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "aaeecde3-8d74-43d8-ba5f-61cf6b42e126",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "file_path": "1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T19:45:08.587+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "2e1c259c-eac5-44d5-bbd2-6f30be076d26",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "file_path": "1765287230804j4b2m/1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T19:45:13.849+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "70fd2276-8890-4b17-9c22-7aa07d49a658",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "file_path": "1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:45:02.769+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "7b61bdca-8f14-400d-b9df-d0afc8ed0a1a",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "file_path": "1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:45:55.546+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "5bb08e9c-4342-42dd-8b7c-61000ba8ed28",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "file_path": "1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:46.382+00:00",
+    "created_at": "2026-01-14T18:41:01.328659+00:00"
+  },
+  {
+    "id": "120919ad-721a-449c-a645-41c220707e16",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "file_path": "1765287230804j4b2m/1768333495572_12242025-intazar_rahi-mandibular.ply",
+    "scan_date": "2026-01-13T19:45:55.795+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "80fc92d9-4401-493e-8a8c-5e60e70eaa42",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "file_path": "1765287230804j4b2m/1768333495638_12242025-intazar_rahi-maxillary.ply",
+    "scan_date": "2026-01-13T19:46:06.899+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "667fae8b-6a11-4088-b983-64afc288ed05",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "file_path": "1765287230804j4b2m/1768333495661_12242025-intazar_rahi-maxillary.stl",
+    "scan_date": "2026-01-13T19:46:08.413+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "261ce9bc-2553-4cd5-a3ed-68669711f99f",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "file_path": "1765287230804j4b2m/1768333495672_12242025-intazar_rahi-maxillary_scanbody.ply",
+    "scan_date": "2026-01-13T19:45:08.587+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "5285b93f-8838-48bd-aa41-0d788c3117c2",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "file_path": "1765287230804j4b2m/1768333495682_12242025-intazar_rahi-maxillary_scanbody.stl",
+    "scan_date": "2026-01-13T19:45:13.849+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "146076bd-2bb5-4f02-8b7b-be606f101cd5",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "file_path": "1765287230804j4b2m/1768333495691_12242025-intazar_rahi-occlusionfirst.ply",
+    "scan_date": "2026-01-13T19:45:02.769+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "f22f685f-7216-4b77-bcfb-8884bb8b68bb",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "file_path": "1765287230804j4b2m/1768333495702_12242025-intazar_rahi-occlusionfirst.stl",
+    "scan_date": "2026-01-13T19:45:55.546+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  },
+  {
+    "id": "6557098f-a9e5-44a6-b1af-a755f33ebfd6",
+    "patient_id": "1765287230804j4b2m",
+    "file_name": "1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "file_url": "https://rwbovdtcnrkslrgdjzth.supabase.co/storage/v1/object/public/scans/1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "file_path": "1765287230804j4b2m/1768333495718_12242025-intazar_rahi-mandibular.stl",
+    "scan_date": "2026-01-13T19:45:46.382+00:00",
+    "created_at": "2026-01-14T18:41:01.375927+00:00"
+  }
+]

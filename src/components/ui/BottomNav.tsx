@@ -18,7 +18,7 @@ export function BottomNav() {
   }).length;
 
   const allNavItems = [
-    { icon: Home, label: 'الرئيسية', path: '/dashboard', permission: null },
+    { icon: Home, label: 'الرئيسية', path: '/dashboard', permission: 'view_dashboard' as const },
     { icon: Calendar, label: 'المواعيد', path: '/appointments', permission: 'view_appointments' as const },
     { icon: Timer, label: 'الانتظار', path: '/waiting-room', permission: null, badge: activeWaitingCount },
     { icon: Users, label: 'المرضى', path: '/patients', permission: 'view_patients' as const },

@@ -30,7 +30,7 @@ const FinancialManagement = lazy(() => import('./pages/FinancialManagement').the
 
 function AppContent() {
   const { error, clearError } = useClinic();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, currentUser } = useAuth();
   
   if (!isAuthenticated) {
     return <Login />;
@@ -40,8 +40,8 @@ function AppContent() {
     <Router>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={currentUser?.permissions?.view_dashboard !== false ? <Navigate to="/dashboard" replace /> : <Navigate to="/appointments" replace />} />
+          <Route path="/dashboard" element={currentUser?.permissions?.view_dashboard !== false ? <Dashboard /> : <Navigate to="/appointments" replace />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/patients" element={<Patients />} />
           <Route path="/patients/:id" element={<PatientProfile />} />
@@ -58,7 +58,7 @@ function AppContent() {
           <Route path="/settings/display" element={<DisplayCustomization />} />
           <Route path="/settings/assistant-assignment" element={<AssistantAssignment />} />
           <Route path="/settings/finance" element={<FinancialManagement />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="*" element={currentUser?.permissions?.view_dashboard !== false ? <Navigate to="/dashboard" replace /> : <Navigate to="/appointments" replace />} />
         </Routes>
       </Suspense>
       <NotificationPrompt />

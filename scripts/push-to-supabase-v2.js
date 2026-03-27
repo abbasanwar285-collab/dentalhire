@@ -43,9 +43,14 @@ async function pushData() {
             id: p.id,
             name: p.name,
             phone: p.phone,
+            email: p.email,
+            date_of_birth: p.date_of_birth,
             age: p.age,
+            blood_type: p.blood_type,
+            allergies: p.allergies,
             medical_history: p.medical_history,
             general_notes: p.general_notes,
+            last_visit: p.last_visit,
             treatment_plans: JSON.parse(p.treatment_plans || '[]')
         });
         if (error) console.error(`Error migrating patient ${p.name}:`, error.message);

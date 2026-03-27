@@ -1,0 +1,92 @@
+id,name,type,quantity,unit,min_stock,expiry_date,price,supplier,last_restocked,image_url,image_thumbnail,image,notes,auto_decrement,consumption_rate,created_at,updated_at
+05bc1f69-25cf-4a3e-8d9f-904937c5dbd3,SHOFU BEAUTIFIL Flowable,Restorative,11,,5,2028-04-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:39.689+00,2026-01-30 22:49:26.064674+00
+0c16650a-ca90-4122-84ed-ead084737c71,Gutta-percha F4,Endodontic,1,,5,2024-02-08,0,,,,,,,false,1,2026-01-12 12:45:50.045+00,2026-01-30 22:49:26.064674+00
+0c416f5e-964b-468a-89b1-6b3719f63697,G-aenial Anterior A02 Composite,Restorative,1,,1,2026-06-08,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:33.511+00,2026-01-30 22:49:26.064674+00
+0e270fe2-83f5-4613-82c5-a6f1636810b6,"Manual File 10 length 31 ",Endodontic,33,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:36.983+00,2026-01-30 22:49:26.064674+00
+0f3dc39c-d2d8-44ff-873c-72d7d00a5071,Black Nitrile Examination Gloves,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:31.575+00,2026-01-30 22:49:26.064674+00
+0fd58c80-6b79-418b-823b-c855f56be3cd,Bisco  Veneer Cement (Light Cured),Restorative,1,,1,2026-10-08,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:46.564+00,2026-01-30 22:49:26.064674+00
+11c4b562-80a2-4775-8470-ca38ce5089ed,"Manual File 8 length 25 ",Endodontic,1,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:54.809+00,2026-01-30 22:49:26.064674+00
+149d30f5-bc50-49f0-8626-7d3a2a2a2f95,"guttapercha F1 ",Endodontic,10,,5,2025-02-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:46:03.429+00,2026-01-30 22:49:26.064674+00
+1803cfa3-b061-464c-8082-9cf965b88766," TOTAL C-RAM self-adhesive resin cement ",Restorative,1,,1,2026-05-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:34.308+00,2026-01-30 22:49:26.064674+00
+22604c28-fa13-4328-8545-b02f30a28631,Paperpoints F3,Endodontic,1,,5,2028-08-08,0,,,,,,,false,1,2026-01-12 12:45:57.169+00,2026-01-30 22:49:26.064674+00
+249e7a35-5eb6-4e5d-8d4c-39cd45a6d397,Dental Tweezers / College Pliers,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:31.149+00,2026-01-30 22:49:26.064674+00
+2913c1f3-deb3-40ab-860d-392fd0da6aa2,G-ænial POSTERIOR  Composite,Restorative,7,,5,2028-02-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:46:05.043+00,2026-01-30 22:49:26.064674+00
+29405bdd-eea8-4fc0-8a80-57e00b0bb225,Manual File 6 length 31,Endodontic,4,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:39.308+00,2026-01-30 22:49:26.064674+00
+2952a65c-db4f-462a-8a36-dd706cbef471,"Rotary File 20 taper 4 length 31 ",Endodontic,11,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:58.731+00,2026-01-30 22:49:26.064674+00
+2d047cb1-067f-4f97-8618-4099d5e14e90,Rotary File 15 taper 3 length 25,Endodontic,16,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:55.603+00,2026-01-30 22:49:26.064674+00
+2d9e8987-31fd-4052-80a2-aa438a13b35f,Rotary File 25 taper 6,Endodontic,18,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:34.685+00,2026-01-30 22:49:26.064674+00
+2e66637a-997c-4369-8ab7-cb0c4f89d5b7,"Bond brush green ",Restorative,2,,1,2028-12-13,0,,,,,,,false,1,2026-01-12 12:45:51.295+00,2026-01-30 22:49:26.064674+00
+3106271d-0b55-4db6-8ef8-684f71f839e5,"Rotary file 25 taper 4 ",Endodontic,10,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:57.957+00,2026-01-30 22:49:26.064674+00
+323b00e8-24a2-4959-85f4-86e15526b21a,"G-ænial ANTERIOR JE composite ",Restorative,1,,5,2027-12-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:52.857+00,2026-01-30 22:49:26.064674+00
+33651560-543c-4904-80b6-94c130c3d63b,"Manual File large sizes ",Endodontic,2,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:46:04.634+00,2026-01-30 22:49:26.064674+00
+34144236-2178-4f50-8145-d913e5fd6af9,"Rotary file 30 taper 6 length 25 ",Endodontic,4,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:59.912+00,2026-01-30 22:49:26.064674+00
+3702269c-dacf-44eb-8836-99a5aa5d7d9e,Dental Bonding Well / Mixing Cup,Restorative,1,,1,,0,,,,,,AI Confidence: 70%,false,1,2026-01-12 12:45:30.393+00,2026-01-30 22:49:26.064674+00
+3835c2a8-e663-4283-8802-0df4523d91b6," Articulating Paper",Restorative,10,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:52.446+00,2026-01-30 22:49:26.064674+00
+3cd2be3d-c467-4a58-8503-7d42b9906519,"Surgical blade 15 ",Restorative,1,,5,2028-05-08,0,,,,,,,false,1,2026-01-12 12:45:52.063+00,2026-01-30 22:49:26.064674+00
+3e7df6f2-9834-4568-8717-328e6e3922db,BISCO Z-PRIME plus Zirconia - Alumina - Metal Primer 2 ml,Restorative,1,,1,2027-09-11,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:46:02.652+00,2026-01-30 22:49:26.064674+00
+3ecc8177-0341-4baa-8321-5532c421e2c1,"Surgical blade 12 ",Restorative,2,,5,2025-03-08,0,,,,,,,false,1,2026-01-12 12:45:32.738+00,2026-01-30 22:49:26.064674+00
+409eb332-8566-40f2-8257-45c85e3f9f23,"Bond brush white ",Restorative,4,,1,2028-12-13,0,,,,,,,false,1,2026-01-12 12:45:48.889+00,2026-01-30 22:49:26.064674+00
+414eaf93-b50e-47d1-8862-3a8cce55d9bf,"Rotary File 20 taper 4 length 25 ",Endodontic,5,,5,2026-12-22,0,,,,,,,false,1,2026-01-12 12:46:01.099+00,2026-01-30 22:49:26.064674+00
+44ac0d7e-f427-4354-8643-c51cac6887bb,"Manual flexible file 10 length 25 ",Endodontic,15,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:36.609+00,2026-01-30 22:49:26.064674+00
+47340ccc-5957-4c2a-8813-b797a61442b8,"G-aenial Anterior A2 composite ",Restorative,1,,1,2026-10-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:53.234+00,2026-01-30 22:49:26.064674+00
+48984f79-7f6c-4194-8b21-507656d857ae,G-aenial ANTERIOR A1 composite,Restorative,1,,1,2026-05-08,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:33.121+00,2026-01-30 22:49:26.064674+00
+4c8dc4dc-6248-436e-8a12-82868ac659c8,"Manual File 20 length 31 ",Endodontic,6,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:35.464+00,2026-01-30 22:49:26.064674+00
+4d88379f-a529-435a-8051-8616ddb796c7,RES Dental Implants,Restorative,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:40.831+00,2026-01-30 22:49:26.064674+00
+4f138350-8c19-4ed1-84ad-10131d60e8f0,Manual File protaper F3 length 31,Endodontic,1,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:45:59.51+00,2026-01-30 22:49:26.064674+00
+57ef3cd5-c605-4a6d-8188-99133cfc2f76,"Bond brush yellow ",Restorative,4,,2,2028-12-13,0,,,,,,,false,1,2026-01-12 12:45:37.375+00,2026-01-30 22:49:26.064674+00
+5dcb9ef5-c6a4-4ade-815c-4ca05d479c4f,Manual File 10 length 25,Endodontic,33,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:59.126+00,2026-01-30 22:49:26.064674+00
+5ef135f8-983e-4b2a-822c-b18b56efcacc,"Rubber dam medium ",Restorative,11,,5,2027-01-08,0,,,,,,,false,1,2026-01-12 12:46:06.235+00,2026-01-30 22:49:26.064674+00
+655fc650-c457-4fd5-826d-802d95e575ae,Dental Rotary Disc/Saw Blade Ø10 NO2,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:41.602+00,2026-01-30 22:49:26.064674+00
+68168a63-7fff-4b32-8940-67e62a5f750b,"Rubber dam medium ",Restorative,11,,5,2027-01-08,0,,,,,,,false,1,2026-01-12 12:46:06.631+00,2026-01-30 22:49:26.064674+00
+690784fe-21e9-4775-8a06-140b399f7e09,ALL-BOND UNIVERSAL Adhesive,Restorative,2,,1,,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:47.714+00,2026-01-30 22:49:26.064674+00
+6b48485a-53c3-490f-8088-ad14816191da,Paper points 25 taper 6,Endodontic,8,,5,2028-02-08,0,,,,,,,false,1,2026-01-12 12:45:54.426+00,2026-01-30 22:49:26.064674+00
+6d4ccd17-86da-4d33-831f-881009eda0c1,TOR M Metallic Contoured Matrices with Locking Fixation Device - Large,Restorative,1,,5,,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:44.644+00,2026-01-30 22:49:26.064674+00
+6da81fd5-cb38-4de5-8a70-54f57019b8a2,"Bond brush purple ",Restorative,2,,2,2026-12-13,0,,,,,,,false,1,2026-01-12 12:45:36.228+00,2026-01-30 22:49:26.064674+00
+780c84bf-f391-44ed-801d-fe5e0f1b889d,"Manual File 8 length 31 ",Endodontic,12,,5,2028-12-22,0,,,,,,,false,1,2026-01-12 12:45:50.899+00,2026-01-30 22:49:26.064674+00
+7a1dbc68-d632-491b-83f1-96281a035e77,Gutta-percha F3,Endodontic,1,,5,2027-04-08,0,,,,,,,false,1,2026-01-12 12:45:35.072+00,2026-01-30 22:49:26.064674+00
+7b20497a-8d8a-4c06-8111-7b0e6062b73e,GC Essentia M Dentin Composite,Restorative,2,,5,2026-04-08,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:35.849+00,2026-01-30 22:49:26.064674+00
+7e83cdc1-1b11-422a-8124-a75c89d03cd5,"Manual File 25 length 31 ",Endodontic,1,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:45.028+00,2026-01-30 22:49:26.064674+00
+803d18f5-5360-4a4a-8024-7018f9eb0cf6,"Manual File 8 length 31 ",Endodontic,11,,5,2028-12-22,0,,,,,,,false,1,2026-01-12 12:45:48.109+00,2026-01-30 22:49:26.064674+00
+80c88036-9edf-4b76-8a7d-a329055edddd,Surgical blade 15,General instrument,1,,2,2028-04-08,0,,,,,,,false,1,2026-01-12 12:45:47.339+00,2026-01-30 22:49:26.064674+00
+80ffad1f-d67f-41dc-87de-35579f1ff2e8,Paperpoints 25 taper 4,Endodontic,3,,5,2028-11-08,0,,,,,,,false,1,2026-01-12 12:45:50.435+00,2026-01-30 22:49:26.064674+00
+8628e22c-b3bc-4090-8db4-252072800df5,Face mask,Restorative,5,,3,2026-12-15,0,,,,,,,false,1,2026-01-12 12:45:51.678+00,2026-01-30 22:49:26.064674+00
+8af295bb-d8ae-411e-82be-f8ce3738ea54,Manual File 15 length 31,Endodontic,9,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:46:01.497+00,2026-01-30 22:49:26.064674+00
+8b2a9bd3-781d-4f69-835d-8176113296b9,"Rotary protaper file kit ",Endodontic,1,,5,2027-12-22,0,,,,,,"موجود كت قديم وناقص S1 ",false,1,2026-01-12 12:46:00.702+00,2026-01-30 22:49:26.064674+00
+8d396525-ca59-4996-848f-c3a73261df5b,Gutta-percha 25 taper 6,Endodontic,7,,5,2028-08-08,0,,,,,,,false,1,2026-01-12 12:46:05.431+00,2026-01-30 22:49:26.064674+00
+8eaeb41d-590b-4915-87c4-d0578ac1ea37,Rotary File 15 taper 3 length 31,Endodontic,1,,5,2026-12-22,0,,,,,,,false,1,2026-01-12 12:45:40.059+00,2026-01-30 22:49:26.064674+00
+973de8b0-8094-4bda-800b-88d762f7e466,Paper points 30 taper 6,Endodontic,3,,5,2027-05-08,0,,,,,,,false,1,2026-01-12 12:45:38.137+00,2026-01-30 22:49:26.064674+00
+99b91522-6735-4396-8609-f4e5a9d69f4e,Disposable Face Mask,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:31.962+00,2026-01-30 22:49:26.064674+00
+9d96bfcb-701c-462a-807f-de8e254800e6,Gutta-percha F3,Endodontic,1,,5,2027-04-08,0,,,,,,,false,1,2026-01-12 12:45:37.758+00,2026-01-30 22:49:26.064674+00
+9e6e26aa-fe64-4701-8598-67b4bb00b2a4,"Manual File orifice opener ",Endodontic,1,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:46:04.239+00,2026-01-30 22:49:26.064674+00
+a23c69de-1b89-4b50-86d2-78aba53abb7f,Dental Handpieces/Tools,General instrument,3,,5,,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:29.997+00,2026-01-30 22:49:26.064674+00
+a2a3661d-7049-4c8d-88da-544eb799e4c5,PALFIQUE LX5 Composite A1,Restorative,1,,5,2026-03-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:49.275+00,2026-01-30 22:49:26.064674+00
+a4bb8474-4b70-448d-88a8-560667785271,"Rotary file Orifice opener ",Endodontic,14,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:46:05.829+00,2026-01-30 22:49:26.064674+00
+a6579055-b5f1-4928-81fe-89afb2fa4ea6,"Manual File protaper F2 length 25 ",Endodontic,1,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:46:03.844+00,2026-01-30 22:49:26.064674+00
+ab905bfd-3e46-44af-82b0-2f12c60b608a,3M Filtek Z350 XT Flowable Restorative A2 A,Restorative,0,,1,,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:29.143+00,2026-01-30 22:49:26.064674+00
+abd39c47-7540-42f7-8aea-a962ff6764ce,Gutta-percha 25 taper 4,Endodontic,3,,5,2027-10-08,0,,,,,,,false,1,2026-01-12 12:45:55.991+00,2026-01-30 22:49:26.064674+00
+b91a14c4-f8d4-462a-8026-3ad4598172e2,"Manual File 20 length 25 ",Endodontic,11,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:55.209+00,2026-01-30 22:49:26.064674+00
+bdb0006f-0d77-4502-8d92-4b0f2019eedc,"Carpol ",General instrument,13,,5,2027-01-08,0,,,,,,,false,1,2026-01-12 12:46:07.023+00,2026-01-30 22:49:26.064674+00
+be9cb182-0116-4ae1-87ac-3bda8123658c,Manual File protaper F3 length 25,Endodontic,2,,5,2026-12-23,0,,,,,,,false,1,2026-01-12 12:45:56.787+00,2026-01-30 22:49:26.064674+00
+c058ea20-c08f-487a-89de-6f6e78e47158,Dental Probe / Explorer,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:30.764+00,2026-01-30 22:49:26.064674+00
+c594c2f6-b842-4996-8bec-bcd934e10618,Paper Points Pro Taper F4/F5,Endodontic,1,,5,2028-12-08,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:49.662+00,2026-01-30 22:49:26.064674+00
+c9d04029-7d65-42ee-8e61-1d55ee56e668,Dental Magnifying Loupes,General instrument,1,,5,,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:32.333+00,2026-01-30 22:49:26.064674+00
+cb07987e-c8cd-4852-8fbd-128f811595cc,PALFIQUE LX5 SW,Restorative,1,,5,2026-09-08,0,,,,,,AI Confidence: 90%,false,1,2026-01-12 12:45:53.618+00,2026-01-30 22:49:26.064674+00
+cb52e754-8b81-4848-873b-0a61f4269b5c,Gutta-percha F4,Endodontic,2,,5,2024-02-08,0,,,,,,,false,1,2026-01-12 12:45:45.399+00,2026-01-30 22:49:26.064674+00
+cc845b6f-25eb-4484-8d80-a4b3b49fc4dd,Rotary File 30 taper 4 length 25,Endodontic,6,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:56.389+00,2026-01-30 22:49:26.064674+00
+d40fa5ed-c2e9-4769-84a5-b7abdf9cbadf,Surgical suture 0003,Restorative,1,,5,2029-12-31,0,,,,,,,false,1,2026-01-12 12:46:03.038+00,2026-01-30 22:49:26.064674+00
+d698903e-89d0-4a09-89d7-152d93930883,"Manual File protaper F2 length 31 ",Endodontic,2,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:46:01.879+00,2026-01-30 22:49:26.064674+00
+ddfac6d3-6ac8-48e9-8828-5e946a0d93f3,"Manual File 25 length 25 ",Endodontic,4,,5,2026-12-22,0,,,,,,,false,1,2026-01-12 12:45:38.926+00,2026-01-30 22:49:26.064674+00
+dfa1507e-4508-44ce-8933-e86eb2326ee8,Kerr Sealapex™ ROOT CANAL SEALER CATALYST,Restorative,1,,5,2026-05-31,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:40.444+00,2026-01-30 22:49:26.064674+00
+e0922de4-5506-4a38-8bf2-91bfd575ed3b,G-ænial ANTERIOR AE Composite,Restorative,1,,1,2024-08-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:45.778+00,2026-01-30 22:49:26.064674+00
+e167e62c-34fc-4752-875b-69b17570cffd,GuttaPercha 30 taper 6,Endodontic,6,,5,2027-04-08,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:33.904+00,2026-01-30 22:49:26.064674+00
+e17f9ccf-569d-4f07-8049-a4a8d4a6afc2,"Manual File 15 length 25 ",Endodontic,13,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:46:02.272+00,2026-01-30 22:49:26.064674+00
+e31e3f2a-4387-45f7-87b1-de32a90a4081,Kerr Sealapex™ CANAL SEALER BASE,Restorative,0,,5,2026-05-31,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:44.271+00,2026-01-30 22:49:26.064674+00
+e414d2cc-3d54-449e-8545-248f4cdd97a2,Manual File 6 length 25,Endodontic,2,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:58.352+00,2026-01-30 22:49:26.064674+00
+e5ef0513-ee17-44ea-840c-d2fd05d53229,"Bond brush orange ",Restorative,1,,1,2028-12-13,0,,,,,,,false,1,2026-01-12 12:45:48.495+00,2026-01-30 22:49:26.064674+00
+e8d02ca8-bd2e-41f4-8452-3476e0f47198,Charisma A2 Composite,Restorative,1,,1,2026-02-10,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:43.878+00,2026-01-30 22:49:26.064674+00
+ea44bf51-1ac1-4cbf-809d-ba7751acecae,3M Bulk Fill anterior Flowable Restorative A1,Restorative,1,,1,2027-06-08,0,,,,,,AI Confidence: 100%,false,1,2026-01-12 12:45:53.998+00,2026-01-30 22:49:26.064674+00
+f117246b-583e-4e9c-82ef-371e5d5a2c9f,Paperpoints 30 taper 4,Endodontic,1,,5,2027-05-08,0,,,,,,,false,1,2026-01-12 12:45:38.537+00,2026-01-30 22:49:26.064674+00
+f6d78b2a-6661-4f01-84c1-3c03345caa47,"Manual H file 10 length 25 ",Endodontic,3,,5,2027-12-23,0,,,,,,,false,1,2026-01-12 12:46:00.315+00,2026-01-30 22:49:26.064674+00
+f7221227-7e29-47f4-816a-aed8cfbd3b25,"Manual File 20 length 25 ",Endodontic,11,,5,2027-12-22,0,,,,,,,false,1,2026-01-12 12:45:57.564+00,2026-01-30 22:49:26.064674+00
+fa56707e-281d-4948-8438-bcc9837bf770,Surgical blade 12,General instrument,3,,2,2025-03-08,0,,,,,,,false,1,2026-01-12 12:45:46.945+00,2026-01-30 22:49:26.064674+00
+fd7d1807-142d-40fe-82dd-3dac41def514,"Essentia LE anterior Composite Restorative ",Restorative,1,,1,2025-11-08,0,,,,,,AI Confidence: 95%,false,1,2026-01-12 12:45:46.17+00,2026-01-30 22:49:26.064674+00

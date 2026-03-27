@@ -213,6 +213,7 @@ export interface UserPermissions {
   delete_patients: boolean;
   view_appointments: boolean;
   edit_appointments: boolean;
+  view_dashboard: boolean; // New Permission
   view_treatment_plans: boolean;
   edit_treatment_plans: boolean;
   view_prices: boolean;
@@ -263,6 +264,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     delete_patients: true,
     view_appointments: true,
     edit_appointments: true,
+    view_dashboard: true,
     view_treatment_plans: true,
     edit_treatment_plans: true,
     view_prices: true,
@@ -283,6 +285,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     delete_patients: true,
     view_appointments: true,
     edit_appointments: true,
+    view_dashboard: true,
     view_treatment_plans: true,
     edit_treatment_plans: true,
     view_prices: true,
@@ -303,6 +306,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     delete_patients: false,
     view_appointments: true,
     edit_appointments: true,
+    view_dashboard: true,
     view_treatment_plans: true,
     edit_treatment_plans: false,
     view_prices: false,
@@ -323,6 +327,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     delete_patients: false,
     view_appointments: true,
     edit_appointments: false,
+    view_dashboard: true,
     view_treatment_plans: true,
     edit_treatment_plans: false,
     view_prices: true,

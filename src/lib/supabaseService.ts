@@ -58,7 +58,8 @@ const buildTreatmentPlansFromOldPatient = (row: any, v2Plans: any[]): any[] => {
           cost: Number(proc.price || proc.amount || saved.cost) || 0, // Fallback to saved JSON cost!
           doctorId: proc.doctorId || proc.doctor_id || saved.doctorId || '',
           toothNumber: proc.tooth || proc.toothNumber || saved.toothNumber || 0,
-          notes: proc.notes || saved.notes || ''
+          notes: proc.notes || saved.notes || '',
+          xrayImages: proc.xrayImages || saved.xrayImages || [],
         };
       }),
       payments: pays.map((pay: any) => ({
@@ -69,7 +70,20 @@ const buildTreatmentPlansFromOldPatient = (row: any, v2Plans: any[]): any[] => {
         doctorId: pay.doctorId || pay.doctor_id || ''
       })),
       steps: savedGeneral?.steps || [],
-      notes: row.diagnosis || row.notes || savedGeneral?.notes || ''
+      notes: row.diagnosis || row.notes || savedGeneral?.notes || '',
+      attachments: (() => {
+        const existingUrls = new Set((savedGeneral?.attachments || []).map((a: any) => a.url));
+        const legacyAttachments = procs.flatMap((p: any) => {
+          const imgs = p.xrayImages || [];
+          return imgs.filter((url: string) => !existingUrls.has(url)).map((url: string, idx: number) => ({
+            id: `leg-${p.id || idx}-${Math.random().toString(36).substr(2, 5)}`,
+            name: `صورة سابقة ${p.tooth || p.toothNumber ? '(سن '+ (p.tooth || p.toothNumber) + ')' : ''}`,
+            type: url.startsWith('data:image/png') ? 'image/png' : 'image/jpeg',
+            url: url
+          }));
+        });
+        return [...(savedGeneral?.attachments || []), ...legacyAttachments];
+      })()
     });
   }
 
@@ -171,6 +185,7 @@ const extractOldFieldsFromPlans = (plans: any[]) => {
       tooth: t.toothNumber,
       notes: t.notes || '',
       doctorId: t.doctorId || '',
+      xrayImages: t.xrayImages || [],
     }));
     payments = (generalPlan.payments || []).map((p: any) => ({
       id: p.id,

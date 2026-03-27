@@ -29,7 +29,9 @@ export function PWAInstallPrompt() {
 
     // Detect OS & Browser
     const ua = window.navigator.userAgent.toLowerCase();
-    const iosDevice = /ipad|iphone|ipod/.test(ua) && !(window as any).MSStream;
+    const isMacLike = /macintosh|mac os x/i.test(ua);
+    const isIpadOS = isMacLike && navigator.maxTouchPoints && navigator.maxTouchPoints > 2;
+    const iosDevice = (/ipad|iphone|ipod/.test(ua) || isIpadOS) && !(window as any).MSStream;
     setIsIOS(iosDevice);
     
     // Detect In-App Browsers

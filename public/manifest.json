@@ -6,29 +6,23 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#0d9488",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "dir": "rtl",
   "lang": "ar",
   "categories": ["medical", "health", "productivity"],
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/128/3467/3467831.png",
-      "sizes": "128x128",
-      "type": "image/png",
+      "src": "/photo_2026-03-28_17-12-04.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
       "purpose": "any"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/256/3467/3467831.png",
-      "sizes": "256x256",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3467/3467831.png",
+      "src": "/photo_2026-03-28_17-12-04.jpg",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/jpeg",
+      "purpose": "any"
     }
   ],
   "screenshots": [],

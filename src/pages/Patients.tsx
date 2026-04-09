@@ -32,7 +32,7 @@ type FilterOption = 'all' | 'debtors' | 'completed' | 'orthodontics' | 'implants
 
 export function Patients() {
   const navigate = useNavigate();
-  const { patients, appointments, addPatient, arrivalRecords, displayPreferences } = useClinic();
+  const { patients, appointments, addPatient, arrivalRecords, displayPreferences, isLoading } = useClinic();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [inputValue, setInputValue] = useState(searchParams.get('q') || '');
@@ -317,7 +317,12 @@ export function Patients() {
         )}
 
         {/* Patients List - Premium */}
-        {filteredPatients.length > 0 ? (
+        {isLoading ? (
+          <div className="glass-card py-16 flex flex-col items-center justify-center text-center px-4">
+             <div className="w-12 h-12 border-4 border-teal-200 border-t-teal-500 rounded-full animate-spin mb-4" />
+             <h3 className="text-lg font-bold text-slate-800">جاري تحميل بيانات المرضى...</h3>
+          </div>
+        ) : filteredPatients.length > 0 ? (
           <div className="glass-card overflow-hidden divide-y divide-slate-100">
             {filteredPatients.map((patient, idx) => (
               <div key={patient.id}>

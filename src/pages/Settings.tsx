@@ -23,6 +23,8 @@ export function Settings() {
     return localStorage.getItem('theme') === 'dark' || document.documentElement.classList.contains('dark');
   });
 
+  const isSecretaryOrAssistant = currentUser?.role === 'secretary' || currentUser?.role === 'accountant';
+
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
@@ -121,6 +123,75 @@ export function Settings() {
       window.location.reload();
     }
   };
+
+  // ── Restricted Settings view for secretary/assistant roles ──
+  if (isSecretaryOrAssistant) {
+    return (
+      <Layout title="الإعدادات">
+        <div className="space-y-6">
+          {/* Profile card */}
+          <div className="glass-card p-5 flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0071E3] to-[#AF52DE] flex items-center justify-center text-white font-bold text-[22px] shadow-lg">
+              {currentUser?.displayName?.charAt(0) || 'د'}
+            </div>
+            <div className="flex-1">
+              <h2 className="font-bold text-[20px] text-apple-text">{currentUser?.displayName}</h2>
+              <p className="text-apple-text-secondary text-[14px] mt-0.5">@{currentUser?.username} · {currentUser?.role === 'secretary' ? 'سكرتارية' : 'محاسب'}</p>
+            </div>
+          </div>
+
+          {/* Salary */}
+          <div>
+            <h3 className="text-[13px] font-semibold text-apple-text-secondary uppercase mb-2 px-1">المالية</h3>
+            <div className="glass-card overflow-hidden">
+              <button
+                onClick={() => navigate('/settings/salary')}
+                className="w-full flex items-center justify-between p-3.5 transition-colors active:bg-apple-fill cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-[30px] h-[30px] rounded-[8px] bg-[#FF9500] text-white flex items-center justify-center shadow-sm">
+                    <Banknote className="w-[16px] h-[16px]" />
+                  </div>
+                  <span className="text-[16px] font-medium text-apple-text">كم راتبي هذا الشهر 💰</span>
+                </div>
+                <ChevronLeft className="w-4 h-4 text-apple-text-tertiary" />
+              </button>
+            </div>
+          </div>
+
+          {/* Dark / Light Mode */}
+          <div>
+            <h3 className="text-[13px] font-semibold text-apple-text-secondary uppercase mb-2 px-1">عام</h3>
+            <div className="glass-card overflow-hidden">
+              <button
+                onClick={toggleDarkMode}
+                className="w-full flex items-center justify-between p-3.5 transition-colors active:bg-apple-fill cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-[30px] h-[30px] rounded-[8px] bg-[#1c1c1e] text-white flex items-center justify-center shadow-sm">
+                    <Moon className="w-[16px] h-[16px]" />
+                  </div>
+                  <span className="text-[16px] font-medium text-apple-text">الوضع الليلي (Dark Mode)</span>
+                </div>
+                <div className={`w-[51px] h-[31px] rounded-full transition-colors flex items-center px-0.5 ${isDarkMode ? 'bg-[#34C759]' : 'bg-[rgba(120,120,128,0.16)]'}`}>
+                  <div className={`w-[27px] h-[27px] rounded-full bg-white shadow-[0_3px_8px_rgba(0,0,0,0.15)] transition-transform duration-300 ${isDarkMode ? '-translate-x-5' : 'translate-x-0'}`} />
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* Logout */}
+          <button
+            onClick={logout}
+            className="w-full glass-card p-3.5 flex items-center justify-center gap-2 active:bg-apple-fill transition-all active:scale-[0.99]"
+          >
+            <LogOut className="w-[16px] h-[16px] text-[#FF3B30]" />
+            <span className="text-[16px] text-[#FF3B30] font-medium">تسجيل الخروج</span>
+          </button>
+        </div>
+      </Layout>
+    );
+  }
 
   const settingsGroups = [
     {

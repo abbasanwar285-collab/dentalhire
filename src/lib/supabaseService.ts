@@ -38,7 +38,26 @@ const buildTreatmentPlansFromOldPatient = (row: any, v2Plans: any[]): any[] => {
                      (row.total_cost || 0) > 0 || savedGeneral;
   if (hasGeneral) {
     const procs = (typeof row.procedures === 'string' ? JSON.parse(row.procedures) : row.procedures) || [];
-    const pays = (typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments) || [];
+    const topPays = (typeof row.payments === 'string' ? JSON.parse(row.payments) : row.payments) || [];
+    
+    // Extract nested payments from within procedures
+    const procPays = procs.flatMap((p: any) => {
+      const innerPays = (typeof p.payments === 'string' ? JSON.parse(p.payments) : p.payments) || [];
+      return innerPays.map((pay: any) => ({
+        ...pay,
+        notes: pay.notes || `دفعة لإجراء: ${p.name || p.type}`,
+        doctorId: pay.doctorId || pay.doctor_id || p.doctorId || p.doctor_id || ''
+      }));
+    });
+    
+    // Combine and deduplicate
+    const allPaysMap = new Map();
+    [...topPays, ...procPays].forEach(p => {
+      if (p.id) allPaysMap.set(p.id, p);
+      else allPaysMap.set(generateId(), p);
+    });
+    const allPays = Array.from(allPaysMap.values());
+
     const savedTreatments = savedGeneral?.treatments || [];
     
     plans.push({
@@ -62,12 +81,13 @@ const buildTreatmentPlansFromOldPatient = (row: any, v2Plans: any[]): any[] => {
           xrayImages: proc.xrayImages || saved.xrayImages || [],
         };
       }),
-      payments: pays.map((pay: any) => ({
+      payments: allPays.map((pay: any) => ({
         id: pay.id || generateId(),
         date: pay.date || new Date().toISOString().split('T')[0],
         amount: Number(pay.amount) || 0,
         method: pay.method || 'cash',
-        doctorId: pay.doctorId || pay.doctor_id || ''
+        doctorId: pay.doctorId || pay.doctor_id || '',
+        notes: pay.notes || ''
       })),
       steps: savedGeneral?.steps || [],
       notes: row.diagnosis || row.notes || savedGeneral?.notes || '',
@@ -364,6 +384,18 @@ const mapAppointmentFromDB = (row: any): Appointment => ({
   notes: row.notes || '',
 });
 
+// Normalize frontend status values to what the DB constraint accepts.
+// The DB constraint "appointments_status_check" typically allows: scheduled, completed, cancelled.
+const normalizeAppointmentStatus = (status: string): string => {
+  const map: Record<string, string> = {
+    'scheduled': 'scheduled',
+    'completed': 'completed',
+    'cancelled': 'cancelled',
+    'pending': 'scheduled', // fallback mapping
+  };
+  return map[status] || 'scheduled';
+};
+
 const mapAppointmentToDB = (a: Appointment) => ({
   id: a.id,
   patient_id: a.patientId,
@@ -372,7 +404,7 @@ const mapAppointmentToDB = (a: Appointment) => ({
   date: a.date,
   time: a.time,
   type: a.treatment,  // Old app uses 'type' column
-  status: a.status,
+  status: normalizeAppointmentStatus(a.status),
   notes: a.notes,
 });
 
@@ -737,14 +769,17 @@ export async function fetchTreatments(): Promise<Treatment[] | null> {
       .order('name');
     if (error) {
       if (error.code === 'PGRST205' || error.code === 'PGRST116' || error.message?.includes('does not exist') || error.message?.includes('Could not find')) {
-        return [];
+        return null; // Return null so ClinicContext falls back to default initialTreatments
       }
       console.error('[Supabase] fetchTreatments:', error);
-      return [];
+      return null;
     }
-    return (data || []).map(mapTreatmentFromDB);
+    if (!data || data.length === 0) {
+      return null;
+    }
+    return data.map(mapTreatmentFromDB);
   } catch (e) {
-    return [];
+    return null;
   }
 }
 
@@ -770,5 +805,134 @@ export async function deleteTreatmentDB(id: string): Promise<void> {
 }
 
 // ═══════════════════════════════════════════
-// WAITING ROOM  (localStorage only - ephemeral)
+// WAITING ROOM & ARRIVAL RECORDS
 // ═══════════════════════════════════════════
+
+const mapWaitingRoomFromDB = (row: any): WaitingPatient => ({
+  id: row.id,
+  patientId: row.patient_id,
+  patientName: row.patient_name,
+  doctorId: row.doctor_id || undefined,
+  doctorName: row.doctor_name || undefined,
+  appointmentId: row.appointment_id || undefined,
+  arrivalTime: row.arrival_time,
+  status: row.status as 'waiting' | 'in_session' | 'done',
+  notes: row.notes || undefined,
+});
+
+const mapWaitingRoomToDB = (entry: WaitingPatient) => ({
+  id: entry.id,
+  patient_id: entry.patientId,
+  patient_name: entry.patientName,
+  doctor_id: entry.doctorId,
+  doctor_name: entry.doctorName,
+  appointment_id: entry.appointmentId,
+  arrival_time: entry.arrivalTime,
+  status: entry.status,
+  notes: entry.notes,
+});
+
+export async function fetchWaitingRoom(): Promise<WaitingPatient[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from('waiting_room')
+      .select('*')
+      .order('arrival_time', { ascending: true });
+    
+    if (error) {
+      console.error('[Supabase] fetchWaitingRoom:', error);
+      return null;
+    }
+    return data ? data.map(mapWaitingRoomFromDB) : [];
+  } catch (e) {
+    console.error('[Supabase] fetchWaitingRoom Exception:', e);
+    return null;
+  }
+}
+
+export async function addWaitingPatient(entry: WaitingPatient): Promise<void> {
+  const { error } = await supabase
+    .from('waiting_room')
+    .insert([mapWaitingRoomToDB(entry)]);
+  if (error) {
+    console.error('[Supabase] addWaitingPatient:', error);
+    throw error;
+  }
+}
+
+export async function updateWaitingPatientDB(id: string, updates: Partial<WaitingPatient>): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const payload: any = {};
+  if (updates.status !== undefined) payload.status = updates.status;
+  if (updates.doctorId !== undefined) payload.doctor_id = updates.doctorId;
+  if (updates.doctorName !== undefined) payload.doctor_name = updates.doctorName;
+  if (updates.notes !== undefined) payload.notes = updates.notes;
+
+  const { error } = await supabase
+    .from('waiting_room')
+    .update(payload)
+    .eq('id', id);
+  if (error) {
+    console.error('[Supabase] updateWaitingPatientDB:', error);
+    throw error;
+  }
+}
+
+export async function deleteWaitingPatient(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('waiting_room')
+    .delete()
+    .eq('id', id);
+  if (error) {
+    console.error('[Supabase] deleteWaitingPatient:', error);
+    throw error;
+  }
+}
+
+// -- Arrival Records --
+const mapArrivalRecordFromDB = (row: any): ArrivalRecord => ({
+  id: row.id,
+  patientId: row.patient_id,
+  appointmentId: row.appointment_id || '',
+  scheduledTime: row.scheduled_time || '',
+  scheduledDate: row.scheduled_date || '',
+  actualArrivalTime: row.actual_arrival_time,
+  differenceMinutes: row.difference_minutes,
+  createdAt: row.created_at,
+});
+
+const mapArrivalRecordToDB = (r: ArrivalRecord) => ({
+  id: r.id,
+  patient_id: r.patientId,
+  appointment_id: r.appointmentId || null,
+  scheduled_time: r.scheduledTime,
+  scheduled_date: r.scheduledDate,
+  actual_arrival_time: r.actualArrivalTime,
+  difference_minutes: r.differenceMinutes,
+});
+
+export async function fetchArrivalRecords(): Promise<ArrivalRecord[] | null> {
+  try {
+    const { data, error } = await supabase
+      .from('arrival_records')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) {
+      console.error('[Supabase] fetchArrivalRecords:', error);
+      return null;
+    }
+    return data ? data.map(mapArrivalRecordFromDB) : [];
+  } catch (e) {
+    return null;
+  }
+}
+
+export async function addArrivalRecord(record: ArrivalRecord): Promise<void> {
+  const { error } = await supabase
+    .from('arrival_records')
+    .insert([mapArrivalRecordToDB(record)]);
+  if (error) {
+    console.error('[Supabase] addArrivalRecord:', error);
+    throw error;
+  }
+}

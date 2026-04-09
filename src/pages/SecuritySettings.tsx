@@ -50,6 +50,7 @@ const PERMISSION_ITEMS: PermissionItem[] = [
   { key: 'edit_payments', label: 'تسجيل دفعات جديدة', group: 'المالية' },
   { key: 'view_indicators', label: 'الوصول لصفحة المؤشرات', group: 'النظام' },
   { key: 'view_dashboard', label: 'الوصول للشاشة الرئيسية والملخصات', group: 'النظام' },
+  { key: 'customize_dashboard', label: 'تخصيص عرض القائمة الرئيسية (الداشبورد)', group: 'النظام' },
   { key: 'view_settings', label: 'الوصول للإعدادات', group: 'النظام' },
   { key: 'purchase_supplies', label: 'شراء المستلزمات (تأكيد الشراء)', group: 'المستلزمات' },
 ];

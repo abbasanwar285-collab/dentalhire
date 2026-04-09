@@ -8,9 +8,10 @@ export function Login() {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [autoLoginInProgress, setAutoLoginInProgress] = useState(true);
   const autoLoginAttempted = useRef(false);
 
-  // Auto-login from saved credentials
+  // Auto-login from saved credentials — instant, no delay
   useEffect(() => {
     if (autoLoginAttempted.current) return;
     autoLoginAttempted.current = true;
@@ -20,22 +21,20 @@ export function Login() {
       try {
         const { username: savedUser, phone: savedPhone } = JSON.parse(savedCreds);
         if (savedUser && savedPhone) {
-          setIsLoading(true);
-          setUsername(savedUser);
-          setPhone(savedPhone);
-          setTimeout(() => {
-            const result = login(savedUser, savedPhone);
-            if (!result.success) {
-              // Credentials changed, clear saved and show form
-              localStorage.removeItem('clinic_saved_credentials');
-              setIsLoading(false);
-            }
-          }, 300);
+          const result = login(savedUser, savedPhone);
+          if (!result.success) {
+            // Credentials changed, clear saved and show form
+            localStorage.removeItem('clinic_saved_credentials');
+            setAutoLoginInProgress(false);
+          }
+          // If success, the component will unmount (isAuthenticated becomes true)
+          return;
         }
       } catch {
         localStorage.removeItem('clinic_saved_credentials');
       }
     }
+    setAutoLoginInProgress(false);
   }, [login]);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -43,14 +42,17 @@ export function Login() {
     setError('');
     setIsLoading(true);
 
-    setTimeout(() => {
-      const result = login(username, phone);
-      if (!result.success) {
-        setError(result.error || 'حدث خطأ');
-      }
-      setIsLoading(false);
-    }, 400);
+    const result = login(username, phone);
+    if (!result.success) {
+      setError(result.error || 'حدث خطأ');
+    }
+    setIsLoading(false);
   };
+
+  // While auto-login is in progress, show nothing (blank) to avoid flashing the login form
+  if (autoLoginInProgress) {
+    return null;
+  }
 
   return (
     <div

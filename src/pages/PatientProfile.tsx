@@ -450,18 +450,21 @@ export function PatientProfile() {
             {patient.treatmentPlans && patient.treatmentPlans.length > 0 ? (
               <div className="space-y-4">
                 {sortedTreatmentPlans.map((plan, idx) => {
+                  const computedTotalCost = (plan.totalCost || 0) > 0 ? plan.totalCost : (plan.treatments?.reduce((sum: number, t: any) => sum + (Number(t.cost || t.price) || 0), 0) || 0);
+                  const computedPaidAmount = (plan.paidAmount || 0) > 0 ? plan.paidAmount : (plan.payments?.reduce((sum: number, p: any) => sum + (Number(p.amount || p.payment) || 0), 0) || 0);
+
                   const canSeePrices = canViewPlanPrices(plan);
-                  const isCompleted = canSeePrices ? ((plan.paidAmount || 0) >= (plan.totalCost || 0) && (plan.totalCost || 0) > 0) : false;
+                  const isCompleted = canSeePrices ? (computedPaidAmount >= computedTotalCost && computedTotalCost > 0) : false;
                   const statusLabel = canSeePrices ? (isCompleted ? 'مكتملة' : 'قيد التنفيذ') : 'نشطة';
                   const statusBg = canSeePrices ? (isCompleted ? '#ecfdf5' : '#fffbeb') : '#f0fdf4';
                   const statusColor = canSeePrices ? (isCompleted ? '#059669' : '#d97706') : '#16a34a';
                   const progressColor = isCompleted ? '#059669' : '#d97706';
                   
                   const accent = accentColors[idx % accentColors.length];
-                          const progress = canSeePrices && (plan.totalCost || 0) > 0 ? ((plan.paidAmount || 0) / (plan.totalCost || 1)) * 100 : 0;
-                  const remaining = canSeePrices ? (plan.totalCost || 0) - (plan.paidAmount || 0) : 0;
+                  const progress = canSeePrices && computedTotalCost > 0 ? (computedPaidAmount / computedTotalCost) * 100 : 0;
+                  const remaining = canSeePrices ? computedTotalCost - computedPaidAmount : 0;
                   
-                  const toothNumbers = plan.treatments?.map(t => t.toothNumber).filter(Boolean) || [];
+                  const toothNumbers = plan.treatments?.map((t: any) => t.toothNumber).filter(Boolean) || [];
                   const planDoctorId = plan.doctorId || plan.treatments?.[0]?.doctorId;
                   const planDoctor = doctors.find(d => d.id === planDoctorId);
                   const docName = plan.doctorName || planDoctor?.name;
@@ -538,10 +541,25 @@ export function PatientProfile() {
                           </div>
                         )}
                         
+                        {/* Treatment Types List */}
+                        {!plan.orthoDetails && plan.treatments && plan.treatments.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {plan.treatments.map((t: any, tidx: number) => {
+                              const typeName = t.treatmentType || t.name || 'إجراء طبي';
+                              if (typeName === 'إجراء طبي' && plan.treatments.length === 1 && plan.name === 'علاج عام') return null; // Skip redundant defaults
+                              return (
+                                <span key={tidx} className="text-[11px] font-bold px-2 py-1.5 rounded-lg border shadow-sm" style={{ backgroundColor: '#ffffff', color: docColor, borderColor: `${docColor}30` }}>
+                                  {typeName} {t.toothNumber ? `(سن ${t.toothNumber})` : ''}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        )}
+
                         {/* Tooth Position Graphics */}
                         {!plan.orthoDetails && toothNumbers.length > 0 && (
                           <div className="flex gap-2 mb-3 overflow-x-auto hide-scrollbar pb-1">
-                            {toothNumbers.map((tooth, tIdx) => (
+                            {toothNumbers.map((tooth: number, tIdx: number) => (
                               <div key={tIdx}>
                                 <ToothPositionBadge tooth={tooth} color={docColor} />
                               </div>
@@ -562,9 +580,9 @@ export function PatientProfile() {
 
                         {canViewPlanPrices(plan) && (
                           <div className="bg-white/80 backdrop-blur-sm rounded-xl p-3 mb-3 border border-white">
-                            <div className="flex justify-between text-xs mb-2"><span className="text-emerald-600">مدفوع: <strong>{(plan.paidAmount || 0).toLocaleString()}</strong></span><span className="text-slate-600">الإجمالي: <strong>{(plan.totalCost || 0).toLocaleString()}</strong></span></div>
+                            <div className="flex justify-between text-xs mb-2"><span className="text-emerald-600">مدفوع: <strong>{computedPaidAmount.toLocaleString()}</strong></span><span className="text-slate-600">الإجمالي: <strong>{computedTotalCost.toLocaleString()}</strong></span></div>
                             <div className="h-1.5 bg-slate-200/60 rounded-full overflow-hidden"><div className="h-full rounded-full transition-all duration-500" style={{ width: `${progress}%`, backgroundColor: progressColor }} /></div>
-                            {remaining > 0 && <p className="text-xs mt-2 text-amber-600 font-medium">متبقي: {(remaining || 0).toLocaleString()} د.ع</p>}
+                            {remaining > 0 && <p className="text-xs mt-2 text-amber-600 font-medium">متبقي: {remaining.toLocaleString()} د.ع</p>}
                           </div>
                         )}
 

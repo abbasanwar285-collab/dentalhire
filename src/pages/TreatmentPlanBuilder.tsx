@@ -56,6 +56,40 @@ export function TreatmentPlanBuilder() {
 
     const isOrtho = selectedTreatmentType?.name === 'تقويم أسنان (Orthodontics)';
 
+    // Initialize data when existingPlan loads (since patients data might be async)
+    const [hasInitialized, setHasInitialized] = useState(false);
+
+    useEffect(() => {
+        if (existingPlan && !hasInitialized) {
+            setTreatments(existingPlan.treatments || []);
+            setPayments(existingPlan.payments || []);
+            setNotes(existingPlan.notes || '');
+            if (existingPlan.doctorId) setSelectedDoctorId(existingPlan.doctorId);
+            
+            const initComputedCost = (existingPlan.totalCost || 0) > 0 ? existingPlan.totalCost : (existingPlan.treatments?.reduce((sum: number, t: any) => sum + (Number(t.cost || t.price) || 0), 0) || 0);
+            setManualCost(initComputedCost ? initComputedCost.toString() : '');
+            
+            setAttachments(existingPlan.attachments || []);
+            
+            if (existingPlan.orthoDetails) {
+                setSelectedTreatmentType(toothTreatmentsList.find(t => t.name === 'تقويم أسنان (Orthodontics)') || null);
+                setTreatedJaw(existingPlan.orthoDetails.treatedJaw || 'Both');
+                setApplianceType(existingPlan.orthoDetails.applianceType || 'Fixed Metal');
+                setCaseType(existingPlan.orthoDetails.caseType || 'Non-Extraction Case');
+                setExpansion(existingPlan.orthoDetails.expansion || false);
+                setDiagnosis(existingPlan.orthoDetails.diagnosis || 'Class I');
+            } else if (existingPlan.treatments && existingPlan.treatments.length > 0) {
+                // Find the existing treatment type in our list to pre-select it
+                const firstTypeName = existingPlan.treatments[0].treatmentType;
+                // We do a loose match because the saved name might have material appended (e.g. 'Crown - Zircon')
+                const matchedType = toothTreatmentsList.find(t => firstTypeName.includes(t.name)) || toothTreatmentsList.find(t => t.name === firstTypeName);
+                if (matchedType) setSelectedTreatmentType(matchedType);
+            }
+            
+            setHasInitialized(true);
+        }
+    }, [existingPlan, hasInitialized]);
+
     // Auto-select orthodontist
     useEffect(() => {
         if (isOrtho && !existingPlan) {
@@ -66,8 +100,6 @@ export function TreatmentPlanBuilder() {
         }
     }, [isOrtho, doctors, existingPlan]);
 
-    // Modal State for Payments
-
     // Scroll to top on mount
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -76,7 +108,8 @@ export function TreatmentPlanBuilder() {
     if (!patient) return null;
 
     const totalCost = manualCost ? parseFloat(manualCost) || 0 : 0;
-    const paidAmount = payments.reduce((sum, p) => sum + p.amount, 0);
+    const computedPaidAmount = payments.reduce((sum, p) => sum + (Number(p.amount) || Number((p as any).payment) || 0), 0);
+    const paidAmount = (existingPlan?.paidAmount || 0) > 0 ? existingPlan?.paidAmount : computedPaidAmount;
     const remainingParams = totalCost - paidAmount;
 
     const handleToothClick = (tooth: number) => {
@@ -164,7 +197,7 @@ export function TreatmentPlanBuilder() {
             return;
         }
 
-        const autoPlanName = isOrtho ? 'خطة تقويم الأسنان' : (treatments[0]?.treatmentType || 'خطة علاجية');
+        const autoPlanName = isOrtho ? 'خطة تقويم الأسنان' : (existingPlan?.name || treatments[0]?.treatmentType || 'خطة علاجية');
 
         const orthoDetails: OrthoDetails | undefined = isOrtho ? {
             treatedJaw,
@@ -182,7 +215,7 @@ export function TreatmentPlanBuilder() {
             totalCost,
             paidAmount,
             status: existingPlan ? existingPlan.status : 'planned',
-            treatments: isOrtho ? [] : treatments,
+            treatments: isOrtho ? existingPlan?.treatments || [] : treatments,
             steps: existingPlan ? existingPlan.steps : [],
             payments,
             attachments,
@@ -220,7 +253,7 @@ export function TreatmentPlanBuilder() {
 
                 {/* ── Treatment Type Selector (Modal Trigger) ── */}
                 <section className="bg-apple-card rounded-2xl border-2 border-[#0071E3]/20 shadow-sm overflow-hidden animate-slide-up p-3">
-                    <label className="text-[13px] font-bold text-[#0071E3] mb-1.5 block">نوع العلاج</label>
+                    <label className="text-[13px] font-bold text-[#0071E3] mb-1.5 block">إضافة معالجة جديدة للأسنان</label>
                     <button
                         onClick={() => setIsTreatmentModalOpen(true)}
                         className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl border-1.5 transition-all text-right ${
@@ -238,7 +271,7 @@ export function TreatmentPlanBuilder() {
                                 <span className="text-[16px] font-bold">{selectedTreatmentType.name}</span>
                             </div>
                         ) : (
-                            <span className="text-[16px] font-semibold">نوع العلاج...</span>
+                            <span className="text-[16px] font-semibold">اختر المعالجة...</span>
                         )}
                         <ChevronRight className="w-5 h-5 opacity-50 rotate-90" />
                     </button>

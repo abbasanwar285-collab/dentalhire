@@ -50,8 +50,14 @@ export function PWAInstallPrompt() {
     };
     window.addEventListener('beforeinstallprompt', handler);
 
+    const installHandler = () => {
+      setIsStandalone(true); // Hide prompt immediately
+    };
+    window.addEventListener('appinstalled', installHandler);
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('appinstalled', installHandler);
       window.matchMedia('(display-mode: standalone)').removeEventListener('change', checkStandalone);
     };
   }, []);
@@ -61,7 +67,7 @@ export function PWAInstallPrompt() {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        // Assume installed, usually triggers display-mode media query
+        setIsStandalone(true);
       }
       setDeferredPrompt(null);
     }
@@ -77,8 +83,8 @@ export function PWAInstallPrompt() {
         <div className="bg-white dark:bg-[#1c1f2b] w-full max-w-[400px] rounded-3xl shadow-[0_8px_40px_rgba(0,0,0,0.2)] overflow-hidden pointer-events-auto flex flex-col animate-scale-in border border-slate-100 dark:border-white/5">
           
           <div className="p-6 pt-8 flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-[22px] bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center shadow-lg shadow-teal-500/30 mb-5 ring-4 ring-white dark:ring-[#1c1f2b] overflow-hidden">
-              <img src="https://cdn-icons-png.flaticon.com/128/3467/3467831.png" alt="App Icon" className="w-12 h-12 object-contain" />
+            <div className="w-20 h-20 rounded-[22px] flex items-center justify-center shadow-lg shadow-purple-500/30 mb-5 ring-4 ring-white dark:ring-[#1c1f2b] overflow-hidden bg-white">
+              <img src="/icon-512.png" alt="App Icon" className="w-full h-full object-cover" />
             </div>
             
             <h2 className="text-[22px] font-black text-slate-800 dark:text-white mb-2 tracking-tight">إلزامية تثبيت التطبيق</h2>

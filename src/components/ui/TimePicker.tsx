@@ -8,13 +8,13 @@ interface TimePickerProps {
     bookedTimes?: string[]; // Array of booked "HH:mm" slots
 }
 
-// Generate time slots from 09:00 to 22:00 every 30 mins
+// Generate time slots from 15:00 (3 PM) to 21:00 (9 PM) every 30 mins
 const generateTimeSlots = () => {
     const slots = [];
-    for (let hour = 9; hour <= 22; hour++) {
+    for (let hour = 15; hour <= 21; hour++) {
         for (let min of [0, 30]) {
-            // Optional: Skip 22:30
-            if (hour === 22 && min === 30) continue;
+            // End exactly at 21:00 (skip 21:30)
+            if (hour === 21 && min === 30) continue;
             
             const time24 = `${hour.toString().padStart(2, '0')}:${min.toString().padStart(2, '0')}`;
             const ampm = hour >= 12 ? 'م' : 'ص';

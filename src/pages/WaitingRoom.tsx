@@ -43,11 +43,11 @@ export function WaitingRoom() {
     return () => clearInterval(interval);
   }, []);
 
-  // Today's scheduled appointments
+  // Today's scheduled & confirmed appointments
   const todayAppointments = useMemo(() => {
-    const today = new Date();
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
     return appointments
-      .filter(a => a.status === 'scheduled' && isSameDay(parseISO(a.date), today))
+      .filter(a => (a.status === 'scheduled' || a.status === 'confirmed') && a.date === todayStr)
       .sort((a, b) => a.time.localeCompare(b.time));
   }, [appointments]);
 

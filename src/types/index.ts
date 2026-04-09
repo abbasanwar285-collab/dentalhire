@@ -191,6 +191,11 @@ export interface DisplayPreferences {
   showAppointments: boolean;
   showNotes: boolean;
   defaultPlanView: 'expanded' | 'collapsed';
+  // Dashboard
+  showDashboardStats: boolean;
+  showDashboardChart: boolean;
+  showDashboardAppointments: boolean;
+  showDashboardDoctors: boolean;
 }
 
 export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
@@ -203,6 +208,10 @@ export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
   showAppointments: true,
   showNotes: true,
   defaultPlanView: 'expanded',
+  showDashboardStats: true,
+  showDashboardChart: true,
+  showDashboardAppointments: true,
+  showDashboardDoctors: true,
 };
 
 export type UserRole = 'admin' | 'doctor' | 'secretary' | 'accountant';
@@ -227,6 +236,7 @@ export interface UserPermissions {
   view_tasks: boolean;
   manage_tasks: boolean;
   purchase_supplies: boolean;
+  customize_dashboard: boolean;
 }
 
 export interface SalaryAdjustment {
@@ -278,6 +288,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     view_tasks: true,
     manage_tasks: true,
     purchase_supplies: true,
+    customize_dashboard: true,
   },
   doctor: {
     view_patients: true,
@@ -299,6 +310,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     view_tasks: true,
     manage_tasks: true,
     purchase_supplies: true,
+    customize_dashboard: true,
   },
   secretary: {
     view_patients: true,
@@ -320,6 +332,7 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     view_tasks: true,
     manage_tasks: false,
     purchase_supplies: false,
+    customize_dashboard: false,
   },
   accountant: {
     view_patients: true,
@@ -341,5 +354,6 @@ export const DEFAULT_PERMISSIONS: Record<UserRole, UserPermissions> = {
     view_tasks: true,
     manage_tasks: false,
     purchase_supplies: false,
+    customize_dashboard: false,
   },
 };

@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Calendar, Users, Settings, PieChart, Home, Timer, ClipboardList } from 'lucide-react';
+import { Calendar, Users, Settings, PieChart, Home, Timer, ClipboardList, Package } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../context/AuthContext';
 import { useClinic } from '../../context/ClinicContext';
@@ -17,12 +17,20 @@ export function BottomNav() {
     return t.status === 'pending' && t.assignedToUserId === currentUser?.id;
   }).length;
 
+  const isSecretaryOrAssistant = currentUser?.role === 'secretary' || currentUser?.role === 'accountant';
+
   const allNavItems = [
     { icon: Home, label: 'الرئيسية', path: '/dashboard', permission: 'view_dashboard' as const },
     { icon: Calendar, label: 'المواعيد', path: '/appointments', permission: 'view_appointments' as const },
     { icon: Timer, label: 'الانتظار', path: '/waiting-room', permission: null, badge: activeWaitingCount },
     { icon: Users, label: 'المرضى', path: '/patients', permission: 'view_patients' as const },
-    { icon: PieChart, label: 'المؤشرات', path: '/indicators', permission: 'view_indicators' as const },
+    // Show Tasks + Supply Requests only for secretaries/assistants; show Indicators for others
+    ...(isSecretaryOrAssistant ? [
+      { icon: ClipboardList, label: 'المهام', path: '/tasks', permission: null, badge: pendingTaskCount },
+      { icon: Package, label: 'المستلزمات', path: '/supply-requests', permission: null, badge: 0 },
+    ] : [
+      { icon: PieChart, label: 'المؤشرات', path: '/indicators', permission: 'view_indicators' as const },
+    ]),
     { icon: Settings, label: 'الإعدادات', path: '/settings', permission: null },
   ];
 

@@ -1,18 +1,23 @@
 import { useNavigate } from 'react-router-dom';
 import { Layout } from '../components/ui/Layout';
 import { useClinic } from '../context/ClinicContext';
+import { useAuth } from '../context/AuthContext';
 import { haptic } from '../lib/haptics';
 import {
   ArrowRight, Calendar, Phone, Eye, EyeOff,
   ToggleLeft, ToggleRight, Square, Circle,
   Stethoscope, FileText, ClipboardList, StickyNote,
-  ChevronDown, ChevronUp, RotateCcw
+  ChevronDown, ChevronUp, RotateCcw, LayoutDashboard,
+  BarChart3, Activity, Users2
 } from 'lucide-react';
 import { DEFAULT_DISPLAY_PREFERENCES } from '../types';
 
 export function DisplayCustomization() {
   const navigate = useNavigate();
   const { displayPreferences, updateDisplayPreferences } = useClinic();
+  const { hasPermission } = useAuth();
+
+  const canCustomizeDashboard = hasPermission('customize_dashboard');
 
   const Toggle = ({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) => (
     <div className="flex items-center justify-between p-3.5">
@@ -126,6 +131,40 @@ export function DisplayCustomization() {
             </div>
           </div>
         </div>
+
+        {/* ── Dashboard Settings ── */}
+        {canCustomizeDashboard && (
+          <div>
+            <h3 className="text-[11px] font-bold text-slate-400 uppercase mb-2 px-1 tracking-wider">لوحة التحكم (الداشبورد)</h3>
+            <div className="glass-card overflow-hidden !rounded-2xl divide-y divide-slate-100">
+              <div className="p-3.5 flex items-center gap-2.5 bg-slate-50/50">
+                <LayoutDashboard className="w-4 h-4 text-teal-600" />
+                <span className="text-[12px] font-bold text-slate-600">تخصيص العناصر المعروضة</span>
+              </div>
+              
+              <Toggle
+                value={displayPreferences.showDashboardStats}
+                onChange={v => updateDisplayPreferences({ showDashboardStats: v })}
+                label="إظهار بطاقات الإحصائيات (المرضى، الحالات...)"
+              />
+              <Toggle
+                value={displayPreferences.showDashboardChart}
+                onChange={v => updateDisplayPreferences({ showDashboardChart: v })}
+                label="إظهار مخطط المواعيد الأسبوعي"
+              />
+              <Toggle
+                value={displayPreferences.showDashboardAppointments}
+                onChange={v => updateDisplayPreferences({ showDashboardAppointments: v })}
+                label="إظهار قائمة المواعيد القادمة"
+              />
+              <Toggle
+                value={displayPreferences.showDashboardDoctors}
+                onChange={v => updateDisplayPreferences({ showDashboardDoctors: v })}
+                label="إظهار قائمة الأطباء المتواجدين"
+              />
+            </div>
+          </div>
+        )}
 
         {/* ── Patient Profile Settings ── */}
         <div>

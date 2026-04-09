@@ -265,9 +265,6 @@ export function MySalary() {
               <div className="mb-5">
                 <div className="flex items-center justify-between text-[11px] text-slate-500 mb-1.5 font-medium">
                   <span>نمو الراتب</span>
-                  <span className="text-emerald-600 font-bold max-w-[120px] truncate text-left" dir="ltr">
-                    / {percentageTarget.toLocaleString()} د.ع
-                  </span>
                 </div>
                 <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
                   <div 

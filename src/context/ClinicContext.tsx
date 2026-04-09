@@ -10,6 +10,16 @@ import { generateId, sanitizeInput, validatePhone, validateEmail, parseJSON } fr
 import { normalizePhone } from '../lib/search';
 import { useAuth } from './AuthContext';
 import * as db from '../lib/supabaseService';
+import { supabase } from '../lib/supabaseClient';
+import toast from 'react-hot-toast';
+
+export const safeStorageSet = (key: string, value: any) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    console.warn(`[Storage Warning] Failed to save ${key} to localStorage (quota exceeded or other error). App will continue using Supabase.`, error);
+  }
+};
 
 export interface ClinicSettings {
   clinicName: string;
@@ -93,30 +103,14 @@ interface ClinicContextType {
 const ClinicContext = createContext<ClinicContextType | undefined>(undefined);
 
 export function ClinicProvider({ children }: { children: React.ReactNode }) {
-  // Initialize from localStorage with safe JSON parsing
-  const [patients, setPatients] = useState<Patient[]>(() =>
-    parseJSON(localStorage.getItem('clinic_patients'), initialPatients)
-  );
+  // Initialize states with empty arrays (except settings/treatments which have defaults)
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [treatments, setTreatments] = useState<Treatment[]>(initialTreatments);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
 
-  const [appointments, setAppointments] = useState<Appointment[]>(() =>
-    parseJSON(localStorage.getItem('clinic_appointments'), initialAppointments)
-  );
-
-  const [treatments, setTreatments] = useState<Treatment[]>(() =>
-    parseJSON(localStorage.getItem('clinic_treatments_v2'), initialTreatments)
-  );
-
-  const [doctors, setDoctors] = useState<Doctor[]>(() =>
-    parseJSON(localStorage.getItem('clinic_doctors_v2'), initialDoctors)
-  );
-
-  const [waitingRoom, setWaitingRoom] = useState<WaitingPatient[]>(() =>
-    parseJSON(localStorage.getItem('clinic_waiting_room'), [])
-  );
-
-  const [arrivalRecords, setArrivalRecords] = useState<ArrivalRecord[]>(() =>
-    parseJSON(localStorage.getItem('clinic_arrival_records'), [])
-  );
+  const [waitingRoom, setWaitingRoom] = useState<WaitingPatient[]>([]);
+  const [arrivalRecords, setArrivalRecords] = useState<ArrivalRecord[]>([]);
 
   const [clinicSettings, setClinicSettings] = useState<ClinicSettings>(() =>
     parseJSON(localStorage.getItem('clinic_settings'), DEFAULT_CLINIC_SETTINGS)
@@ -136,7 +130,9 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       db.fetchTasks(),
       db.fetchTreatments(),
       db.fetchSettings(),
-    ]).then(([patientsData, aptsData, expsData, reqsData, tasksData, treatmentsData, settingsData]) => {
+      db.fetchWaitingRoom(),
+      db.fetchArrivalRecords(),
+    ]).then(([patientsData, aptsData, expsData, reqsData, tasksData, treatmentsData, settingsData, waitingData, arrivalData]) => {
       if (!mounted) return;
       
       // Crucial: Only update state if fetch was successful (not null)
@@ -148,10 +144,12 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       if (tasksData !== null) setTasks(tasksData);
       if (treatmentsData !== null) setTreatments(treatmentsData);
       if (settingsData !== null) setClinicSettings(settingsData);
+      if (waitingData !== null) setWaitingRoom(waitingData);
+      if (arrivalData !== null) setArrivalRecords(arrivalData);
       
       // If any of the main entities failed to load, notify the user
       if (patientsData === null || aptsData === null) {
-        setError('تعذر في الاتصال بالسيرفر. يتم استخدام البيانات المحلية حالياً.');
+        setError('تعذر في الاتصال بالسيرفر. يتم عرض البيانات المتاحة حالياً.');
       }
       
       setIsLoading(false);
@@ -159,39 +157,110 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to init from Supabase:', err);
       if (mounted) {
         setIsLoading(false);
-        setError('خطأ في الاتصال بالسيرفر. يرجoy التأكد من الإنترنت.');
+        setError('خطأ في الاتصال بالسيرفر. يرجى التأكد من الإنترنت.');
       }
     });
     return () => { mounted = false; };
   }, []);
 
-  // Persist to localStorage
+  // ── Real-Time Subscriptions ──
   useEffect(() => {
-    localStorage.setItem('clinic_patients', JSON.stringify(patients));
-  }, [patients]);
+    let mounted = true;
+    const channel = supabase
+      .channel('public:appointments')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'appointments' }, (payload) => {
+        if (!mounted) return;
+        const newApt = payload.new;
+        
+        setAppointments(prev => {
+          // If the appointment is already strictly in our state (because WE created it here), ignore the event.
+          if (prev.some(a => a.id === newApt.id)) return prev;
+
+          // Notify UI
+          toast.success(`موعد جديد للمريض ${newApt.patient_name || 'غير معروف'} مع ${newApt.doctor_name || 'طبيب'}\nبميعاد ${newApt.time}`, {
+            duration: 6000,
+            icon: '📅'
+          });
+
+          // Notify System Level
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('تمت إضافة موعد جديد', {
+              body: `المريض: ${newApt.patient_name}\nالطبيب: ${newApt.doctor_name}\nالوقت: ${newApt.time}`,
+              icon: '/photo_2026-03-28_17-12-04.jpg'
+            });
+          }
+
+          // Inject into local state so Calendar flashes the new appointment instantly
+          const formatted: Appointment = {
+            id: newApt.id,
+            patientId: newApt.patient_id || '',
+            patientName: newApt.patient_name || '',
+            doctorId: newApt.doctor_id || '',
+            doctorName: newApt.doctor_name || '',
+            date: newApt.date || '',
+            time: newApt.time || '',
+            treatment: newApt.type || newApt.treatment || '',
+            status: newApt.status || 'scheduled',
+            notes: newApt.notes || '',
+          };
+          return [...prev, formatted];
+        });
+      })
+      .subscribe();
+
+    const waitingChannel = supabase
+      .channel('public:waiting_room')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'waiting_room' }, (payload) => {
+        if (!mounted) return;
+        
+        if (payload.eventType === 'INSERT') {
+          const newEntry = payload.new as any;
+          setWaitingRoom((prev: WaitingPatient[]) => {
+            if (prev.some((w: WaitingPatient) => w.id === newEntry.id)) return prev;
+            return [...prev, {
+              id: newEntry.id,
+              patientId: newEntry.patient_id,
+              patientName: newEntry.patient_name,
+              doctorId: newEntry.doctor_id || undefined,
+              doctorName: newEntry.doctor_name || undefined,
+              appointmentId: newEntry.appointment_id || undefined,
+              arrivalTime: newEntry.arrival_time,
+              status: newEntry.status,
+              notes: newEntry.notes || undefined,
+            }];
+          });
+        } else if (payload.eventType === 'UPDATE') {
+          const updatedEntry = payload.new as any;
+          setWaitingRoom((prev: WaitingPatient[]) => prev.map((w: WaitingPatient) => 
+            w.id === updatedEntry.id ? { ...w, status: updatedEntry.status, doctorId: updatedEntry.doctor_id, doctorName: updatedEntry.doctor_name, notes: updatedEntry.notes } : w
+          ));
+        } else if (payload.eventType === 'DELETE') {
+          const deletedEntry = payload.old as any;
+          setWaitingRoom((prev: WaitingPatient[]) => prev.filter((w: WaitingPatient) => w.id !== deletedEntry.id));
+        }
+      })
+      .subscribe();
+
+    return () => {
+      mounted = false;
+      supabase.removeChannel(channel);
+      supabase.removeChannel(waitingChannel);
+    };
+  }, []);
+
+  // Persist lightweight settings ONLY to prevent UI freezes
+
 
   useEffect(() => {
-    localStorage.setItem('clinic_appointments', JSON.stringify(appointments));
-  }, [appointments]);
-
-  useEffect(() => {
-    localStorage.setItem('clinic_treatments_v2', JSON.stringify(treatments));
-  }, [treatments]);
-
-  useEffect(() => {
-    localStorage.setItem('clinic_doctors_v2', JSON.stringify(doctors));
-  }, [doctors]);
-
-  useEffect(() => {
-    localStorage.setItem('clinic_waiting_room', JSON.stringify(waitingRoom));
+    safeStorageSet('clinic_waiting_room', waitingRoom);
   }, [waitingRoom]);
 
   useEffect(() => {
-    localStorage.setItem('clinic_arrival_records', JSON.stringify(arrivalRecords));
+    safeStorageSet('clinic_arrival_records', arrivalRecords);
   }, [arrivalRecords]);
 
   useEffect(() => {
-    localStorage.setItem('clinic_settings', JSON.stringify(clinicSettings));
+    safeStorageSet('clinic_settings', clinicSettings);
   }, [clinicSettings]);
 
   const [displayPreferences, setDisplayPreferences] = useState<DisplayPreferences>(() => ({
@@ -200,31 +269,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   }));
 
   useEffect(() => {
-    localStorage.setItem('clinic_display_preferences', JSON.stringify(displayPreferences));
+    safeStorageSet('clinic_display_preferences', displayPreferences);
   }, [displayPreferences]);
 
-  const [tasks, setTasks] = useState<ClinicTask[]>(() =>
-    parseJSON(localStorage.getItem('clinic_tasks'), [])
-  );
-
-  useEffect(() => {
-    localStorage.setItem('clinic_tasks', JSON.stringify(tasks));
-  }, [tasks]);
-
-  const [supplyRequests, setSupplyRequests] = useState<SupplyRequest[]>(() =>
-    parseJSON(localStorage.getItem('clinic_supply_requests'), [])
-  );
-
-  useEffect(() => {
-    localStorage.setItem('clinic_supply_requests', JSON.stringify(supplyRequests));
-  }, [supplyRequests]);
+  const [tasks, setTasks] = useState<ClinicTask[]>([]);
+  const [supplyRequests, setSupplyRequests] = useState<SupplyRequest[]>([]);
 
   const [assistantAssignments, setAssistantAssignments] = useState<AssistantDoctorAssignment[]>(() =>
     parseJSON(localStorage.getItem('clinic_assistant_assignments'), [])
   );
 
   useEffect(() => {
-    localStorage.setItem('clinic_assistant_assignments', JSON.stringify(assistantAssignments));
+    safeStorageSet('clinic_assistant_assignments', assistantAssignments);
   }, [assistantAssignments]);
 
   // ── Sync doctors from Auth users ──
@@ -525,9 +581,16 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const addToWaitingRoom = useCallback((entry: Omit<WaitingPatient, 'id'>) => {
     const newEntry: WaitingPatient = { ...entry, id: generateId() };
     setWaitingRoom((prev: WaitingPatient[]) => [...prev, newEntry]);
+    db.addWaitingPatient(newEntry).catch(err => {
+      setWaitingRoom(prev => prev.filter(w => w.id !== newEntry.id));
+      setError(`فشل إضافة المريض لصالة الانتظار: ${err.message || 'يرجى المحاولة مجدداً'}`);
+    });
   }, []);
 
   const updateWaitingStatus = useCallback((id: string, status: WaitingPatient['status']) => {
+    // Keep reference to the previous state for rollback
+    const originalEntry = waitingRoom.find(w => w.id === id);
+
     setWaitingRoom((prev: WaitingPatient[]) => {
       const entry = prev.find((w: WaitingPatient) => w.id === id);
       if (entry) {
@@ -545,9 +608,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
       return prev.map((w: WaitingPatient) => (w.id === id ? { ...w, status } : w));
     });
-  }, []);
+
+    if (originalEntry) {
+      db.updateWaitingPatientDB(id, { status }).catch(err => {
+        setWaitingRoom(prev => prev.map(w => w.id === id ? originalEntry : w));
+        setError(`فشل تحديث حالة الانتظار: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      });
+    }
+  }, [waitingRoom]);
 
   const removeFromWaitingRoom = useCallback((id: string) => {
+    const originalEntry = waitingRoom.find(w => w.id === id);
+
     setWaitingRoom((prev: WaitingPatient[]) => {
       const entry = prev.find((w: WaitingPatient) => w.id === id);
       if (entry) {
@@ -562,9 +634,18 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
       }
       return prev.filter((w: WaitingPatient) => w.id !== id);
     });
-  }, []);
+
+    db.deleteWaitingPatient(id).catch(err => {
+      if (originalEntry) {
+        setWaitingRoom(prev => [...prev, originalEntry]);
+        setError(`فشل إزالة المريض: ${err.message || 'يرجى المحاولة مجدداً'}`);
+      }
+    });
+  }, [waitingRoom]);
 
   const clearWaitingRoom = useCallback(() => {
+    // To clear the waiting room, ideally we'd delete all from DB, 
+    // but typically we don't clear the whole waiting room remotely for everyone unless intended.
     setWaitingRoom([]);
   }, []);
 
@@ -572,6 +653,11 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   const recordPatientArrival = useCallback((recordData: Omit<ArrivalRecord, 'id'>) => {
     const newRecord: ArrivalRecord = { ...recordData, id: generateId() };
     setArrivalRecords((prev: ArrivalRecord[]) => [...prev, newRecord]);
+    db.addArrivalRecord(newRecord).catch(err => {
+      // rollback not strictly necessary for arrival records, but let's do it for consistency
+      setArrivalRecords(prev => prev.filter(r => r.id !== newRecord.id));
+      console.error('Failed to save arrival record:', err);
+    });
   }, []);
 
   // ── Clinic Settings ──
@@ -745,13 +831,7 @@ export function ClinicProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // ── Clinic Expenses ──
-  const [clinicExpenses, setClinicExpenses] = useState<ClinicExpense[]>(() =>
-    parseJSON(localStorage.getItem('clinic_expenses'), [])
-  );
-
-  useEffect(() => {
-    localStorage.setItem('clinic_expenses', JSON.stringify(clinicExpenses));
-  }, [clinicExpenses]);
+  const [clinicExpenses, setClinicExpenses] = useState<ClinicExpense[]>([]);
 
   const addExpense = useCallback((data: Omit<ClinicExpense, 'id'>) => {
     const newExpense: ClinicExpense = { ...data, id: generateId() };

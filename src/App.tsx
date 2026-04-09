@@ -5,9 +5,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LoadingSpinner } from './components/ui/LoadingSpinner';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { BottomNav } from './components/ui/BottomNav';
-import { PWAInstallPrompt } from './components/ui/PWAInstallPrompt';
 import { NotificationPrompt } from './components/ui/NotificationPrompt';
 import { ErrorToast } from './components/ui/ErrorToast';
+import { Toaster } from 'react-hot-toast';
 import { Login } from './pages/Login';
 import { useClinic } from './context/ClinicContext';
 
@@ -40,7 +40,7 @@ function AppContent() {
     <Router>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-          <Route path="/" element={currentUser?.permissions?.view_dashboard !== false ? <Navigate to="/dashboard" replace /> : <Navigate to="/appointments" replace />} />
+          <Route path="/" element={<Navigate to="/patients" replace />} />
           <Route path="/dashboard" element={currentUser?.permissions?.view_dashboard !== false ? <Dashboard /> : <Navigate to="/appointments" replace />} />
           <Route path="/appointments" element={<Appointments />} />
           <Route path="/patients" element={<Patients />} />
@@ -58,11 +58,12 @@ function AppContent() {
           <Route path="/settings/display" element={<DisplayCustomization />} />
           <Route path="/settings/assistant-assignment" element={<AssistantAssignment />} />
           <Route path="/settings/finance" element={<FinancialManagement />} />
-          <Route path="*" element={currentUser?.permissions?.view_dashboard !== false ? <Navigate to="/dashboard" replace /> : <Navigate to="/appointments" replace />} />
+          <Route path="*" element={<Navigate to="/patients" replace />} />
         </Routes>
       </Suspense>
       <NotificationPrompt />
       <ErrorToast message={error} onClear={clearError} />
+      <Toaster position="top-center" toastOptions={{ duration: 4000, style: { background: '#334155', color: '#fff', fontSize: '14px', borderRadius: '16px', fontWeight: 'bold' } }} />
       <BottomNav />
     </Router>
   );
@@ -83,7 +84,6 @@ export default function App() {
       <AuthProvider>
         <ClinicProvider>
           <AppContent />
-          <PWAInstallPrompt />
         </ClinicProvider>
       </AuthProvider>
     </ErrorBoundary>
